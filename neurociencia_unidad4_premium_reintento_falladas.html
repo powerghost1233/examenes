@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neurociencia Unidad 4 Premium | DAVID MILÁN STUDIO</title>
+<style>
+:root{--bg:#05070d;--bg2:#0b1323;--gold:#d4af37;--gold2:#f3d98b;--white:#f8f4e8;--muted:#aab3c5;--green:#33d17a;--red:#ff6b6b;--blue:#4da3ff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;font-family:'Segoe UI',Arial,sans-serif;background:radial-gradient(circle at top left,rgba(212,175,55,.22),transparent 34%),radial-gradient(circle at bottom right,rgba(30,90,180,.28),transparent 38%),linear-gradient(135deg,var(--bg),var(--bg2),#05070d);color:var(--white);display:flex;justify-content:center;align-items:center;padding:35px 18px}
+.quiz-container{width:100%;max-width:980px;background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.035));border:1px solid rgba(212,175,55,.28);border-radius:30px;padding:34px;box-shadow:0 30px 90px rgba(0,0,0,.45);backdrop-filter:blur(18px)}
+.brand{display:inline-block;padding:10px 18px;border-radius:999px;border:1px solid rgba(212,175,55,.45);color:var(--gold2);letter-spacing:3px;font-weight:800;font-size:13px;margin-bottom:18px;background:rgba(255,255,255,.04)}
+h1{font-size:clamp(30px,5vw,54px);line-height:1;margin-bottom:10px;letter-spacing:-1px;background:linear-gradient(90deg,#fff,var(--gold2));-webkit-background-clip:text;color:transparent}
+h2{font-size:17px;color:var(--muted);font-weight:400;margin-bottom:26px}
+.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:24px}
+.stat{padding:12px 16px;border-radius:16px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.1);color:var(--gold2);font-weight:800}
+.progress-wrap{height:10px;background:rgba(255,255,255,.09);border-radius:999px;overflow:hidden;margin-bottom:24px}
+.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:999px;transition:.35s ease}
+.question-card{background:rgba(4,8,16,.55);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:26px}
+.question{font-size:21px;font-weight:800;line-height:1.45;margin-bottom:22px}
+.options{display:grid;gap:13px}
+.option-btn{border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:16px 18px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.035));color:var(--white);font-size:16px;text-align:left;cursor:pointer;transition:.25s ease}
+.option-btn:hover:not(:disabled){transform:translateY(-2px);border-color:rgba(212,175,55,.65);box-shadow:0 12px 30px rgba(212,175,55,.12)}
+.option-btn:disabled{cursor:not-allowed;opacity:.95}
+.correct{background:rgba(51,209,122,.16)!important;border-color:var(--green)!important;color:#dfffea!important}
+.incorrect{background:rgba(255,107,107,.16)!important;border-color:var(--red)!important;color:#ffe0e0!important}
+.feedback{display:none;margin-top:22px;padding:20px;border-radius:20px;line-height:1.65;font-size:15px}
+.feedback.show{display:block}.feedback-correct{background:rgba(51,209,122,.12);border-left:5px solid var(--green)}.feedback-incorrect{background:rgba(255,107,107,.12);border-left:5px solid var(--red)}
+.feedback strong{font-size:18px}.solution-label{display:block;margin-top:12px;color:var(--gold2);font-weight:900}
+.controls{margin-top:22px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center}
+.btn{border:none;border-radius:16px;padding:14px 22px;font-weight:900;font-size:15px;cursor:pointer;transition:.25s ease}.btn:hover{transform:translateY(-2px)}
+.next-btn{display:none;background:linear-gradient(135deg,var(--gold2),var(--gold));color:#080b12}.secondary-btn{background:rgba(255,255,255,.08);color:var(--white);border:1px solid rgba(255,255,255,.14)}
+.score-container{display:none;text-align:center;padding:24px}.score-text{font-size:30px;font-weight:900;color:var(--gold2);margin-bottom:18px}.result-message{color:var(--muted);font-size:17px;line-height:1.6;margin-bottom:24px}
+.medal{display:inline-block;margin:14px 0 10px;padding:12px 18px;border-radius:999px;border:1px solid rgba(212,175,55,.45);background:rgba(212,175,55,.10);color:var(--gold2);font-weight:900}
+.missed-box{text-align:left;margin:24px 0;padding:20px;border-radius:20px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.1)}.missed-box h3{color:var(--gold2);margin-bottom:12px}.missed-box ul{padding-left:20px;color:#dbe2f2;line-height:1.6}
+.mode-label{color:var(--blue);font-weight:900}
+@media(max-width:650px){.quiz-container{padding:22px}.question-card{padding:20px}.question{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="quiz-container">
+  <div class="brand">DAVID MILÁN STUDIO</div>
+  <h1>Mega-Test Premium</h1>
+  <h2>Unidad 4 · Organización del Sistema Nervioso II</h2>
+  <div id="quiz-screen">
+    <div class="topbar">
+      <div class="stat" id="progress-text">Pregunta 1 de 80</div>
+      <div class="stat" id="score-tracker">Puntuación: 0</div>
+      <div class="stat" id="mode-text">Modo completo</div>
+    </div>
+    <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+    <div class="question-card">
+      <div class="question" id="question-text"></div>
+      <div class="options" id="options-container"></div>
+      <div id="feedback-container" class="feedback"></div>
+      <div class="controls">
+        <button class="btn secondary-btn" onclick="restartQuiz()">Reiniciar test</button>
+        <button id="next-btn" class="btn next-btn" onclick="nextQuestion()">Siguiente pregunta</button>
+      </div>
+    </div>
+  </div>
+  <div id="result-screen" class="score-container">
+    <div class="score-text" id="final-score"></div>
+    <div class="medal" id="medal-text"></div>
+    <div class="result-message" id="final-message"></div>
+    <div id="missed-summary" class="missed-box"></div>
+    <div class="controls" style="justify-content:center;">
+      <button class="btn secondary-btn" onclick="restartQuiz()">Volver a intentar todo</button>
+      <button class="btn next-btn" id="retry-missed-btn" onclick="retryMissed()">Reintentar preguntas falladas</button>
+    </div>
+  </div>
+</div>
+<script>
+const originalQuestions = [
+
+        // Diencéfalo: Hipotálamo y Tálamo
+        { q: "¿En qué área cerebral se sitúa el diencéfalo, ocupando una posición central?", o: ["En el cerebelo.", "En el tronco del encéfalo posterior.", "En el encéfalo anterior."], c: 2, e: "El diencéfalo ocupa una posición central en el encéfalo anterior." },
+        { q: "¿Qué dos estructuras conforman principalmente el diencéfalo?", o: ["Amígdala e hipocampo.", "Tálamo e hipotálamo.", "Cuerpo caudado y putamen."], c: 1, e: "El diencéfalo está formado principalmente por el tálamo y el hipotálamo." },
+        { q: "¿Aproximadamente cuántos núcleos y sistemas de fibras contiene el hipotálamo?", o: ["Unos 5 núcleos.", "Unos 22 núcleos.", "Más de 50 núcleos."], c: 1, e: "El hipotálamo contiene unos 22 núcleos y sistemas de fibras." },
+        { q: "En la base del hipotálamo, ¿qué glándula se encuentra conectada a él?", o: ["Glándula pineal.", "Amígdala.", "Hipófisis."], c: 2, e: "El hipotálamo está conectado con la hipófisis, que se encuentra en su base." },
+        { q: "¿Qué núcleos del hipotálamo son responsables de la liberación de vasopresina y oxitocina?", o: ["Núcleo ventromedial y dorsomedial.", "Núcleo supraquiasmático.", "Núcleos paraventricular y supraóptico."], c: 2, e: "El paraventricular y el supraóptico liberan vasopresina y oxitocina." },
+        { q: "El núcleo supraquiasmático del hipotálamo recibe información de la retina. ¿Cuál es su función principal?", o: ["Regular la ingesta de alimentos.", "Regular los ritmos biológicos.", "Liberar oxitocina."], c: 1, e: "El supraquiasmático recibe información de la retina y regula los ritmos biológicos." },
+        { q: "¿Qué función cumple el núcleo ventromedial del hipotálamo?", o: ["Regulación del ritmo cardíaco.", "Control de la ingesta.", "Interpretación de información visual."], c: 1, e: "El núcleo ventromedial se encarga del control de la ingesta." },
+        { q: "¿Qué porcentaje del diencéfalo constituye aproximadamente el tálamo?", o: ["El 20%.", "El 50%.", "El 80%."], c: 2, e: "El tálamo constituye aproximadamente el 80% del diencéfalo." },
+        { q: "¿Qué estructura une los dos lóbulos del tálamo a través del tercer ventrículo?", o: ["Cuerpo calloso.", "Masa intermedia.", "Lámina medular interna."], c: 1, e: "Los dos lóbulos del tálamo están unidos por la masa intermedia." },
+        { q: "¿Qué estructura divide cada lóbulo del tálamo en varias zonas formando los núcleos talámicos?", o: ["Fórnix.", "Lámina medular interna.", "Surco calcarino."], c: 1, e: "Cada lóbulo se divide en varias zonas mediante la lámina medular interna." },
+        { q: "¿De qué tipo de información se encarga el núcleo geniculado lateral del tálamo?", o: ["Información visual.", "Información auditiva.", "Información motora."], c: 0, e: "El núcleo geniculado lateral se encarga de la información visual." },
+        { q: "La información auditiva es procesada en el tálamo a través del núcleo:", o: ["Ventral posterior.", "Geniculado lateral.", "Geniculado medial."], c: 2, e: "El núcleo geniculado medial procesa la información auditiva." },
+        { q: "En el tálamo, los núcleos ventral anterior y lateral se ocupan principalmente de la información...", o: ["Somatosensorial.", "Motora.", "De emociones y memoria."], c: 1, e: "Ventral anterior y lateral: Información motora." },
+        { q: "¿De qué sistema sensorial NO actúa el tálamo como estación de relevo antes de llegar a la corteza?", o: ["Sistema visual.", "Sistema olfatorio.", "Sistema auditivo."], c: 1, e: "El tálamo actúa como estación de relevo de todos los sistemas sensoriales, excepto el olfatorio." },
+
+        // Ganglios Basales
+        { q: "¿Qué son exactamente los ganglios basales?", o: ["Haces de sustancia blanca en la médula espinal.", "Núcleos subcorticales de sustancia gris dentro de los hemisferios cerebrales.", "Ventrículos llenos de líquido cefalorraquídeo."], c: 1, e: "Los ganglios basales son núcleos subcorticales de sustancia gris situados dentro de los hemisferios cerebrales." },
+        { q: "¿Con qué función están relacionados principalmente los ganglios basales?", o: ["Control del movimiento.", "Visión en color.", "Regulación de la temperatura corporal."], c: 0, e: "Están relacionados principalmente con el control del movimiento." },
+        { q: "¿Qué dos estructuras componen el 'Neoestriado' o estriado?", o: ["Putamen y globo pálido.", "Cuerpo caudado y putamen.", "Sustancia negra y núcleo subtalámico."], c: 1, e: "Neoestriado o estriado: Cuerpo caudado y putamen." },
+        { q: "¿Qué dos estructuras forman el 'Núcleo lentiforme o lenticular'?", o: ["Cuerpo caudado y putamen.", "Putamen y globo pálido.", "Amígdala e hipocampo."], c: 1, e: "Núcleo lentiforme o lenticular: Putamen y globo pálido." },
+        { q: "¿De dónde salen las eferencias (vías de salida) principales de los ganglios basales?", o: ["Del cuerpo caudado hacia la médula espinal.", "Del globo pálido hacia el tálamo.", "Del putamen hacia la corteza frontal."], c: 1, e: "Sus eferencias salen del globo pálido hacia el tálamo." },
+        { q: "La degeneración de la sustancia negra y el déficit de dopamina es la causa patológica de:", o: ["La Enfermedad de Parkinson.", "El Síndrome de Tourette.", "La Corea de Huntington."], c: 0, e: "Parkinson: Degeneración de la sustancia negra, déficit de dopamina." },
+        { q: "¿Qué enfermedad motora está causada por la degeneración de los núcleos estriados y la disminución de GABA y ACh?", o: ["Enfermedad de Alzheimer.", "Enfermedad de Huntington.", "Esclerosis Múltiple."], c: 1, e: "Huntington: Degeneración de los núcleos estriados y corteza, disminución de GABA y ACh." },
+        { q: "Los tics motores y vocales involuntarios son característicos de una alteración en los ganglios basales conocida como:", o: ["Síndrome de Gilles de la Tourette.", "Parkinsonismo atípico.", "Corea menor."], c: 0, e: "Síndrome de Gilles de la Tourette: Tics motores y vocales involuntarios." },
+        { q: "Las patologías de los ganglios basales afectan al control de los movimientos, pero ¿qué síntoma NO provocan directamente?", o: ["Temblores.", "Parálisis.", "Movimientos involuntarios."], c: 1, e: "El deterioro de los ganglios basales afecta el control de los movimientos, pero no provoca parálisis." },
+
+        // Sistema Límbico
+        { q: "¿De dónde proviene la denominación de 'sistema límbico'?", o: ["Del latín 'limbus', que significa 'borde', por situarse alrededor del tálamo.", "Del griego 'limnos', que significa 'centro'.", "De su descubridor, el neurólogo francés Paul Limbus."], c: 0, e: "Proviene del latín limbus, 'borde', por situarse en la zona medial del encéfalo alrededor del tálamo." },
+        { q: "¿Es el sistema límbico una estructura anatómica única?", o: ["Sí, es un órgano compacto.", "No, es una red compleja de estructuras cerebrales interconectadas.", "Sí, es idéntico a la amígdala."], c: 1, e: "Aunque no constituye una estructura anatómica única, funciona como un circuito integrado." },
+        { q: "¿Qué estructura límbica actúa como puente entre la información cognitiva de la corteza prefrontal y la emocional de la amígdala/hipocampo?", o: ["La corteza cingulada.", "El cuerpo mamilar.", "El área septal."], c: 0, e: "Corteza cingulada: Forma parte de la corteza límbica y actúa como un puente entre la información cognitiva y la emocional." },
+        { q: "¿Cuáles son los tres componentes que conforman la 'formación hipocampal'?", o: ["Fórnix, amígdala y giro cingulado.", "Hipocampo, giro dentado y subículo.", "Caudado, putamen y pálido."], c: 1, e: "Formación hipocampal: Comprende el hipocampo, el giro dentado y el subículo." },
+        { q: "¿Cuál es la función esencial de la formación hipocampal?", o: ["Generar la hormona del crecimiento.", "Consolidar la memoria (de corto a largo plazo) y participar en la orientación espacial.", "Coordinar los reflejos motores de la columna."], c: 1, e: "Su función esencial es la consolidación de la memoria... Participa en la orientación espacial y la navegación." },
+        { q: "¿A través de qué estructura se conecta la formación hipocampal con el hipotálamo?", o: ["Cuerpo calloso.", "Cápsula interna.", "Fórnix."], c: 2, e: "Conecta con el hipotálamo a través del fórnix, integrando memoria y respuestas fisiológicas." },
+        { q: "Localizada en la porción anteromedial del lóbulo temporal, evalúa el significado emocional de estímulos (miedo, ira). Es la:", o: ["Amígdala.", "Ínsula.", "Glándula pineal."], c: 0, e: "Amígdala: Conjunto de núcleos en la porción anteromedial del lóbulo temporal... evalúa el miedo, la ira." },
+        { q: "El aprendizaje aversivo (asociar un estímulo neutro con algo negativo, como ver una serpiente) es facilitado por:", o: ["La corteza somatosensorial.", "El giro poscentral.", "La amígdala."], c: 2, e: "La amígdala permite los aprendizajes aversivos: asociar estímulos neutros con experiencias negativas." },
+        { q: "¿Con qué se relaciona el 'Área septal' dentro del sistema límbico?", o: ["Con la ceguera emocional.", "Con las sensaciones de recompensa y placer, activándose en procesos motivacionales.", "Con el control estricto de la temperatura corporal."], c: 1, e: "Área septal: Relacionada con las sensaciones de recompensa y placer." },
+        { q: "Los cuerpos mamilares, que reciben proyecciones del hipocampo, juegan un papel clave en un circuito de la memoria llamado:", o: ["Circuito de Willis.", "Circuito de Broca.", "Circuito de Papez."], c: 2, e: "Cuerpos mamilares: juegan un papel clave en el circuito de Papez, fundamental para el aprendizaje y la memoria." },
+        { q: "¿Qué estructura coordina las respuestas fisiológicas de las emociones (ritmo cardíaco, presión arterial) y se conecta con la hipófisis?", o: ["El tálamo.", "El hipotálamo.", "El cerebelo."], c: 1, e: "Hipotálamo: Coordina las respuestas fisiológicas de las emociones... Su conexión con la hipófisis lo convierte en centro neuroendocrino." },
+        { q: "¿Qué área se considera la parte 'racional' del sistema límbico, encargada de regular los impulsos y planificar en función de normas sociales?", o: ["La corteza prefrontal.", "El surco calcarino.", "La circunvolución parahipocampal."], c: 0, e: "Corteza prefrontal: Considerada la parte 'racional' del sistema límbico. Controla emociones, regula impulsos." },
+        { q: "El sistema límbico asigna valor afectivo a los estímulos, pero ¿qué facilita la interacción entre el hipocampo y la amígdala?", o: ["El almacenamiento de recuerdos ligados a experiencias emocionales.", "El borrado inmediato de los recuerdos traumáticos.", "La pérdida de empatía social."], c: 0, e: "La interacción hipocampo-amígdala facilita el almacenamiento de recuerdos ligados a experiencias emocionales." },
+
+        // Corteza y hemisferios cerebrales (Generalidades)
+        { q: "La capa superficial de sustancia gris muy replegada que forma giros y surcos en el cerebro es:", o: ["La médula oblongada.", "La cápsula interna.", "La corteza cerebral."], c: 2, e: "Cada hemisferio está formado por una capa superficial de sustancia gris, denominada corteza cerebral." },
+        { q: "¿Qué función cumple el plegamiento de la corteza cerebral en surcos y giros?", o: ["Aislar la electricidad.", "Aumentar considerablemente la superficie disponible ocultando gran parte en los surcos.", "Reducir el peso del cerebro a la mitad."], c: 1, e: "Esta organización aumenta considerablemente la superficie disponible, de modo que gran parte queda oculta." },
+        { q: "¿Qué extensa lámina de fibras conecta los dos hemisferios cerebrales atravesando la fisura longitudinal?", o: ["El fórnix.", "El cuerpo calloso.", "La corona radiada."], c: 1, e: "Los dos hemisferios permanecen unidos a través del cuerpo calloso, una extensa lámina de fibras." },
+        { q: "El surco lateral (o cisura de Silvio) separa el lóbulo temporal de qué otros dos lóbulos?", o: ["Frontal y parietal.", "Parietal y occipital.", "Frontal y occipital."], c: 0, e: "El surco lateral separa al lóbulo temporal de los lóbulos frontal y parietal." },
+        { q: "¿Qué estructura se encuentra oculta en la profundidad del surco lateral cubierta por opérculos?", o: ["El hipocampo.", "La ínsula.", "El cerebelo."], c: 1, e: "En la profundidad del surco lateral se encuentra la ínsula." },
+        { q: "¿Qué marca el límite exacto entre los lóbulos frontal y parietal?", o: ["El surco central.", "El surco calcarino.", "El surco parietooccipital."], c: 0, e: "El surco central marca el límite entre los lóbulos frontal y parietal." },
+        { q: "El mapa citoarquitectónico elaborado a principios del siglo XX que divide la corteza en áreas numeradas fue creado por:", o: ["Wernicke.", "Broca.", "Brodmann."], c: 2, e: "Brodmann elaboró un mapa citoarquitectónico que divide la corteza en áreas numeradas." },
+        { q: "Filogenéticamente, el arquicórtex y paleocórtex son las regiones más antiguas. ¿Cuántas capas presentan?", o: ["Tres capas.", "Seis capas.", "Nueve capas."], c: 0, e: "Arquicórtex y paleocórtex presentan una estructura simple de tres capas." },
+        { q: "La mayor parte de la corteza humana corresponde al neocórtex. ¿Cuántas capas lo organizan?", o: ["Tres capas.", "Seis capas.", "Dos capas."], c: 1, e: "La mayor parte corresponde al neocórtex, que se organiza en seis capas." },
+        { q: "A nivel global, la corteza cerebral es el nivel más alto de organización del sistema motor humano porque en ella...", o: ["Terminan los reflejos medulares.", "Se generan e inician las acciones voluntarias.", "Se procesa de manera inconsciente la digestión."], c: 1, e: "Representa el nivel más alto de organización del sistema motor, pues en ella se generan e inician las acciones voluntarias." },
+        { q: "En la mayoría de los individuos, ¿para qué es dominante el hemisferio derecho?", o: ["Para la producción del lenguaje hablado.", "Para la percepción espacial y musical.", "Para la lógica deductiva escrita."], c: 1, e: "El derecho lo es para la percepción espacial y musical (el izquierdo para el lenguaje)." },
+
+        // Lóbulos Cerebrales (Frontal, Temporal, Parietal, Occipital)
+        { q: "En el lóbulo frontal, la corteza motora primaria (área 4) se sitúa en el:", o: ["Giro poscentral.", "Giro precentral.", "Lobulillo parietal inferior."], c: 1, e: "El lóbulo frontal alberga la corteza motora primaria en el giro precentral (área 4)." },
+        { q: "¿En qué área del homúnculo motor de la corteza primaria se ocupan grandes extensiones debido a los movimientos finos y precisos?", o: ["La espalda y el abdomen.", "Las rodillas y los tobillos.", "La lengua, la cara y los dedos."], c: 2, e: "Movimientos finos y precisos, como los de la lengua, la cara y los dedos, ocupan una gran extensión cortical." },
+        { q: "¿Qué área del lóbulo frontal (área 6) está implicada en la programación de los movimientos antes de que se ejecuten?", o: ["La corteza prefrontal.", "El área de Broca.", "La corteza premotora."], c: 2, e: "Por delante se encuentra la corteza premotora (área 6), implicada en la programación de los movimientos." },
+        { q: "En la cara medial del lóbulo frontal se halla la corteza motora suplementaria, que se relaciona principalmente con:", o: ["La producción del lenguaje.", "Movimientos posturales y coordinación bilateral.", "La sensibilidad auditiva."], c: 1, e: "Corteza motora suplementaria, relacionada con movimientos posturales y coordinación bilateral." },
+        { q: "En el hemisferio dominante, las áreas 44 y 45 del lóbulo frontal conforman el Área de Broca, encargada de:", o: ["La visión periférica.", "La comprensión de la lectura.", "La producción del lenguaje."], c: 2, e: "El área de Broca (áreas 44 y 45), en el hemisferio dominante, se encarga de la producción del lenguaje." },
+        { q: "En el lóbulo temporal, las circunvoluciones transversas de Heschl (áreas 41 y 42) corresponden a:", o: ["La corteza somatosensorial.", "La corteza auditiva primaria.", "El área motora suplementaria."], c: 1, e: "En las circunvoluciones transversas de Heschl, se localiza la corteza auditiva primaria." },
+        { q: "¿En qué lóbulo cerebral y hemisferio (típicamente) se encuentra el área de Wernicke, responsable de la comprensión del lenguaje?", o: ["Lóbulo parietal derecho.", "Lóbulo frontal izquierdo.", "Lóbulo temporal izquierdo."], c: 2, e: "En el hemisferio izquierdo (del lóbulo temporal) corresponde al área de Wernicke, responsable de la comprensión del lenguaje." },
+        { q: "El lóbulo parietal comienza en el giro poscentral, donde se sitúa la corteza...", o: ["Visual primaria.", "Somatosensorial primaria (áreas 1, 2 y 3).", "Motora primaria."], c: 1, e: "El lóbulo parietal comienza en el giro poscentral, donde se ubica la corteza somatosensorial primaria." },
+        { q: "¿Qué parte del lóbulo parietal interpreta la información sensorial y nos otorga la 'conciencia del propio cuerpo'?", o: ["El lobulillo parietal superior.", "La corteza auditiva.", "El surco calcarino."], c: 0, e: "El lobulillo parietal superior interpreta la información sensorial y otorga conciencia del propio cuerpo." },
+        { q: "El lóbulo occipital, situado en la parte posterior, alberga la corteza visual primaria (área 17) delimitada por el surco:", o: ["Central.", "Parietooccipital.", "Calcarino."], c: 2, e: "En la cara medial, el surco calcarino delimita la corteza visual primaria (área 17)." },
+        { q: "La proyección en la corteza visual primaria es somatotópica e invertida. Esto significa que la parte inferior del campo visual se proyecta en:", o: ["La corteza inferior al surco calcarino.", "La corteza superior al surco calcarino.", "El lóbulo temporal profundo."], c: 1, e: "La parte inferior del campo visual se proyecta sobre la corteza superior al surco calcarino, y viceversa." },
+
+        // Sustancia Blanca del Hemisferio
+        { q: "Las fibras nerviosas de la sustancia blanca se clasifican en tres grandes grupos:", o: ["Aferentes, eferentes y motoras.", "Asociación, comisurales y de proyección.", "Cranial, espinal y periférica."], c: 1, e: "Se clasifican en tres grupos: de asociación, comisurales y de proyección." },
+        { q: "Las fibras que conectan regiones corticales dentro de un MISMO hemisferio se denominan:", o: ["Fibras de asociación.", "Fibras comisurales.", "Fibras de proyección."], c: 0, e: "Las fibras de asociación conectan regiones corticales dentro de un mismo hemisferio." },
+        { q: "¿Qué fascículo de asociación está directamente implicado en el lenguaje al unir el lóbulo frontal y el temporal?", o: ["El fascículo longitudinal inferior.", "El cíngulo.", "El fascículo arqueado."], c: 2, e: "El fascículo arqueado, implicado en el lenguaje, que une frontal y temporal." },
+        { q: "¿Qué gran estructura está formada por fibras comisurales que comunican las regiones homólogas de ambos hemisferios?", o: ["Cápsula interna.", "Cuerpo calloso.", "Corona radiada."], c: 1, e: "El cuerpo calloso es la mayor de estas estructuras y conecta la mayor parte del neocórtex." },
+        { q: "Las fibras que conectan la corteza cerebral con estructuras subcorticales (tálamo, tronco, médula) se denominan:", o: ["Fibras de asociación.", "Fibras de proyección.", "Fibras en forma de 'U'."], c: 1, e: "Las fibras de proyección conectan la corteza cerebral con estructuras subcorticales." },
+        { q: "Las fibras de proyección se disponen radialmente bajo la corteza formando la 'corona radiada' y convergen en una estructura llamada:", o: ["Comisura anterior.", "Cápsula interna.", "Surco lateral."], c: 1, e: "Se disponen radialmente formando la corona radiada y convergen en la cápsula interna." },
+        { q: "¿Qué tipo de fibras discurren específicamente por la 'rodilla' de la cápsula interna?", o: ["Fibras frontopontinas.", "Radiaciones ópticas.", "Fibras corticonucleares hacia los nervios craneales."], c: 2, e: "En la rodilla discurren fibras corticonucleares hacia los nervios craneales." },
+        { q: "Las radiaciones ópticas y acústicas transitan por qué parte de la cápsula interna?", o: ["Brazo anterior.", "Brazo posterior.", "Porción retrolentiforme."], c: 2, e: "La porción retrolentiforme incluye radiaciones ópticas y acústicas." },
+
+        // Protección del Sistema Nervioso (Ósea, Meninges, LCR, BHE, Vascular)
+        { q: "Según el esquema de repaso, el cráneo, como cobertura ósea, se divide funcionalmente en:", o: ["Duramadre y Piamadre.", "Neurocráneo (Encéfalo) y Esplacnocráneo (Cara).", "Vertebras cervicales y lumbares."], c: 1, e: "Según el esquema: Cráneo -> Neurocráneo (Encéfalo) y Esplacnocráneo (Cara)." },
+        { q: "¿Cuál es la capa meníngea más externa, gruesa y resistente?", o: ["La piamadre.", "La aracnoides.", "La duramadre."], c: 2, e: "Duramadre: es la capa más externa, gruesa y resistente." },
+        { q: "Además de proteger, ¿qué estructura venosa vital para el drenaje de sangre y LCR forma la duramadre?", o: ["Los ventrículos laterales.", "Los senos venosos durales.", "El polígono de Willis."], c: 1, e: "La duramadre forma los senos venosos durales, encargados de drenar la sangre venosa y el LCR." },
+        { q: "¿Cómo se llama el espacio entre la aracnoides y la piamadre por donde circula el LCR?", o: ["Espacio epidural.", "Espacio subdural.", "Espacio subaracnoideo."], c: 2, e: "Entre la aracnoides y la piamadre se encuentra el espacio subaracnoideo, donde circula el LCR." },
+        { q: "La meninge más interna, que está firmemente adherida al cerebro siguiendo todos sus pliegues, es la:", o: ["Aracnoides.", "Piamadre.", "Capa perióstica de la duramadre."], c: 1, e: "Piamadre: es la capa más interna, firmemente adherida al cerebro y a la médula." },
+        { q: "¿Cuántos ventrículos cerebrales conforman el sistema de cavidades del SNC?", o: ["Dos.", "Tres.", "Cuatro."], c: 2, e: "Son cuatro: Dos laterales, un tercer ventrículo y un cuarto ventrículo." },
+        { q: "¿En qué estructura anatómica se localiza el cuarto ventrículo?", o: ["Entre los tálamos.", "En cada hemisferio cerebral.", "En el tronco del encéfalo."], c: 2, e: "Un cuarto ventrículo (en el tronco del encéfalo)." },
+        { q: "¿Qué estructura es la encargada principal de producir el Líquido Cefalorraquídeo (LCR)?", o: ["Los plexos coroideos.", "El cuerpo calloso.", "Los senos venosos durales."], c: 0, e: "El líquido cefalorraquídeo es producido principalmente en los plexos coroideos." },
+        { q: "Una de las funciones principales del Líquido Cefalorraquídeo (LCR) es:", o: ["Sintetizar la dopamina.", "Mantener la flotabilidad del encéfalo, disminuyendo su peso aparente.", "Producir glóbulos rojos en casos de emergencia."], c: 1, e: "Mantener la flotabilidad del encéfalo (disminuye su peso aparente)." },
+        { q: "La Barrera Hematoencefálica (BHE) está formada por uniones estrechas entre las células endoteliales de los capilares, reforzadas por:", o: ["Los oligodendrocitos.", "Las neuronas bipolares.", "Los astrocitos."], c: 2, e: "Formada por uniones estrechas entre células endoteliales, reforzadas por los astrocitos." },
+        { q: "Aunque la BHE bloquea compuestos tóxicos, ¿qué tipo de moléculas deja pasar más fácilmente?", o: ["Grandes proteínas.", "Moléculas liposolubles como el alcohol y los anestésicos.", "Exclusivamente virus."], c: 1, e: "Deja pasar moléculas liposolubles (alcohol, anestésicos) más fácilmente." },
+        { q: "¿Qué característica define a los 'órganos circunventriculares' (como la hipófisis posterior o el área postrema)?", o: ["Están hechos completamente de hueso.", "En ellos la BHE es más permeable para poder detectar hormonas o toxinas en sangre.", "Son los únicos lugares sin riego sanguíneo."], c: 1, e: "En estas regiones la barrera es más permeable, lo que permite detectar hormonas o toxinas circulantes." },
+        { q: "La irrigación cerebral que abastece la parte ANTERIOR del encéfalo procede de las arterias:", o: ["Vertebrales.", "Cerebelosas.", "Carótidas internas."], c: 2, e: "Arterias carótidas internas, que abastecen la parte anterior del encéfalo." },
+        { q: "Las arterias vertebrales irrigan la parte POSTERIOR del encéfalo. Al unirse, ¿qué gran arteria forman?", o: ["Arteria basilar.", "Arteria carótida externa.", "Arteria cerebral media."], c: 0, e: "Arterias vertebrales, que se unen para formar la arteria basilar y riegan la parte posterior." },
+        { q: "¿Cómo se llama la red en la base del encéfalo donde se conectan los dos sistemas arteriales para compensar posibles obstrucciones?", o: ["Senos durales.", "Polígono de Willis (circuito arterial de Willis).", "Agujero de Monro."], c: 1, e: "Ambos sistemas se conectan en la base del encéfalo formando el circuito arterial de Willis." },
+        { q: "Según el esquema de repaso, el núcleo neoestriado (caudado y putamen) junto con el globo pálido conforman funcionalmente:", o: ["El tronco cerebral.", "Los ganglios basales para el control motor corporal.", "El sistema límbico."], c: 1, e: "Esquema: Ganglios basales -> Control motor corporal -> Núcleo neoestriado (Caudado y Putamen) y Globo pálido." },
+        { q: "Según los esquemas, ¿qué estructura del sistema límbico se encarga específicamente de la integración y sincronización sensorial?", o: ["Septum pellucidum.", "Glándula pituitaria.", "Vermis."], c: 0, e: "Esquema: Septum pellucidum -> Integración y sincronización sensorial." },
+        { q: "¿Qué par de nervios o radiaciones sensoriales viaja de manera representativa a través de la porción retrolentiforme de la cápsula interna?", o: ["El nervio ciático.", "Las vías corticoespinales motoras.", "Las radiaciones ópticas y acústicas."], c: 2, e: "Porción retrolentiforme incluye radiaciones ópticas y acústicas que transmiten información visual y auditiva." }
+    
+];
+
+let questions=[...originalQuestions],currentQuestion=0,score=0,answered=false,missedQuestions=[],retryMode=false;
+const questionText=document.getElementById('question-text'),optionsContainer=document.getElementById('options-container'),feedbackContainer=document.getElementById('feedback-container'),nextBtn=document.getElementById('next-btn'),progressText=document.getElementById('progress-text'),scoreTracker=document.getElementById('score-tracker'),quizScreen=document.getElementById('quiz-screen'),resultScreen=document.getElementById('result-screen'),finalScore=document.getElementById('final-score'),finalMessage=document.getElementById('final-message'),progressBar=document.getElementById('progress-bar'),missedSummary=document.getElementById('missed-summary'),retryMissedBtn=document.getElementById('retry-missed-btn'),modeText=document.getElementById('mode-text'),medalText=document.getElementById('medal-text');
+function loadQuestion(){answered=false;feedbackContainer.style.display='none';feedbackContainer.className='feedback';feedbackContainer.innerHTML='';nextBtn.style.display='none';const q=questions[currentQuestion],total=questions.length,percent=Math.round((currentQuestion/total)*100);progressText.innerText=`Pregunta ${currentQuestion+1} de ${total}`;progressBar.style.width=`${percent}%`;modeText.innerHTML=retryMode?'<span class="mode-label">Modo repaso: falladas</span>':'Modo completo';questionText.innerText=`${currentQuestion+1}. ${q.q}`;optionsContainer.innerHTML='';q.o.forEach((opt,index)=>{const btn=document.createElement('button');btn.className='option-btn';btn.innerText=opt;btn.onclick=()=>selectOption(index,btn);optionsContainer.appendChild(btn);});}
+function selectOption(index,btn){if(answered)return;answered=true;const q=questions[currentQuestion],allBtns=optionsContainer.querySelectorAll('.option-btn');allBtns.forEach(b=>b.disabled=true);const correctText=q.o[q.c];if(index===q.c){btn.classList.add('correct');score++;scoreTracker.innerText=`Puntuación: ${score}`;feedbackContainer.classList.add('show','feedback-correct');feedbackContainer.innerHTML=`<strong>Correcto.</strong><span class="solution-label">Por qué es correcto:</span>${q.e}`;}else{btn.classList.add('incorrect');allBtns[q.c].classList.add('correct');if(!missedQuestions.some(item=>item.q===q.q)){missedQuestions.push(q)}feedbackContainer.classList.add('show','feedback-incorrect');feedbackContainer.innerHTML=`<strong>Respuesta equivocada.</strong><br>Has marcado: <b>${q.o[index]}</b><br>La solución correcta es: <b>${correctText}</b><span class="solution-label">Por qué esa es la solución correcta:</span>${q.e}`;}nextBtn.style.display='block';nextBtn.innerText=currentQuestion===questions.length-1?'Ver resultados':'Siguiente pregunta';}
+function nextQuestion(){currentQuestion++;if(currentQuestion<questions.length){loadQuestion()}else{showResults()}}
+function showResults(){quizScreen.style.display='none';resultScreen.style.display='block';progressBar.style.width='100%';const percentage=Math.round((score/questions.length)*100);finalScore.innerHTML=`Has acertado ${score} de ${questions.length} preguntas (${percentage}%)`;if(percentage>=90)medalText.innerText='🏆 Medalla de Oro · Dominio excelente';else if(percentage>=75)medalText.innerText='🥈 Medalla de Plata · Muy buen nivel';else if(percentage>=60)medalText.innerText='🥉 Medalla de Bronce · Base aprobada';else medalText.innerText='📚 Modo refuerzo · Conviene repasar';let message='';if(percentage>=90)message='Extraordinario. Dominas diencéfalo, ganglios basales, sistema límbico, corteza cerebral y sistemas de protección.';else if(percentage>=70)message='Buen resultado. Repasa las preguntas falladas para consolidar lóbulos, tálamo, hipotálamo, cápsula interna y meninges.';else message='Conviene repasar el encéfalo anterior, núcleos subcorticales, áreas corticales, sustancia blanca y protección del sistema nervioso.';finalMessage.innerText=message;if(missedQuestions.length>0){missedSummary.style.display='block';missedSummary.innerHTML=`<h3>Preguntas falladas: ${missedQuestions.length}</h3><ul>${missedQuestions.map((q,i)=>`<li>${i+1}. ${q.q}</li>`).join('')}</ul>`;retryMissedBtn.style.display='inline-block';}else{missedSummary.style.display='block';missedSummary.innerHTML='<h3>No has fallado ninguna pregunta.</h3><p>Resultado perfecto. No hay preguntas que reintentar.</p>';retryMissedBtn.style.display='none';}}
+function retryMissed(){if(missedQuestions.length===0)return;questions=[...missedQuestions];missedQuestions=[];currentQuestion=0;score=0;retryMode=true;scoreTracker.innerText='Puntuación: 0';resultScreen.style.display='none';quizScreen.style.display='block';nextBtn.innerText='Siguiente pregunta';loadQuestion();}
+function restartQuiz(){questions=[...originalQuestions];currentQuestion=0;score=0;answered=false;missedQuestions=[];retryMode=false;scoreTracker.innerText='Puntuación: 0';quizScreen.style.display='block';resultScreen.style.display='none';nextBtn.innerText='Siguiente pregunta';loadQuestion();}
+loadQuestion();
+
+</script>
+</body>
+</html>
