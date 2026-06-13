@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAVID MILÁN STUDIO | Memoria Semántica</title>
+<style>
+:root{--gold:#d4af37;--gold2:#f3d98b;--bg:#05070d;--bg2:#0b1323;--txt:#f5f5f5;--muted:#aab3c5;--ok:#33d17a;--bad:#ff6b6b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Segoe UI,sans-serif;min-height:100vh;background:
+radial-gradient(circle at top left,rgba(212,175,55,.20),transparent 30%),
+radial-gradient(circle at bottom right,rgba(50,90,180,.25),transparent 35%),
+linear-gradient(135deg,var(--bg),var(--bg2),#05070d);
+display:flex;justify-content:center;align-items:center;padding:30px;color:var(--txt)}
+.container{width:100%;max-width:1000px;background:rgba(255,255,255,.06);
+backdrop-filter:blur(18px);border:1px solid rgba(212,175,55,.25);
+border-radius:28px;padding:32px;box-shadow:0 25px 80px rgba(0,0,0,.45)}
+.brand{display:inline-block;padding:10px 18px;border-radius:999px;border:1px solid rgba(212,175,55,.4);color:var(--gold2);font-weight:800;letter-spacing:3px;margin-bottom:18px}
+h1{font-size:52px;background:linear-gradient(90deg,#fff,var(--gold2));-webkit-background-clip:text;color:transparent}
+h2{margin:8px 0 25px;color:var(--muted);font-weight:400}
+.top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.stat{padding:12px 16px;border-radius:14px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.1);color:var(--gold2);font-weight:700}
+.bar{height:10px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-bottom:20px}
+.fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.card{padding:24px;border-radius:22px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.08)}
+.q{font-size:22px;font-weight:800;line-height:1.4;margin-bottom:20px}
+.options{display:grid;gap:12px}
+.opt{padding:15px;border-radius:16px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);cursor:pointer;color:white;text-align:left}
+.opt:hover:not(:disabled){border-color:var(--gold)}
+.correct{background:rgba(51,209,122,.18)!important;border-color:var(--ok)!important}
+.incorrect{background:rgba(255,107,107,.18)!important;border-color:var(--bad)!important}
+.feedback{display:none;margin-top:18px;padding:18px;border-radius:16px;line-height:1.6}
+.show{display:block}
+.good{background:rgba(51,209,122,.12);border-left:5px solid var(--ok)}
+.bad{background:rgba(255,107,107,.12);border-left:5px solid var(--bad)}
+.controls{display:flex;justify-content:space-between;gap:10px;margin-top:20px}
+.btn{padding:14px 22px;border:none;border-radius:14px;font-weight:800;cursor:pointer}
+.gold{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#111}
+.dark{background:rgba(255,255,255,.08);color:white}
+#results{display:none;text-align:center}
+.medal{margin:15px auto;padding:12px 20px;border-radius:999px;border:1px solid rgba(212,175,55,.35);display:inline-block;color:var(--gold2)}
+.missed{text-align:left;margin-top:20px;padding:18px;border-radius:16px;background:rgba(0,0,0,.2)}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="brand">DAVID MILÁN STUDIO</div>
+<h1>Mega-Test Premium</h1>
+<h2>Tema 5: Memoria Semántica y Conocimiento Almacenado</h2>
+
+<div id="quiz">
+<div class="top">
+<div class="stat" id="prog"></div>
+<div class="stat" id="score">Puntuación: 0</div>
+<div class="stat" id="mode">Modo completo</div>
+</div>
+<div class="bar"><div class="fill" id="fill"></div></div>
+<div class="card">
+<div class="q" id="q"></div>
+<div class="options" id="opts"></div>
+<div id="fb" class="feedback"></div>
+<div class="controls">
+<button class="btn dark" onclick="restartQuiz()">Reiniciar</button>
+<button class="btn gold" id="next" onclick="nextQuestion()" style="display:none">Siguiente</button>
+</div>
+</div>
+</div>
+
+<div id="results">
+<h2 id="final"></h2>
+<div class="medal" id="medal"></div>
+<p id="msg"></p>
+<div id="missed" class="missed"></div><br>
+<button class="btn dark" onclick="restartQuiz()">Volver a empezar</button>
+<button class="btn gold" id="retry" onclick="retryMissed()">Repasar falladas</button>
+</div>
+</div>
+
+<script>
+const originalQuestions=[
+        // 1. INTRODUCCIÓN
+        { q: "Según Binder y Desai (2011), ¿cómo se define fundamentalmente la memoria semántica?", o: ["Como el almacén de conocimiento generalizado sobre el mundo, abstraído de la experiencia real.", "Como la capacidad de viajar mentalmente en el tiempo hacia el pasado.", "Como el sistema encargado exclusivamente de retener información procedimental motora."], c: 0, e: "Se define como el almacén de conocimiento de un individuo sobre el mundo, abstraído de la experiencia real y de carácter conceptual o generalizado." },
+        { q: "Si evaluáramos el vocabulario básico de una persona promedio, descubriríamos que en su memoria semántica conoce el significado de aproximadamente:", o: ["500 a 1.000 palabras.", "2.000 a 5.000 palabras.", "20.000 a 100.000 palabras."], c: 2, e: "Si evaluáramos el vocabulario, probablemente descubriríamos que conoce el significado de entre 20.000 y 100.000 palabras." },
+        { q: "¿Qué demostró el estudio de Chassy y Gobet (2011) sobre las diferencias individuales en el contenido de la memoria semántica utilizando a jugadores de ajedrez?", o: ["Que los grandes maestros han memorizado alrededor de 100.000 movimientos de apertura gracias a su experiencia.", "Que la memoria semántica de los expertos es idéntica a la de los novatos, solo que la procesan más rápido.", "Que el ajedrez se almacena en la memoria episódica, no en la semántica."], c: 0, e: "Estimaron que los grandes maestros de ajedrez han memorizado 100.000 movimientos de apertura, demostrando que disponemos de más información en áreas de especial interés." },
+        { q: "¿Qué obra literaria se menciona en el texto para ilustrar el dramático estado de desesperación que causa perder los significados y funciones de los objetos (memoria semántica)?", o: ["El Quijote de Cervantes.", "Cien años de soledad de Gabriel García Márquez (la plaga del insomnio).", "Ficciones de Jorge Luis Borges."], c: 1, e: "García Márquez, en Cien años de soledad, describe cómo los habitantes de Macondo pierden gradualmente la información sobre los significados afectados por la plaga del insomnio." },
+        
+        // 2. SEMÁNTICA VS. EPISÓDICA
+        { q: "Desde la perspectiva de la experiencia subjetiva (Wheeler, Stuss y Tulving), la recuperación de información de la memoria episódica implica un 'autoconocimiento'. ¿Qué implica la memoria semántica?", o: ["Un 'sentimiento de familiaridad periférica'.", "Un 'recuerdo fotográfico'.", "Una 'conciencia de saber' (knowing awareness)."], c: 2, e: "La memoria episódica implica un «autoconocimiento» mientras que la memoria semántica implica una «conciencia de saber»." },
+        { q: "Según Tulving (2002), desde el punto de vista evolutivo y del desarrollo, la memoria episódica es:", o: ["De evolución muy antigua, se desarrolla temprano en los niños y es extremadamente resistente al daño.", "De evolución reciente, de desarrollo tardío y de deterioro temprano.", "Anatómicamente idéntica a la procedimental y no se deteriora jamás."], c: 1, e: "Es un sistema de evolución reciente, de desarrollo tardío y de deterioro temprano, más vulnerable que otros sistemas." },
+        { q: "En la revisión de Spiers, Maguire y Burgess (2001) sobre 147 casos de amnesia, se encontró como patrón general que:", o: ["La memoria semántica estaba arrasada en todos, pero la episódica estaba intacta.", "La memoria episódica estaba deteriorada en todos los casos, mientras que la semántica solo presentaba problemas modestos.", "Ambas memorias sufrían exactamente el mismo nivel de deterioro simultáneo."], c: 1, e: "La memoria episódica estaba deteriorada en todos los casos, mientras que muchos pacientes solo presentaban problemas modestos con la memoria semántica." },
+        { q: "Respecto a la amnesia retrógrada en los pacientes amnésicos típicos, se observa que la pérdida de memorias episódicas abarca años. ¿Qué ocurre con la memoria semántica?", o: ["Suele estar razonablemente intacta, excepto para el conocimiento adquirido poco antes de la amnesia.", "Se pierde completamente todo el conocimiento previo.", "Afecta solo al conocimiento del vocabulario pero no a los hechos del mundo."], c: 0, e: "La amnesia retrógrada para memorias semánticas es generalmente razonablemente intacta, excepto para el conocimiento adquirido poco antes del inicio de la amnesia." },
+        { q: "El trastorno neurodegenerativo progresivo caracterizado por el deterioro gradual de la memoria semántica con pérdida severa del conocimiento conceptual es la:", o: ["Corea de Huntington.", "Esclerosis lateral amiotrófica.", "Demencia semántica."], c: 2, e: "La demencia semántica es un trastorno neurodegenerativo progresivo caracterizado por el deterioro gradual de la memoria semántica." },
+        { q: "A nivel anatómico, la demencia semántica está característicamente asociada con daño en:", o: ["Los lóbulos temporales frontales anteriores.", "El lóbulo occipital primario.", "El cerebelo y la médula espinal."], c: 0, e: "Está asociada con daño en los lóbulos temporales frontales anteriores (a diferencia de los amnésicos típicos, donde el daño está en el temporal medial)." },
+        { q: "En el estudio de Adlam, Patterson y Hodges (2009) sobre pacientes con demencia semántica, se descubrió que, a pesar de sus déficits semánticos, estos pacientes:", o: ["No podían recordar absolutamente nada de lo sucedido en la última semana.", "Podían recordar qué tareas habían realizado 24 horas antes a un nivel comparable al de los controles.", "Podían jugar al ajedrez a ciegas pero no caminar."], c: 1, e: "Encontraron que estos pacientes podían recordar qué tareas habían realizado 24 horas antes a un nivel comparable al de los controles sanos (preservación episódica inicial)." },
+        { q: "Burianova et al. compararon los patrones cerebrales durante la recuperación episódica, semántica y autobiográfica. ¿Qué encontraron sobre la relación funcional de estos sistemas?", o: ["Que se activaba exactamente la misma red neural, indicando que funcionan de forma interdependiente.", "Que cada tipo de memoria utilizaba un hemisferio cerebral distinto sin solapamiento.", "Que el tronco encefálico era el único responsable de la memoria semántica."], c: 0, e: "Encontraron que la misma red neural se activaba durante la recuperación de los tres tipos de memoria, apoyando la interdependencia de los sistemas." },
+        { q: "En el estudio de Kan et al. (2009) con pacientes amnésicos que debían aprender precios de supermercado (congruentes vs. incongruentes), se observó que:", o: ["Todos los amnésicos, independientemente de su estado semántico, fallaban en ambas tareas.", "El conocimiento semántico previo (precios congruentes) mejoraba el aprendizaje episódico, pero solo en los amnésicos que conservaban intacta su memoria semántica.", "Los precios incongruentes se aprendían el doble de rápido por el efecto sorpresa."], c: 1, e: "Los pacientes amnésicos con memoria semántica relativamente intacta mostraban mejor rendimiento para lo congruente; los que tenían pobre memoria semántica no mostraban este efecto." },
+        { q: "Irish et al. (2011) demostraron que los pacientes con demencia semántica rinden significativamente peor que los sanos al recordar memorias autobiográficas REMOTAS. ¿Por qué ocurre esto según Irish y Piguet?", o: ["Porque las memorias remotas requieren del andamiaje proporcionado por el conocimiento semántico que estos pacientes han perdido.", "Porque sufren un bloqueo de consolidación sistémica por estrés.", "Porque los eventos remotos se convierten exclusivamente en reflejos motores."], c: 0, e: "El recuerdo de memorias remotas requiere del andamiaje proporcionado por el conocimiento semántico (que los pacientes con demencia semántica tienen deteriorado)." },
+
+        // 3. ORGANIZACIÓN Y VISIONES TRADICIONALES
+        { q: "Loftus y Suppes (1972) encontraron que para generar una palabra es mucho más rápido dar como clave primero la categoría (fruta) y luego la inicial (m), que al revés (m-fruta). Esto sugiere que:", o: ["Es más fácil activar la categoría porque es un grupo coherente y manejable en nuestra memoria, en lugar de buscar por iniciales difusas.", "El cerebro está alfabetizado de la Z a la A.", "La letra inicial actúa como una barrera de inhibición proactiva."], c: 0, e: "Sugiere que es más fácil activar la categoría como preparación... ya que es relativamente coherente y manejable, mientras que las palabras por inicial forman un grupo muy difuso." },
+        { q: "El primer modelo sistemático de memoria semántica, propuesto por Collins y Quillian (1969), postulaba que la información se organiza en:", o: ["Una matriz bidimensional aleatoria.", "Una serie de redes jerárquicas con nodos conceptuales.", "Sistemas de engramas flotantes sin conexión."], c: 1, e: "Su suposición clave era que la memoria semántica está organizada en una serie de redes jerárquicas." },
+        { q: "En el modelo de Collins y Quillian, el principio por el cual las características comunes a una clase (ej. 'puede volar' para los pájaros) se almacenan solo en el nodo de nivel superior para evitar repeticiones, se conoce como:", o: ["Interferencia proactiva.", "Efecto de tipicidad.", "Economía cognitiva."], c: 2, e: "El principio de economía cognitiva: las propiedades que poseen casi todos los miembros se almacenan solo en el nodo superior para minimizar la cantidad de información." },
+        { q: "Al evaluar su modelo mediante una tarea de verificación de oraciones, Collins y Quillian descubrieron que el tiempo de respuesta:", o: ["Aumentaba progresivamente según los niveles de distancia jerárquica que separaban el concepto de su propiedad.", "Era idéntico para cualquier oración sin importar la distancia semántica.", "Dependía exclusivamente del número de sílabas de la oración."], c: 0, e: "Los tiempos de respuesta aumentaban progresivamente con la distancia jerárquica (ej. 'Un canario es amarillo' más rápido que 'Un canario tiene piel')." },
+        { q: "Una crítica importante al modelo de red jerárquica fue realizada por Conrad (1972), quien demostró que si se controlaba una variable específica, la distancia jerárquica apenas afectaba el tiempo de verificación. ¿Cuál era esa variable?", o: ["La longitud de la palabra.", "La familiaridad.", "El estado de ánimo del sujeto."], c: 1, e: "Demostró que cuando se controlaba la familiaridad, la distancia jerárquica tenía poco efecto sobre el tiempo de verificación." },
+        { q: "El fenómeno que demuestra que tardamos menos en verificar que 'Un canario es un pájaro' que en verificar 'Un pingüino es un pájaro', a pesar de estar al mismo nivel jerárquico, se denomina:", o: ["Efecto de economía cognitiva.", "Efecto de tipicidad.", "Efecto de nivel básico."], c: 1, e: "Efecto de tipicidad: el tiempo necesario para decidir que un miembro pertenece a la categoría es menor para los miembros típicos que para los atípicos." },
+        { q: "Para ilustrar que las categorías no tienen límites rígidamente definidos, el filósofo Wittgenstein (1958) usó el ejemplo de los 'juegos', sugiriendo que los conceptos son en realidad:", o: ["Idénticos y con exactamente las mismas reglas matemáticas.", "Como los miembros de una familia: comparten características, pero no un único conjunto fijo de rasgos comunes a todos.", "Esferas perfectas de conocimiento abstracto."], c: 1, e: "Sugirió que los miembros de la categoría 'juegos' son como los miembros de una familia: comparten ciertas características en diferentes combinaciones, pero no un conjunto único." },
+        { q: "McCloskey y Glucksberg (1978) preguntaron a participantes '¿Es una calabaza una fruta?' y, al volver a preguntarles un mes después, muchos cambiaron de opinión. Esto evidencia que:", o: ["Muchos conceptos en la memoria semántica son difusos.", "La memoria sufre decaimiento por interferencia retroactiva total.", "Los conceptos botánicos no existen en el hemisferio derecho."], c: 0, e: "Proporcionaron evidencia convincente de que muchos conceptos en la memoria semántica son difusos (sus límites no están claramente definidos)." },
+        { q: "Según Verheyen y Storms (2013), las diferencias individuales a la hora de categorizar un elemento difuso (ej. decidir si el ictus es enfermedad) se deben principalmente a dos razones:", o: ["La amnesia y el daño prefrontal.", "La falta de atención y el estrés.", "La ambigüedad (usar diferentes criterios) y la vaguedad (usar diferentes puntos de corte)."], c: 2, e: "Identificaron dos razones: la ambigüedad (pueden usar diferentes criterios) y la vaguedad (diferentes puntos de corte para separar miembros de no miembros)." },
+
+        // 4. MODELO DE PROPAGACIÓN
+        { q: "Para resolver la rigidez del modelo jerárquico, Collins y Loftus (1975) propusieron la teoría de la propagación de la activación. En este modelo, la memoria semántica se organiza sobre la base de:", o: ["El orden alfabético estricto de las palabras.", "La relación semántica o distancia semántica entre conceptos.", "Las reglas de la sintaxis universal innata."], c: 1, e: "Se asume que la memoria semántica se organiza sobre la base de la relación semántica o distancia semántica entre conceptos." },
+        { q: "Según la teoría de propagación de la activación, cuando pensamos en 'petirrojo', el nodo de 'pájaro' se activa:", o: ["Fuerte y rápidamente debido a su estrecha relación semántica.", "Débil y lentamente porque son conceptos opuestos.", "Solo si previamente pensamos en 'pingüino'."], c: 0, e: "La activación se propaga fuerte y rápidamente a conceptos estrechamente relacionados ('pájaro'), y más débil y lentamente a los más distantes." },
+        { q: "El fenómeno experimental por el cual identificar la palabra 'mantequilla' es más rápido si va precedida de 'pan' que si va precedida de 'enfermera' se conoce como:", o: ["Inhibición retroactiva.", "Efecto de tipicidad léxica.", "Facilitación semántica (semantic priming)."], c: 2, e: "Facilitación semántica: la presentación de una palabra semánticamente relacionada facilita el procesamiento de una palabra objetivo posterior." },
+        { q: "McNamara (1992) demostró que el efecto de facilitación semántica (priming) disminuye su fuerza si:", o: ["La palabra objetivo está a dos vínculos semánticos de distancia en lugar de uno.", "Se realiza la prueba en silencio absoluto.", "La palabra es un sustantivo en lugar de un verbo."], c: 0, e: "Mostró que el efecto de facilitación era mayor cuando la palabra objetivo estaba a un vínculo de distancia que cuando estaba a dos vínculos." },
+        { q: "En el paradigma DRM (Schacter et al.), se induce el falso recuerdo de una palabra crítica ausente (ej. 'doctor') al presentar a los participantes una lista de palabras muy asociadas. Según el modelo de propagación, esto ocurre porque:", o: ["El estrés de la prueba altera la corteza visual.", "La palabra ausente queda altamente activada en la red por la energía propagada desde todas las palabras relacionadas de la lista.", "El paciente tiene amnesia anterógrada focal."], c: 1, e: "La palabra ausente debería estar altamente activada por su estrecha relación con todas las palabras de la lista, explicando el falso reconocimiento." },
+        { q: "Al observar la activación cerebral de los sujetos durante los falsos recuerdos del paradigma DRM, Schacter et al. comprobaron que:", o: ["No existía ninguna actividad cerebral en el córtex semántico.", "Los patrones de activación cerebral al reconocer falsamente la palabra ausente eran muy similares a los de reconocer palabras que sí estaban en la lista.", "Solo se activaba la amígdala por el miedo a equivocarse."], c: 1, e: "Los patrones e intensidad de activación cerebral eran muy similares en ambos casos, indicando una activación sustancial de la palabra ausente." },
+        { q: "Una limitación importante del modelo de propagación de la activación es que asume que cada concepto tiene una representación única y fija en la red. En realidad, el procesamiento de los conceptos es:", o: ["Estrictamente fonológico.", "Completamente aleatorio y cambia cada milisegundo.", "Flexible y depende fuertemente del contexto (ej. el peso del 'piano' frente a su sonido)."], c: 2, e: "Nuestro procesamiento de un concepto dado es flexible y depende del contexto (ej. 'Pedro disfrutó tocando el piano' vs. 'Pedro encontró difícil levantar el piano')." },
+
+        // 5. NIVELES DE CATEGORIZACIÓN
+        { q: "En la jerarquía de conceptos, la categoría 'silla' frente a 'mueble' (más abstracta) o 'sillón reclinable' (más específica), se clasifica como:", o: ["Categoría supraordinada.", "Categoría de nivel básico.", "Categoría subordinada."], c: 1, e: "El nivel básico es el intermedio (ej. 'silla'), mientras que supraordinado es el más alto ('mueble') y subordinado el más bajo ('sillón')." },
+        { q: "¿Por qué en nuestra comunicación cotidiana existe una fortísima preferencia (demostrada por Rosch) por usar las categorías de nivel básico?", o: ["Porque son las únicas palabras que el hemisferio derecho puede pronunciar.", "Porque proporcionan el mejor equilibrio entre informatividad y distintividad.", "Porque carecen de cualquier significado emocional."], c: 1, e: "El nivel básico proporciona típicamente el mejor equilibrio entre informatividad (a diferencia del supraordinado) y distintividad (a diferencia del subordinado)." },
+        { q: "El estudio de Tanaka y Taylor (1991) con expertos en aves y en perros demostró que la preferencia por el nivel básico tiene excepciones, ya que los expertos en su propio dominio tienden a usar:", o: ["Categorías supraordinadas (ej. 'animal').", "Exclusivamente el nombre científico en latín.", "Categorías subordinadas (el nombre específico de la especie o raza)."], c: 2, e: "Los expertos en aves usaban nombres subordinados el 74% de las veces en su dominio, demostrando que la expertise altera la preferencia hacia el nivel subordinado." },
+        { q: "¿Qué otro factor, ilustrado por el estudio con miembros de la cultura itzá de Guatemala, hace que los individuos tiendan a categorizar plantas y animales usando el nivel subordinado?", o: ["El tipo de dieta vegetariana.", "Los factores culturales y el contacto más estrecho y cotidiano con el entorno natural.", "La carencia de palabras supraordinadas en su gramática."], c: 1, e: "Los factores culturales influyen: los itzá tienden más a categorizar en nivel subordinado, probablemente reflejando su contacto más estrecho con el entorno natural." },
+        { q: "Según Anaki y Bentin (2009), ¿cuál es el único tipo de objeto para el cual prácticamente todos los individuos, independientemente de su expertise, usan casi siempre categorías subordinadas?", o: ["Los rostros humanos.", "Los vehículos a motor.", "Los muebles del hogar."], c: 0, e: "Prácticamente todos los individuos usan categorías subordinadas para un tipo de objeto: los rostros." },
+        { q: "Aunque preferimos usar el nivel básico al hablar, ¿qué nivel de categorización resulta ser MÁS RÁPIDO cuando a un sujeto se le presiona con un límite de tiempo severo para tomar la decisión (Macé et al.)?", o: ["El nivel subordinado (ej. Caniche).", "El nivel supraordinado (ej. Animal).", "El nivel básico siempre sigue siendo el más rápido bajo estrés."], c: 1, e: "Cuando se requiere una respuesta rápida, la precisión era mayor para la supraordinada, y decidir si hay un 'animal' es 40-65 ms más rápido que la especie particular." },
+        { q: "¿Por qué los pacientes con demencia semántica severa rinden mejor en tareas de categorización supraordinada ('¿es un animal?') que en las de nivel básico?", o: ["Porque el nivel supraordinado requiere menos procesamiento cognitivo y retiene los rasgos globales que tardan más en deteriorarse.", "Porque la demencia semántica afecta únicamente a la capacidad de leer en voz alta.", "Porque han hipertrofiado sus lóbulos temporales posteriores."], c: 0, e: "Ocurre porque la categorización supraordinada requiere menos procesamiento cognitivo (es un juicio más general), ventaja que se observa también en la demencia semántica severa." },
+
+        // 6. SIMULACIÓN SITUADA
+        { q: "La teoría clásica asume que los conceptos son abstractos, estables y compartidos. La teoría de la simulación situada de Barsalou desafía esto argumentando que las representaciones conceptuales:", o: ["Son un engaño visual sin arraigo en el cerebro.", "Implican los sistemas perceptivo y motor, y varían radicalmente entre situaciones según los objetivos del individuo.", "Residen exclusivamente en la médula espinal de manera innata."], c: 1, e: "Barsalou argumentó que las representaciones conceptuales implican los sistemas perceptivo y motor, y varían entre situaciones dependiendo de los objetivos actuales." },
+        { q: "En el experimento de Wu y Barsalou, se demostró que el sistema perceptivo participa en los conceptos: a quienes se les pedía pensar en 'césped enrollado' tendían a describir propiedades internas (tierra), pero quienes pensaban en 'césped' natural describían:", o: ["Propiedades externas (planta, hojas).", "Las leyes de la fotosíntesis.", "Exclusivamente herramientas para cortarlo."], c: 0, e: "Quienes recibían 'césped' tendían a centrarse en propiedades externas (planta, hojas), mostrando que el estado perceptivo imaginado altera las propiedades generadas." },
+        { q: "El experimento de Bub, Masson y Cree demostró el papel del sistema motor. Observaron que leer palabras de objetos manipulables (ej. 'timbre') mientras se hacía un gesto motor:", o: ["Causaba amnesia transitoria.", "Activaba el conocimiento motor del objeto, entorpeciendo o alargando el tiempo de respuesta si el gesto exigido no encajaba con el uso real del objeto.", "No tenía ninguna relación con los tiempos de respuesta del paciente."], c: 1, e: "Las palabras de objetos activaban el conocimiento motor relevante, de forma que los participantes tardaban más en ensayos incongruentes donde el movimiento exigido chocaba con el uso del objeto." },
+        { q: "Connell et al. (2012) proporcionaron evidencia adicional al demostrar que la estimulación táctil de las manos de los participantes:", o: ["Aceleraba los juicios de tamaño para objetos pequeños/manipulables, pero no para objetos grandes.", "Causaba cosquillas que impedían pensar lógicamente.", "Provocaba que olvidaran el nivel básico de categorización."], c: 0, e: "La estimulación táctil aceleraba los juicios de tamaño con objetos pequeños (manipulables por las manos) pero no con grandes, confirmando el papel sensorial/motor." },
+        { q: "Según Barsalou y Wiemer-Hastings, ¿cómo logramos procesar conceptos abstractos (ej. 'verdad' o 'invención') que no pueden tocarse ni verse físicamente?", o: ["Creando hologramas mentales en el lóbulo parietal.", "A través de las propiedades de los contextos, situaciones o eventos físicos concretos que asociamos con ellos (ej. 'científicos en un laboratorio').", "Usando puramente lógica matemática formal."], c: 1, e: "Encontraron que muchas de las propiedades generadas para conceptos abstractos se referían a contextos o eventos asociados con el concepto." },
+        { q: "Pecher et al. estudiaron la vertiente emocional de los conceptos abstractos y demostraron que aquellos con asociaciones positivas:", o: ["Suscitan una total neutralidad física en el cuerpo.", "Suscitan respuestas motoras de evitación o rechazo.", "Suscitan respuestas motoras de aproximación, mientras que los negativos suscitan evitación."], c: 2, e: "Los conceptos abstractos con asociaciones emocionales positivas tienden a suscitar respuestas de aproximación, mientras que los negativos suscitan evitación." },
+        { q: "A pesar del éxito empírico de la teoría de Barsalou, críticos como Mazzone y Lalumera señalan una limitación importante de su modelo: exagera la variabilidad de los conceptos, porque en realidad:", o: ["El conocimiento es 100% genético e inmutable.", "Los conceptos sí mantienen un núcleo abstracto y estable, combinándose con una estructura dependiente del contexto.", "Solo existen 50 conceptos puros en el cerebro."], c: 1, e: "Señalan que exagera la variabilidad: la visión tradicional de que los conceptos poseen un núcleo abstracto estable no ha sido refutada. Ambos enfoques son parcialmente correctos." },
+
+        // 7. HUB-AND-SPOKE
+        { q: "La afirmación de que la información visual de un gato, su sonido al maullar y lo que le gusta hacer se guardan en áreas cerebrales separadas, corresponde a un enfoque de almacenamiento:", o: ["Unitario piramidal.", "Distribuido o basado en rasgos.", "Centralizado subcortical."], c: 1, e: "La memoria semántica almacena diferentes tipos de información sobre un objeto en diferentes localizaciones cerebrales. Este es un enfoque basado en rasgos o distribuido." },
+        { q: "El modelo que asume que los conceptos se representan combinando un centro abstracto y múltiples nodos de información específica de modalidad sensorial es el:", o: ["Modelo de redes jerárquicas estrictas.", "Modelo de simulación puramente situada.", "Modelo hub-and-spoke (centro y radios)."], c: 2, e: "El modelo hub-and-spoke (centro y radios), desarrollado por Patterson et al., combina e integra la representación unificada con los rasgos distribuidos." },
+        { q: "En el modelo hub-and-spoke, los 'radios' (spokes) representan 6 áreas cerebrales donde ocurre el procesamiento. ¿Cuál NO es uno de esos radios mencionados en el texto?", o: ["Olfato y sonidos.", "Praxis (información motora) e información somatosensorial.", "Núcleo supracadiano del sueño."], c: 2, e: "Los 6 radios son: rasgos visuales, descriptores verbales, olfato, sonidos, praxis (info motora) e info somatosensorial." },
+        { q: "Según el modelo, el 'centro' (hub) proporciona una representación conceptual unificada independiente de la modalidad. ¿En qué zona del cerebro se localizan estos centros?", o: ["Lóbulos temporales anteriores.", "Corteza motora primaria.", "Hipotálamo posterior."], c: 0, e: "Se asume que los centros están localizados en los lóbulos temporales anteriores (evidenciado por pacientes con demencia semántica)." },
+        { q: "Mayberry et al. observaron que los pacientes con demencia semántica sufren un 'difuminado' progresivo de los límites de las categorías a medida que el centro conceptual (hub) se daña. Por ello, tenían especial dificultad para diferenciar:", o: ["Colores primarios entre sí.", "Miembros atípicos de una categoría (ej. un emú) y no miembros que se les parecen físicamente (ej. una mariposa).", "Vocales de consonantes."], c: 1, e: "Tenían problemas especiales con dos estímulos: los miembros atípicos de la categoría (emú) y los no miembros que se parecían a los miembros (mariposa)." },
+        { q: "El fenómeno clínico en el cual un paciente con daño cerebral tiene mucha mayor dificultad para identificar cosas VIVAS (como animales) frente a cosas NO VIVAS se denomina:", o: ["Afasia de Broca.", "Agnosia aperceptiva universal.", "Déficit específico de categoría."], c: 2, e: "Muchos pacientes exhiben déficits específicos de categoría: problemas con categorías específicas, siendo muy común la dificultad con cosas vivas." },
+        { q: "¿Cuál es una de las razones estructurales por las que suele ser más difícil identificar imágenes de cosas vivas que no vivas, propiciando déficits categoriales?", o: ["Las cosas vivas son invenciones modernas.", "Tienen mayor solapamiento en sus contornos, son más complejas estructuralmente y se diferencian menos visualmente entre ellas.", "Emiten radiación infrarroja."], c: 1, e: "No se debe simplemente a que sean vivas, sino a que tienen mayor solapamiento de contornos, son más complejas estructuralmente y menos similares visualmente (Marques et al.)." },
+        { q: "El brillante estudio de Pobric et al. utilizó Estimulación Magnética Transcraneal (EMT) para probar el modelo hub-and-spoke. Si aplicaban la EMT sobre el 'centro' (Lóbulo Temporal Anterior), ¿qué ocurría con los tiempos de denominación del paciente?", o: ["Aumentaban para todas las categorías (cosas vivas, objetos manipulables y no manipulables).", "Aumentaban solo para los objetos manipulables.", "Mejoraban volviéndose el doble de rápidos."], c: 0, e: "La EMT en el lóbulo temporal anterior (centro) debería (y logró) aumentar los tiempos de denominación para las tres categorías." },
+        { q: "En el mismo experimento de Pobric et al., cuando aplicaron la EMT para inhibir el lóbulo parietal inferior (un 'radio' de acción motora), ¿qué sucedió?", o: ["El paciente perdió la memoria autobiográfica.", "Aumentaron los tiempos de denominación para todas las palabras del mundo.", "Aumentaron los tiempos de denominación EXCLUSIVAMENTE para los objetos manipulables."], c: 2, e: "La EMT en el lóbulo parietal inferior solo aumentó los tiempos para los objetos manipulables, probando que es un 'radio' específico de praxis motora." },
+        { q: "Una limitación actual del modelo hub-and-spoke mencionada en el texto es:", o: ["Que aún no hay consenso sobre el número exacto y la naturaleza definitiva de los radios conceptuales.", "Que la demencia semántica demuestra que el lóbulo frontal no importa.", "Que niega categóricamente la existencia de los lóbulos temporales."], c: 0, e: "Aún no hay consenso sobre el número y la naturaleza de los radios conceptuales, y queda por entender cómo se integra la información de radios y centros." },
+
+        // 8. ESQUEMAS, GUIONES Y MARCOS
+        { q: "Bartlett introdujo el concepto fundamental de que gran parte del conocimiento almacenado en la memoria semántica consiste en estructuras amplias llamadas 'esquemas'. Un esquema es:", o: ["Un fragmento de conocimiento bien integrado sobre el mundo, los eventos, las personas o las acciones.", "Un código binario genético innato.", "Una asociación temporal de dos sílabas sin sentido."], c: 0, e: "Un esquema es un fragmento de conocimiento bien integrado sobre el mundo, los eventos, las personas o las acciones." },
+        { q: "Dentro de los esquemas, las estructuras que contienen información específica sobre secuencias de EVENTOS comunes (como lo que pasa al ir a un restaurante) se denominan:", o: ["Radios modales.", "Guiones (scripts).", "Marcos (frames)."], c: 1, e: "Los guiones (scripts) se refieren al conocimiento sobre eventos y sus consecuencias u orden típico." },
+        { q: "El tipo de esquema en el que se almacena información estática sobre OBJETOS (como las propiedades fijas de un 'edificio' y espacios para variables) recibe el nombre de:", o: ["Guiones (scripts).", "Homúnculos visuales.", "Marcos (frames)."], c: 2, e: "Los marcos (frames) son estructuras referidas a algún aspecto del mundo (objetos), con info fija y espacios variables." },
+        { q: "El caso de la paciente EP (con demencia semántica severa), que no sabía nombrar para qué servía un bolígrafo o una aguja pero supo utilizarlos para concertar una cita o coser un botón, demuestra una disociación entre:", o: ["Memoria icónica y ecoica.", "Conceptos individuales deteriorados y conocimiento de guiones preservados.", "Memoria episódica anterógrada y retrógrada."], c: 1, e: "EP tenía rendimiento pobre sobre el significado de conceptos (objetos), pero conservaba acceso razonable al conocimiento de acciones/guiones." },
+        { q: "A diferencia de la demencia semántica, los pacientes con daño prefrontal estudiados por Sirigu et al. exhiben el patrón opuesto: conservan los conceptos individuales, pero ante los guiones de eventos...", o: ["Quedan mudos repentinamente.", "Pueden generar las acciones pero cometen muchos errores al secuenciarlas temporalmente y al priorizar cuáles lograrán la meta.", "Creen que los eventos ocurrieron en el siglo XIX."], c: 1, e: "Producían eventos rápidamente, pero cometían muchos errores al ordenar las acciones dentro del guión y al priorizarlas hacia un objetivo." },
+        { q: "Cosentino et al. confirmaron esta disociación mostrando que, mientras los pacientes con demencia semántica detectan por igual errores semánticos y de secuencia, los pacientes con demencia fronto-temporal:", o: ["No detectan casi el doble de errores de secuenciación que de errores semánticos.", "Tienen un oído absoluto perfecto.", "Se paralizan ante un error gramatical."], c: 0, e: "Los pacientes fronto-temporales no detectaban casi el doble de errores de secuenciación que semánticos, reflejando su daño en el conocimiento basado en guiones ejecutivos." },
+        { q: "El experimento de Bransford y Johnson (1972) en el que se presentaba un texto confuso que solo se entendía si se daba el título 'Lavando ropa', demostró que el conocimiento esquemático:", o: ["Causa falsos recuerdos permanentes y estrés cognitivo.", "Permite rellenar vacíos, mejorando la comprensión y el recuerdo previniendo la sobrecarga cognitiva.", "Solo funciona si el texto se lee al revés."], c: 1, e: "Los esquemas desempeñan un papel en la lectura permitiéndonos rellenar vacíos y mejorar la comprensión. El título previo duplicó el recuerdo de ideas." },
+        { q: "Al hablar de esquemas, los estereotipos (ej. sobre sexo, edad, etnia) son considerados sociológicamente como generalizaciones simplificadas que, a nivel cognitivo:", o: ["No afectan en absoluto a nuestra primera impresión.", "Actúan como esquemas que ayudan a formarnos una impresión rápida y simple, aunque potencialmente engañosa y con coste de sobrecarga prejuiciosa.", "Son puramente genéticos."], c: 1, e: "Los estereotipos son esquemas que usamos para ayudarnos a formarnos una impresión de forma más simple y prevenir sobrecarga, aunque muy engañosos." },
+        { q: "En su famoso estudio 'La guerra de los fantasmas', Bartlett descubrió que los ingleses alteraban los elementos de la leyenda nativo-americana para adaptarlos a su propia cultura. Denominó a esta distorsión:", o: ["Confabulación clínica frontal.", "Racionalización.", "Facilitación semántica regresiva."], c: 1, e: "Racionalización: tendencia a producir errores en el recuerdo que se conforman a las expectativas culturales del individuo, distorsionando lo ajeno al esquema." },
+        { q: "En el experimento de Brewer y Treyens (el despacho del estudiante), el impacto de los esquemas se hizo muy evidente cuando en la prueba de memoria se comprobó que los participantes:", o: ["No lograban recordar ningún objeto de la habitación.", "Reconocieron con alta confianza objetos que NUNCA estuvieron en la habitación, pero que eran consistentes con el esquema de 'despacho' (ej. libros).", "Recordaron con exactitud quirúrgica cada objeto sin fallar ninguno."], c: 1, e: "Los objetos no presentes 'reconocidos' con alta confianza eran casi siempre consistentes con el esquema de despacho (ej. libros o un archivador que no estaban)." },
+        { q: "A pesar de los clásicos experimentos de distorsión, Steyvers y Hemmer argumentaron que la memoria no es tan falible. Al evaluar escenarios naturalistas, observaron que los objetos altamente inconsistentes o inesperados (ej. calavera):", o: ["Se borraban por completo de la memoria por la disonancia.", "También se recordaban relativamente bien debido a que llamaban la atención (efecto von Restorff).", "Dañaban el núcleo central del hipocampo."], c: 1, e: "Los muy inconsistentes también se recordaban relativamente bien (efecto von Restorff) por llamar la atención, concluyendo que en ambientes naturales los esquemas son muy beneficiosos." },
+        { q: "Una de las críticas contemporáneas a la teoría de esquemas es que los investigadores han subestimado la importancia de las diferencias individuales. Por ejemplo, Murray y Burke demostraron que:", o: ["Todos los humanos inferimos el futuro del mismo modo desde que nacemos.", "Solo los participantes con ALTA habilidad lectora realizan inferencias predictivas automáticas de forma rápida.", "La miopía reduce la efectividad de los esquemas un 50%."], c: 1, e: "Encontraron que solo los participantes con alta habilidad lectora realizaban inferencias predictivas de forma rápida y automática, destacando las diferencias individuales ignoradas por la teoría." }
+    ];
+let questions=[...originalQuestions],current=0,score=0,missed=[],retryMode=false;
+
+function loadQuestion(){
+let q=questions[current];
+document.getElementById('prog').innerText=`Pregunta ${current+1} de ${questions.length}`;
+document.getElementById('fill').style.width=(current/questions.length*100)+'%';
+document.getElementById('mode').innerText=retryMode?'Modo repaso':'Modo completo';
+document.getElementById('q').innerText=q.q;
+document.getElementById('fb').className='feedback';
+document.getElementById('fb').style.display='none';
+document.getElementById('next').style.display='none';
+let opts=document.getElementById('opts');opts.innerHTML='';
+q.o.forEach((o,i)=>{let b=document.createElement('button');b.className='opt';b.innerText=o;b.onclick=()=>answer(i,b);opts.appendChild(b);});
+}
+
+function answer(i,btn){
+let q=questions[current];
+let all=document.querySelectorAll('.opt');
+all.forEach(x=>x.disabled=true);
+if(i===q.c){
+btn.classList.add('correct');
+score++;
+document.getElementById('score').innerText='Puntuación: '+score;
+document.getElementById('fb').className='feedback show good';
+document.getElementById('fb').innerHTML='<b>Correcto.</b><br>'+q.e;
+}else{
+btn.classList.add('incorrect');
+all[q.c].classList.add('correct');
+if(!missed.some(m=>m.q===q.q)) missed.push(q);
+document.getElementById('fb').className='feedback show bad';
+document.getElementById('fb').innerHTML='<b>Incorrecto.</b><br><br>'+q.e;
+}
+document.getElementById('next').style.display='inline-block';
+}
+
+function nextQuestion(){current++; if(current<questions.length) loadQuestion(); else showResults();}
+
+function showResults(){
+document.getElementById('quiz').style.display='none';
+document.getElementById('results').style.display='block';
+let pct=Math.round(score/questions.length*100);
+document.getElementById('final').innerHTML=`${score}/${questions.length} · ${pct}%`;
+document.getElementById('medal').innerText=pct>=90?'🏆 Oro':pct>=75?'🥈 Plata':pct>=60?'🥉 Bronce':'📚 Repaso';
+document.getElementById('msg').innerText='Memoria semántica, redes conceptuales, hub-and-spoke, esquemas, categorización y simulación situada.';
+document.getElementById('missed').innerHTML=missed.length?'<h3>Preguntas falladas</h3><ul>'+missed.map(x=>'<li>'+x.q+'</li>').join('')+'</ul>':'<b>Perfecto. Sin errores.</b>';
+document.getElementById('retry').style.display=missed.length?'inline-block':'none';
+}
+
+function retryMissed(){
+questions=[...missed];missed=[];current=0;score=0;retryMode=true;
+document.getElementById('score').innerText='Puntuación: 0';
+document.getElementById('results').style.display='none';
+document.getElementById('quiz').style.display='block';
+loadQuestion();
+}
+
+function restartQuiz(){
+questions=[...originalQuestions];current=0;score=0;missed=[];retryMode=false;
+document.getElementById('score').innerText='Puntuación: 0';
+document.getElementById('results').style.display='none';
+document.getElementById('quiz').style.display='block';
+loadQuestion();
+}
+loadQuestion();
+</script>
+</body>
+</html>

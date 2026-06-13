@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAVID MILÁN STUDIO | Memoria Autobiográfica</title>
+<style>
+:root{--gold:#d4af37;--gold2:#f3d98b;--bg:#05070d;--bg2:#0b1323;--txt:#f5f5f5;--muted:#aab3c5;--ok:#33d17a;--bad:#ff6b6b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Segoe UI,sans-serif;min-height:100vh;background:
+radial-gradient(circle at top left,rgba(212,175,55,.20),transparent 30%),
+radial-gradient(circle at bottom right,rgba(50,90,180,.25),transparent 35%),
+linear-gradient(135deg,var(--bg),var(--bg2),#05070d);
+display:flex;justify-content:center;align-items:center;padding:30px;color:var(--txt)}
+.container{width:100%;max-width:1000px;background:rgba(255,255,255,.06);
+backdrop-filter:blur(18px);border:1px solid rgba(212,175,55,.25);
+border-radius:28px;padding:32px;box-shadow:0 25px 80px rgba(0,0,0,.45)}
+.brand{display:inline-block;padding:10px 18px;border-radius:999px;border:1px solid rgba(212,175,55,.4);color:var(--gold2);font-weight:800;letter-spacing:3px;margin-bottom:18px}
+h1{font-size:52px;background:linear-gradient(90deg,#fff,var(--gold2));-webkit-background-clip:text;color:transparent}
+h2{margin:8px 0 25px;color:var(--muted);font-weight:400}
+.top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.stat{padding:12px 16px;border-radius:14px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.1);color:var(--gold2);font-weight:700}
+.bar{height:10px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-bottom:20px}
+.fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:.3s}
+.card{padding:24px;border-radius:22px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.08)}
+.q{font-size:22px;font-weight:800;line-height:1.4;margin-bottom:20px}
+.options{display:grid;gap:12px}
+.opt{padding:15px;border-radius:16px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);cursor:pointer;color:white;text-align:left;font-size:15px;line-height:1.45}
+.opt:hover:not(:disabled){border-color:var(--gold);transform:translateY(-1px)}
+.opt:disabled{cursor:not-allowed;opacity:.95}
+.correct{background:rgba(51,209,122,.18)!important;border-color:var(--ok)!important}
+.incorrect{background:rgba(255,107,107,.18)!important;border-color:var(--bad)!important}
+.feedback{display:none;margin-top:18px;padding:18px;border-radius:16px;line-height:1.6}
+.show{display:block}
+.good{background:rgba(51,209,122,.12);border-left:5px solid var(--ok)}
+.bad{background:rgba(255,107,107,.12);border-left:5px solid var(--bad)}
+.controls{display:flex;justify-content:space-between;gap:10px;margin-top:20px;flex-wrap:wrap}
+.btn{padding:14px 22px;border:none;border-radius:14px;font-weight:800;cursor:pointer}
+.gold{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#111}
+.dark{background:rgba(255,255,255,.08);color:white;border:1px solid rgba(255,255,255,.12)}
+#results{display:none;text-align:center}
+.medal{margin:15px auto;padding:12px 20px;border-radius:999px;border:1px solid rgba(212,175,55,.35);display:inline-block;color:var(--gold2)}
+.missed{text-align:left;margin-top:20px;padding:18px;border-radius:16px;background:rgba(0,0,0,.2);line-height:1.55}
+.missed h3{color:var(--gold2);margin-bottom:10px}
+.missed ul{padding-left:20px}
+@media(max-width:650px){.container{padding:22px}h1{font-size:36px}.q{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="brand">DAVID MILÁN STUDIO</div>
+<h1>Mega-Test Premium</h1>
+<h2>Tema 9: Memoria Autobiográfica (Identidad y Recuerdo Vital)</h2>
+
+<div id="quiz">
+<div class="top">
+<div class="stat" id="prog"></div>
+<div class="stat" id="score">Puntuación: 0</div>
+<div class="stat" id="mode">Modo completo</div>
+</div>
+<div class="bar"><div class="fill" id="fill"></div></div>
+<div class="card">
+<div class="q" id="q"></div>
+<div class="options" id="opts"></div>
+<div id="fb" class="feedback"></div>
+<div class="controls">
+<button class="btn dark" onclick="restartQuiz()">Reiniciar</button>
+<button class="btn gold" id="next" onclick="nextQuestion()" style="display:none">Siguiente</button>
+</div>
+</div>
+</div>
+
+<div id="results">
+<h2 id="final"></h2>
+<div class="medal" id="medal"></div>
+<p id="msg"></p>
+<div id="missed" class="missed"></div><br>
+<button class="btn dark" onclick="restartQuiz()">Volver a empezar</button>
+<button class="btn gold" id="retry" onclick="retryMissed()">Repasar falladas</button>
+</div>
+</div>
+
+<script>
+const originalQuestions=[
+        // 1. NATURALEZA Y FUNCIONES DE LA MA (1-14)
+        { q: "¿A qué nos referimos cuando hablamos del tipo de memoria que contiene interacciones con el mundo y experiencias de nuestro propio colegio o amigos?", o: ["Memoria semántica estricta.", "Memoria autobiográfica.", "Memoria implícita de procedimiento."], c: 1, e: "La memoria autobiográfica se refiere a los recuerdos que mantenemos sobre nosotros mismos y nuestras interacciones con el mundo." },
+        { q: "La primera cuestión teórica sobre la memoria autobiográfica es si constituye un sistema independiente. Según Baddeley, la respuesta es:", o: ["Sí, es un sistema anatómico completamente aislado en el cerebelo.", "No, no existe, es un mito de la psicología clínica.", "Sí y no, ya que aunque tiene una relevancia propia, depende casi con total seguridad de los sistemas de memoria episódica y semántica."], c: 2, e: "Baddeley dice «sí y no». Depende de la episódica y la semántica, pero su rol vital difiere de manera importante, mereciendo estudio separado." },
+        { q: "Recordar el propio nombre o la dirección de donde se vive es un aspecto personal que corresponde a información de la memoria:", o: ["Episódica.", "Semántica.", "Procedimental."], c: 1, e: "Recordar datos sobre uno mismo (nombre, dirección) es autobiográfico pero constituye un aspecto personal de la memoria semántica (conocimiento abstracto)." },
+        { q: "En cambio, recordar qué se desayunó hoy es también autobiográfico, pero implica recuperar una experiencia específica de la memoria:", o: ["Episódica.", "Ecoica.", "Semántica."], c: 0, e: "Recordar qué desayunaste hoy exige viajar mentalmente en el tiempo hacia esa experiencia concreta, por lo que es de naturaleza episódica." },
+        { q: "¿Cuál es el reto metodológico fundamental o la mayor dificultad al investigar la memoria autobiográfica en el laboratorio?", o: ["Que el experimentador no suele tener control sobre la situación original de aprendizaje (codificación).", "Que los pacientes siempre mienten.", "Que se borra por completo al llegar a los 18 años."], c: 0, e: "El reto metodológico es que el investigador no sabe exactamente qué experimentó el sujeto originalmente ni en qué condiciones se codificó." },
+        { q: "De las 4 funciones de la memoria autobiográfica propuestas por Williams, Conway y Cohen, ¿cuál consiste en usar el pasado para guiar la conducta presente y resolver problemas (ej. cómo cambiar una rueda)?", o: ["Función social.", "Función de autorrepresentación.", "Función directiva."], c: 2, e: "La función directiva consiste en utilizar la experiencia pasada como base de datos práctica para resolver problemas actuales y tomar decisiones." },
+        { q: "Según Hyman y Faries, cuando preguntaban a la gente para qué usaban su memoria, ¿se halló mucha evidencia del uso directivo de la misma?", o: ["Sí, era la función más reportada del día a día.", "En absoluto, no encontraron ningún caso, solo sirve para deprimirse.", "Encontraron muy pocos casos de uso directivo; lo más común era compartir experiencias en interacciones sociales."], c: 2, e: "Hyman y Faries encontraron muy pocos casos del uso directivo para resolver problemas internos; predominaba el uso para mantener relaciones sociales." },
+        { q: "La «terapia de reminiscencia» en pacientes mayores, que utiliza fotografías para evocar su pasado, se apoya teóricamente en la función de:", o: ["Afrontamiento cognitivo profundo.", "Autorrepresentación.", "Dirección motora."], c: 1, e: "Esta terapia ayuda a sostener el sentido de identidad de los mayores, apoyándose directamente en la función de autorrepresentación." },
+        { q: "El uso de la memoria para crear y consolidar vínculos con otros (o su ruptura, que hace que el cónyuge sienta que 'no es la persona con la que se casó') se atribuye a la función:", o: ["Social.", "De afrontamiento.", "Lingüística estructural."], c: 0, e: "Compartir recuerdos y mantener el sentido compartido de vida en pareja responde a la función social de la memoria autobiográfica." },
+        { q: "En la función de afrontamiento, la tendencia a recuperar más fácilmente recuerdos cuya valencia emocional coincide con nuestra emoción actual se llama:", o: ["Amnesia emocional retrógrada.", "Sesgo de positividad incondicional.", "Memoria congruente con el estado de ánimo."], c: 2, e: "Es la memoria congruente con el estado de ánimo, lo que retroalimenta la depresión si no se frena." },
+        { q: "¿Cómo afecta la «memoria congruente con el estado de ánimo» a una persona con depresión?", o: ["Facilita selectivamente los recuerdos alegres para contrarrestar la tristeza.", "Facilita el acceso a recuerdos negativos y dificulta el de los positivos, contribuyendo al mantenimiento del trastorno.", "Provoca amnesia total retroactiva."], c: 1, e: "Un estado deprimido facilita el acceso a los recuerdos negativos, atrapando a la persona en un sesgo que retroalimenta su enfermedad." },
+        { q: "¿Logró el cuestionario TALE de Bluck et al. separar con éxito y limpieza empírica las distintas funciones autobiográficas?", o: ["Sí, demostró que cada memoria solo tiene una única función.", "No, el análisis factorial reveló un solapamiento considerable entre las funciones directiva, del self y social.", "El cuestionario TALE fue abandonado por no funcionar en humanos."], c: 1, e: "Se evidenció un solapamiento considerable entre las funciones, lo que demuestra que un recuerdo puede ser directivo y social al mismo tiempo." },
+        
+        // 2. MÉTODOS DE ESTUDIO: DIARIOS Y SONDEOS (13-24)
+        { q: "En el estudio de diario de Marigold Linton (autoevaluación mensual con fichas), el hallazgo teórico más importante sobre el aprendizaje a largo plazo fue que:", o: ["Cuanto más a menudo se sondeaba un evento (prueba de memoria), mejor se retenía.", "Los eventos no se recordaban nunca si ocurrían en invierno.", "El olvido autobiográfico es matemáticamente imposible."], c: 0, e: "Descubrió que la probabilidad de olvidar un ítem disminuía sistemáticamente con el número de pruebas o sondeos previos (efecto de prueba)." },
+        { q: "En el monumental estudio de diario del psicólogo Willem Wagenaar, ¿qué clave de recuperación resultó ser consistentemente mucho MENOS eficiente para acceder al recuerdo?", o: ["La clave del 'dónde' (lugar).", "La clave del 'cuándo' (la fecha).", "La clave del 'qué' (evento)."], c: 1, e: "Mientras las claves quién, qué y dónde eran buenas, la clave 'cuándo' (fecha) era muy ineficiente, algo que rompe la persona con memoria calendárica." },
+        { q: "Según Wagenaar, si él no podía recuperar el incidente a pesar de todas las claves anotadas, ¿qué ocurría frecuentemente si se lo contaba otra persona implicada?", o: ["Se enfadaba por sufrir amnesia.", "Tampoco lograba recordarlo, indicando que el borrado era absoluto e irreversible.", "Podía normalmente evocar la recolección, sugiriendo que casi nunca olvidamos absolutamente nada si la clave es la correcta."], c: 2, e: "A menudo lograba evocar el recuerdo si otra persona se lo recordaba, indicando que el recuerdo estaba en la memoria pero inaccesible." },
+        { q: "¿Cuál es la 'limitación clave' (sesgo) más grave que sufren los estudios de diario como los de Linton y Wagenaar para extraer conclusiones generales?", o: ["Tienen demasiados participantes, falseando la estadística.", "Seleccionan eventos especialmente memorables, y el propio acto de registrarlos impone una codificación atípicamente profunda.", "Solo evaluaban el recuerdo de sus mascotas."], c: 1, e: "El problema es que anotan lo memorable y al analizarlo y registrarlo, ensayan el recuerdo a un nivel altísimo y no generalizable al día a día de una persona normal." },
+        { q: "Al evaluar la memoria de los eventos reportados en cartas que envió a su madre 40 años atrás, Baddeley dedujo que los recuerdos vívidos que conservaba dependían fuertemente de:", o: ["Tener la carta físicamente delante.", "El 'recontado' (ensayo) de la anécdota a otras personas a lo largo de los años.", "El consumo de café ese día exacto."], c: 1, e: "Descubrió que los episodios vivos dependían del recontado, surgiendo la sospecha de que podrían ser meros 'recuerdos de recuerdos'." },
+        { q: "Tras analizar sus cartas de hacía cuarenta años, la visión mental que Baddeley adoptó sobre su memoria autobiográfica pasó a ser la de:", o: ["Un paisaje fotográfico perfecto y nítido de toda su juventud.", "Un agujero negro de olvido orgánico.", "Una serie limitada de «islas de memoria en un mar de olvido»."], c: 2, e: "El autor desechó la metáfora del 'paisaje con picos y valles' para sugerir que en realidad tenemos escasas 'islas de memoria' rodeadas de inmensos vacíos de olvido." },
+        { q: "Para evitar el sesgo selectivo de los diarios, Brewer (1988) usó una metodología en la que los participantes:", o: ["Solo escribían lo peor del mes.", "Llevaban un buscapersonas (beeper) que les exigía anotar qué hacían en intervalos totalmente aleatorios.", "Eran hipnotizados diariamente."], c: 1, e: "Brewer muestreó eventos al azar usando beepers y descubrió que el recuerdo caía bruscamente frente a los métodos de diario dirigidos." },
+        { q: "Conway et al. compararon el reconocimiento de verdaderos 'eventos' cotidianos frente a 'pensamientos' puros. Los que eran 'eventos' tenían el doble de probabilidad de:", o: ["Generar ataques epilépticos.", "Borrar un recuerdo falso.", "Evocar una experiencia de recolección (clasificación de 'recordar' frente a mero 'saber')."], c: 2, e: "Los eventos episódicos verdaderos disparaban respuestas fenoménicas de 'recolección', probando la fuerza autonoética de lo actuado frente a lo solo pensado." },
+        { q: "¿Qué pionero de la psicología inventó en 1879 el 'método de sondeo de la memoria' o técnica de la palabra-clave (luego revivida por Crovitz)?", o: ["Hermann Ebbinghaus.", "Francis Galton.", "Ivan Pavlov."], c: 1, e: "Sir Francis Galton fue el inventor original de la técnica de usar una palabra-clave para evocar recuerdos autobiográficos libres." },
+        { q: "¿En qué consiste empíricamente el método de sondeo de la memoria mediante palabras-clave?", o: ["Obligar al sujeto a escribir un diario durante 6 años.", "Medir con fMRI su amígdala mientras duerme.", "Dar al participante una palabra (ej. 'caballo') para que recupere el primer recuerdo autobiográfico asociado a ella."], c: 2, e: "El sondeo de memoria simplemente pide al sujeto que deje vagar su memoria hasta atrapar una experiencia ligada a la palabra inductora." },
+        
+        // 3. LA DISTRIBUCIÓN VITAL Y DIFERENCIAS CULTURALES (25-33)
+        { q: "La curva de recuperación vital que distribuye temporalmente todos los recuerdos libres tiene tres componentes robustos. Estos son:", o: ["Interferencia, Facilitación y Consolidación.", "Amnesia infantil, Efecto de recencia y Pico de reminiscencia.", "Curva de olvido rápida, meseta semántica y represión."], c: 1, e: "La curva se define por estos tres: amnesia infantil (vacío temprano), pico de reminiscencia (auge joven) y efecto de recencia (auge actual)." },
+        { q: "El fenómeno denominado 'amnesia infantil' en la memoria autobiográfica consiste en:", o: ["Olvidar los nombres de los hijos al envejecer.", "Incapacidad de retener rostros antes de la edad adulta.", "La escasez muy marcada de recuerdos autobiográficos correspondientes a los primeros cinco años de vida."], c: 2, e: "Es la característica falta de memorias consolidadas antes de los 5 años (por hipocampo inmaduro, self en desarrollo, etc.)." },
+        { q: "En participantes mayores de 40 años, la curva muestra sistemáticamente un 'pico de reminiscencia'. ¿A qué periodo vital corresponden mayoritariamente los recuerdos evocados en ese pico?", o: ["A los primeros 5 años de vida.", "Aproximadamente entre los 15 y los 30 años (adolescencia tardía y primera juventud).", "A la crisis de los 40."], c: 1, e: "El pico de reminiscencia rescata desproporcionadamente eventos vividos entre los 15 y los 30 años de edad." },
+        { q: "En los estudios transculturales sobre la memoria infantil temprana (Wang, 2006), se observó que la edad media del primer recuerdo (superación de la amnesia infantil) en los estadounidenses es:", o: ["Hacia los 3,8 años, más temprana que la de los asiáticos (5,4 años).", "Hacia los 7 años, mucho más tardía que los orientales.", "Idéntica en todas las culturas sin variación."], c: 0, e: "El primer recuerdo es significativamente más temprano en americanos (3.8) que en chinos (5.4), demostrando influjo cultural." },
+        { q: "Se ha sugerido que las diferencias en la memoria temprana entre americanos y chinos tienen su origen principal en:", o: ["Mutaciones en la corteza prefrontal asiática.", "Diferencias dietéticas en la asimilación de proteínas.", "El estilo de interacción materna: las madres occidentales son más elaboradas, orientadas emocionalmente y enfocadas al yo en sus conversaciones del pasado."], c: 2, e: "Las madres estadounidenses dialogan más sobre el pasado del niño enfocado en sus propias emociones, entrenando el self autobiográfico antes." },
+        { q: "La principal explicación del 'pico de reminiscencia' propone que en esa edad ocurren los principales eventos definitorios vitales, configurando lo que se llama nuestra:", o: ["Amnesia psicógena latente.", "Narrativa vital.", "Confabulación estructurada."], c: 1, e: "Nuestra 'narrativa vital' (quiénes somos y de dónde venimos) se forma fundamentalmente con los hitos de los 15 a los 30 años." },
+        { q: "Según Glück y Bluck (2007), que examinaron más de 3000 eventos para refinar el pico de reminiscencia, este pico sólo se produce claramente para:", o: ["Traumas mortales y accidentes.", "Eventos positivos sobre los que los participantes sentían tener un alto grado de control.", "Eventos donde no había implicación personal."], c: 1, e: "Ellos precisaron que la gente consolida el pico de reminiscencia solo para asentar una narrativa vital de éxito: eventos felices y bajo control." },
+        { q: "¿Qué variante metodológica de experimentación con sondeos altera bruscamente la edad del pico de reminiscencia, adelantándolo a la edad de 6 a 10 años?", o: ["El uso de música clásica.", "El uso de claves olfativas (olores).", "La estimulación magnética transcraneal."], c: 1, e: "Las claves olfativas rompen el patrón verbal típico (15-30) evocando recuerdos más antiguos de la niñez profunda." },
+        { q: "¿Por qué se asume, según los autores Herz o Willander y Larsson, que el olfato evoca recuerdos más tempranos?", o: ["Porque el nervio olfativo madura a los 40 años.", "Porque los humanos solo huelen en la infancia.", "Porque los recuerdos evocados por claves olfativas tienden a estar cargados con mayor intensidad emocional pura."], c: 2, e: "La conexión directa del bulbo olfativo con la amígdala induce recuerdos muy cargados emocionalmente y, por tanto, más primarios." },
+        
+        // 4. EL MODELO DE CONWAY (34-44)
+        { q: "El modelo teórico integrador más influyente para la memoria autobiográfica es el propuesto por:", o: ["Martin Conway.", "Endel Tulving.", "Alan Baddeley y Graham Hitch."], c: 0, e: "Martin Conway (2005) estructuró la teoría dominante de la base de conocimiento y el self operativo." },
+        { q: "Según Conway, ¿la memoria autobiográfica produce SIEMPRE una experiencia 'recolectiva' o detallada episódicamente?", o: ["Sí, siempre que hay memoria autobiográfica hay un recuerdo visual.", "Nunca, la memoria autobiográfica es solo conocimiento de cultura general.", "No, el sistema puede producir simplemente conocimiento sin experiencia recolectiva (ej. saber que fuiste a París sin recordar detalles)."], c: 2, e: "El sistema puede arrojar conocimiento puro (semántico personal) sin conectar nunca con la vivencia de recolección episódica detallada." },
+        { q: "En el modelo de Conway, el elemento dinámico que modula qué se recupera en función de las metas activas y las autoimágenes del sujeto se denomina:", o: ["Ejecutivo central periférico.", "Búfer semántico.", "Self operativo (working self)."], c: 2, e: "El self operativo desempeña el rol directivo (equivalente a la MT) sobre qué buscar en la base del conocimiento en función de nuestras metas vitales actuales." },
+        { q: "Si el 'self operativo' pierde su coherencia y su anclaje o correspondencia con la realidad externa, un efecto clínico muy probable (típico en daño frontal) es:", o: ["La producción de recuerdos falsos muy vívidos y reconfortantes, pero delirantes (confabulación).", "Amnesia total, no reconociendo objetos.", "Sordera verbal pura."], c: 0, e: "Sin el filtro de monitorización y realidad del self operativo, el sujeto asume confabulaciones como su historia real." },
+        { q: "La estructura subyacente de la 'base de conocimiento autobiográfico' propuesta por Conway está organizada de forma:", o: ["Completamente aleatoria, como islas dispersas.", "Ampliamente jerárquica (de la historia general abstracta a los detalles perceptivos).", "Secuencial cronológica, estricta e inmutable."], c: 1, e: "Es ampliamente jerárquica: temas vitales > periodos de tiempo > eventos generales > episodios sensorio-perceptivos específicos." },
+        { q: "Dentro de la jerarquía de Conway, ¿qué nivel es el que finalmente nos convence, como un sello de garantía, de que el recuerdo es genuino y no inventado?", o: ["El gran tema vital subyacente.", "El conocimiento semántico de la biografía.", "El nivel más fundamental de información sensorio-perceptiva detallada y a menudo arbitraria (ej. el clima o el tono de voz)."], c: 2, e: "Ese detalle sensorial (como la lluvia, la textura, la inflexión vocal) es la prueba interna que nos indica que el episodio fue real." },
+        { q: "Tulving denomina a la capacidad mental humana de reflexionar sobre nuestros propios pensamientos y discriminar entre el pasado recordado y la fantasía como:", o: ["Conciencia somática.", "Conciencia autonoética.", "Memoria ecoica residual."], c: 1, e: "La conciencia autonoética es lo que nos permite viajar en el tiempo y «saber» reflexivamente que estamos experimentando un recuerdo nuestro." },
+        { q: "A diferencia de la velocidad instantánea con la que el cerebro recupera una capital de un país (memoria semántica), ¿cuánto se tarda típicamente en acceder a la conciencia autonoética del detalle autobiográfico?", o: ["Es igual de instantáneo (milisegundos).", "Típicamente varios segundos.", "Típicamente varios meses de terapia."], c: 1, e: "Haque y Conway demuestran que ensamblar la escena con sus detalles sensoriales autonoéticos es un proceso que exige varios segundos de construcción." },
+        { q: "Marian y Kaushanskaya (2004) entrevistaron a inmigrantes bilingües ruso-inglés y demostraron la influencia del contexto social sobre la memoria probando que:", o: ["No podían hablar ruso sin perder su memoria reciente.", "Los recuerdos en ruso (su cultura base) eran siempre más colectivistas que sus recolecciones emitidas en inglés.", "El idioma no tenía ningún efecto en la naturaleza del recuerdo."], c: 1, e: "Independientemente del idioma de codificación original, relatar la memoria en ruso activaba el esquema colectivista propio de esa cultura frente a la anglosajona." },
+
+        // 5. MEMORIA CALENDÁRICA Y HSAM (45-51)
+        { q: "El caso de memoria calendárica analizado por Baddeley y Conway es el del paciente RM. Cuando se le presentaban fechas, su recuperación funcionaba:", o: ["Solo para noticias médicas que le hubiesen afectado orgánicamente.", "Identificando velozmente el día de la semana para orientarse cronológicamente como en un diario.", "Midiendo la posición de las estrellas ese año."], c: 1, e: "RM usaba las fechas como clave estructurante gracias a su extraña habilidad automática para calcular el día de la semana correspondiente a cualquier fecha." },
+        { q: "Frente a la organización 'jerárquica' general del modelo de Conway, Baddeley argumenta que el paciente calendárico RM utilizaba una estructura organizativa distinta para sus recuerdos, que sería:", o: ["Estructura circular fractal.", "Estructura asociativa libre aleatoria.", "Estructura matricial (cruzando variables y filas de años/días como un cuaderno)."], c: 2, e: "Se asume que funciona como una matriz (columnas de fechas, días, etc.) permitiéndole intersecar rápidamente su evento sobre el tiempo." },
+        { q: "El término HSAM acuñado por LePort et al. designa un cuadro excepcional de memoria que se traduce en castellano como:", o: ["Memoria Sensorial Auditiva Medular.", "Memoria Autobiográfica Altamente Superior.", "Hipomnesia Subliminal por Ansiedad Masiva."], c: 1, e: "HSAM (Highly Superior Autobiographical Memory) hace referencia a una capacidad clínica excepcional para recordar detalles vitales." },
+        { q: "En los estudios clínicos de LePort sobre la HSAM, una constatación muy importante es que su rendimiento en pruebas de laboratorio de memoria EPISÓDICA ESTÁNDAR (como la amplitud de dígitos o de prosa) resultó ser:", o: ["Un 200% superior al de la población normal.", "Prácticamente nulo, sugiriendo síndrome autista puro.", "Totalmente normal, sin diferencias claras con el grupo de control."], c: 2, e: "La gran paradoja del HSAM es que la excepcionalidad mnésica se confina estrictamente a su vida autobiográfica; ante tests episódicos puros, son normales." },
+        { q: "¿Cuál se define empíricamente como la 'característica única' y central que unifica y da potencia a las personas que sufren de HSAM?", o: ["Su memoria icónica fotográfica.", "La habilidad calendárica (fechas/días precisos).", "Que todos tienen un daño evidente en el cerebelo."], c: 1, e: "LePort et al. (2012) postulan que la base para esa recuperación es el andamiaje mental cronológico que les provee su habilidad calendárica." },
+
+        // 6. FLASHBULB Y DISTORSIONES (52-65)
+        { q: "El fenómeno popularizado por Brown y Kulik (1977) de los recuerdos extremadamente vívidos (ej. saber qué hacías al enterarte del asesinato de Kennedy o el 11-S) recibe el nombre técnico de:", o: ["Recuerdos flash (flashbulb memories).", "Recuerdos semánticos puros.", "Fenómeno del marco rígido."], c: 0, e: "La vivacidad casi fotográfica que surge del shock noticioso se denominó flashbulb memories." },
+        { q: "El teórico mecanismo postulado originalmente por Brown y Kulik para explicar los recuerdos flash (una grabación neurológica paralela desencadenada por la emoción) se bautizó como:", o: ["Vía muerta (garden path).", "Mecanismo de impresión (now print).", "Filtro atencional rígido."], c: 1, e: "Mecanismo «now print» asume un registro inmutable por un grado extremo de shock fisiológico y emocional." },
+        { q: "Según las investigaciones de McCloskey y de Berntsen (sobre las muertes de líderes negros o la ocupación danesa), ¿qué variable es clave para disparar la vivacidad del recuerdo flash?", o: ["Haber grabado el suceso en VHS.", "La falta de sueño del día anterior.", "El alto grado de implicación y relevancia personal que la víctima o el individuo siente ante el evento."], c: 2, e: "Los daneses de la resistencia recordaban suceso de ocupación mejor, al igual que los afroamericanos el asesinato de Luther King; la implicación personal modula el flash." },
+        { q: "En el clásico estudio crítico de Neisser y Harsch sobre el desastre del Challenger, se evidenció que los recuerdos flash:", o: ["Son un engaño, porque son 100% fotográficos y nunca cambian.", "Sufren una caída brutal de precisión, alterando la memoria de la fuente (ej. muchos aseguraban haberlo visto por TV cuando en origen lo negaban).", "No existen en la cultura americana."], c: 1, e: "Con el tiempo el detalle inicial cambiaba o se perdía, probando que no eran grabaciones perfectas inmutables en la mente." },
+        { q: "Talarico y Rubin demostraron experimentalmente contrastando un evento flash (11-S) con un recuerdo de un evento cotidiano en el mismo día que:", o: ["El recuerdo flash perdía objetivamente los mismos detalles y se difuminaba igual, aunque el sujeto mantenía la ilusión o CREENCIA de que seguía siendo vívido.", "El recuerdo cotidiano se afianzaba diez veces más fuerte que el flash.", "El evento flash no sufría deterioro anatómico jamás."], c: 0, e: "Ambos decaen objetivamente a la misma velocidad. Lo que distingue al recuerdo flash es la extrema CONFIANZA infundada que retiene el sujeto en él." },
+        { q: "Como conclusión sobre los recuerdos flash, la mayoría de psicólogos cognitivos hoy defiende que:", o: ["Operan mediante el gen 'now print' del hemisferio derecho.", "Es imposible olvidar los traumas bajo ninguna circunstancia.", "No requieren de un mecanismo especial o sobrenatural: se explican simplemente por ser eventos distintivos, relevantes, muy emocionales y repasados repetidamente en los medios."], c: 2, e: "Las variables potenciadoras convencionales de la memoria (repetición, emoción y distintividad) bastan para explicar el aparente fenómeno fotográfico." },
+        { q: "Al estudiar las distorsiones de la memoria del famoso testigo John Dean (el «hombre con memoria de grabadora» del Watergate), Neisser se percató de que:", o: ["Dean era una máquina sin fallos gracias a su edad.", "El sentido general de lo narrado era preciso, pero distorsionaba los detalles específicos exagerando sistemáticamente su propio papel.", "Inventó un escándalo donde no lo hubo."], c: 1, e: "Como en 'rashomon', el recuerdo tendía al egocentrismo retrospectivo: la narrativa vital se moldea para asegurar la autoimportancia del sujeto." },
+        { q: "En la memoria autobiográfica sana, ¿qué función utilitaria se asume que cumplen las distorsiones, el olvido selectivo del fracaso y la hipertrofia del recuerdo del éxito?", o: ["La preservación y mantenimiento de la autoestima frente a críticas.", "Hacer daño y dañar a terceros sociopáticamente.", "Ninguna, indican Alzheimer temprano incipiente."], c: 0, e: "La memoria humana no es una grabadora; sus sesgos están diseñados homeostáticamente para proteger nuestro autoconcepto del desmoronamiento depresivo." },
+        { q: "Frente a este mecanismo defensivo sano de la memoria, ¿cómo reaccionan característicamente las personas inmersas en cuadros de depresión (según Williams y Scott)?", o: ["Recuerdan sus éxitos con una hiper-nitidez patológica (manía).", "Suprimen todos sus recuerdos asumiendo un estado de fuga psíquica.", "Recuperan recuerdos autobiográficos mucho menos ricos, detallados y, en general, se ven atrapados en rumiaciones y sesgos negativos."], c: 2, e: "El deprimido pierde el sesgo protector de autoestima, atrapándose en un bucle negativo donde recuerda peor y con menos detalle específico." },
+        { q: "Al presentar palabras-clave neutras a pacientes con tendencias depresivas, se observa un síntoma mnésico consistente en responder con vaguedades recurrentes (ej. «cuando me critican»). Esto se llama:", o: ["Doble disociación temporal.", "Sobregeneralización autobiográfica.", "Recuperación espontánea hiperactiva."], c: 1, e: "La sobregeneralización se utiliza presuntamente para evadir la recuperación de detalles dolorosos dolorosos, quedándose en la superficie del recuerdo." },
+        { q: "El fenómeno de la sobregeneralización autobiográfica en pacientes que han intentado el suicidio recientemente:", o: ["Es irreversible genéticamente.", "Se agudiza si leen poesía en voz alta.", "Se revierte cuando la depresión se trata y cura con éxito."], c: 2, e: "A medida que remite el cuadro anímico grave, el paciente vuelve a recuperar su capacidad para ofrecer memorias puntuales y detalladas." },
+        { q: "El experimento de Conway, donde interrogó a alumnos sobre sus notas de examen antes y después de su publicación, demostró elegantemente que:", o: ["Quienes rindieron por debajo de lo esperado distorsionaban su relato afirmando haber estudiado menos o que el examen era menos válido.", "Nadie se atrevió a contestar a la encuesta final.", "Quienes suspendían confesaban recordar detalles humillantes con precisión."], c: 0, e: "Una reescritura total del pasado: el alumno 'ajusta' retrospectivamente su motivación e inversión de tiempo para justificar el fracaso y proteger su autoestima." },
+        { q: "A pesar del infierno emocional, el testimonio judicial de los supervivientes del campo de exterminio (Wagenaar) comprobó un grave fallo que comprometía el reconocimiento del verdugo ('Iván el Terrible'). Esto ocurrió porque:", o: ["Muchos de los testigos que dijeron reconocerle lo habían visto en imágenes emitidas previamente por televisión.", "Los testigos eran sordos y ciegos.", "Solo testificaban por dinero."], c: 0, e: "El factor de 'contaminación por medios de comunicación' interfiere mortalmente: se mezcla el rostro visto ayer en las noticias con el contexto del trauma." },
+
+        // 7. TEPT, FLASHBACKS Y LA HIPÓTESIS DE REAPARICIÓN (66-72)
+        { q: "El trastorno caracterizado por ansiedad severa y la emergencia de flashbacks donde la persona 'revive' intrusivamente el terror de la escena (violación, guerra, accidente) se denomina:", o: ["Demencia Semántica Cortical.", "Síndrome Hipertimésico Fóbico.", "Trastorno de Estrés Postraumático (TEPT)."], c: 2, e: "El TEPT es la reacción clínica frente a sucesos traumáticos acompañada de ansiedad extrema e invasión autobiográfica de la memoria." },
+        { q: "Brewin propone una distinción entre memoria accesible a la voluntad, y la que experimenta un paciente de TEPT en un flashback intrusivo. Esta última, tan detallada y rebelde a la voluntad, se llamaría:", o: ["Memoria episódica genérica.", "Memoria procedimental automática.", "Memoria situacionalmente accesible."], c: 2, e: "Brewin denomina 'situacionalmente accesible' a esa memoria tan anclada al miedo, que emerge como flashback sin poder forzarse conscientemente (verbalmente)." },
+        { q: "A nivel fisiológico y terapéutico, el modelo que intenta explicar el TEPT asumiendo que los estímulos del contexto se han asociado fatalmente a la emoción de terror y se tratan extinguiendo la respuesta, es el:", o: ["El modelo de condicionamiento clásico conductual.", "La terapia centrada en la represión freudiana del ello.", "El modelo cognitivista del procesamiento de la información del ordenador."], c: 0, e: "Explicar el miedo por emparejamiento con el contexto traumático y tratarlo con exposición se basa en las leyes del condicionamiento clásico." },
+        { q: "Se ha especulado que si en un trauma se atenúa la respuesta en cadena del sistema nervioso autónomo (la descarga de la amígdala), el paciente podría evitar consolidar un TEPT severo. Esto se logra experimentalmente con:", o: ["Benzodiacepinas para el sueño profundo.", "Fármacos que asisten a la recuperación de adrenalina y cortisol, como el propranolol.", "Cafeína en altísimas dosis."], c: 1, e: "El tratamiento inicial con el bloqueador propranolol puede atenuar el sobre-arraigo de las huellas fóbicas al frenar la hormona del estrés." },
+        { q: "El inteligente estudio sobre el hipocampo de Gilbertson en gemelos (donde uno fue veterano en Vietnam y otro se quedó en casa) demostró teóricamente que:", o: ["Ir a la guerra te hace crecer el hipocampo al 200%.", "Un hipocampo anatómicamente reducido es un factor de vulnerabilidad genética PREVIO a ir a la guerra que predispone a desarrollar TEPT tras el estrés.", "El estrés de la guerra no deja ninguna secuela si el veterano tiene hermano gemelo."], c: 1, e: "Tanto el soldado con TEPT como su gemelo seguro en casa tenían un hipocampo pequeño. Esto prueba que el hipocampo pequeño predispone a enfermar de TEPT (no que la guerra encoja el hipocampo)." },
+        { q: "La afirmación clínica, sostenida por Neisser (1967), de que los flashbacks traumáticos son fijos, estereotipados e inmutables (aparecen y reaparecen exactamente iguales siempre) es conocida como:", o: ["El dogma del olvido traumático.", "La hipótesis de la reaparición.", "El constructivismo absoluto de Bartlett."], c: 1, e: "La hipótesis de la reaparición asume erróneamente que una memoria traumática en TEPT es fija, estática, idéntica como un disco atascado." },
+        { q: "Sin embargo, el equipo de Berntsen y Rubin evaluó la hipótesis de la reaparición estudiando a los supervivientes daneses del tsunami (2004) y descubrió empíricamente que:", o: ["Efectivamente, el recuerdo nunca variaba su forma estereotipada.", "El tsunami afectó el cerebelo y sufrieron ataxia progresiva.", "Los flashbacks del TEPT no son inmutables, sino que se reconstruyen y rigen por los mismos principios generales de declive de toda la memoria autobiográfica."], c: 2, e: "Demostraron que en verdad los flashbacks no están 'encerrados' estáticamente, sino que son recuerdos reconstructivos vulnerables a los mismos sesgos que lo normal." },
+
+        // 8. AMNESIA PSICÓGENA Y CORRELATOS NEURALES (73-80)
+        { q: "La pérdida de memoria autobiográfica y autobiográfica motivada no por un golpe en la cabeza, sino originada por el escape psíquico frente a una crisis emocional aguda, estrés judicial o deudas, se denomina globalmente:", o: ["Amnesia psicógena.", "Amnesia retrógrada simétrica o síndrome de Ribot.", "Amnesia anterógrada total permanente."], c: 0, e: "El cuadro de amnesias derivadas del plano psicológico o afectivo conforma el campo de las amnesias psicógenas funcionales." },
+        { q: "Un sujeto acusado de desfalco huye, pierde el acceso a su propia identidad personal pasada, y asume un rol vagabundo durante un tiempo. ¿Cómo se conoce este subtipo de amnesia funcional?", o: ["Crisis de histeria clásica.", "Síndrome hiper-reconocimiento focal.", "Estado de fuga."], c: 2, e: "El 'estado de fuga' implica una desconexión drástica con la identidad en respuesta al estrés (junto con ánimo deprimido)." },
+        { q: "Un rasgo muy importante del estado de fuga funcional (que lo diferencia de graves lesiones cerebrales) es que en el paciente de fuga:", o: ["El conocimiento semántico general y la inteligencia suelen estar bien preservados.", "El cociente intelectual se vuelve el de un niño de 3 años.", "Se destruye el recuerdo de cómo abrocharse los cordones de los zapatos."], c: 0, e: "Conservan el conocimiento general del mundo (saben matemáticas, hablan idiomas), a diferencia de la demencia generalizada o traumas destructivos de áreas." },
+        { q: "Cerca de un 30% de las personas que cometen un crimen violento extremo afirman sufrir amnesia de su propio acto ('amnesia de situación'). Yuille y Cutshall señalan que parte de esto es amnesia genuina en vez de simulación, debido a factores fisiológicos como:", o: ["La falta repentina de magnesio en el hipotálamo.", "El factor agresivo sumado al uso de alcohol excesivo que produce 'blackouts' o dependencia del estado al momento del crimen.", "El efecto Von Restorff temporal."], c: 1, e: "El pico brutal de agresión, a menudo borracho, bloquea o segmenta la consolidación por intoxicación (blackouts o dependencia del estado farmacológico severo)." },
+        { q: "Respecto al 'trastorno de personalidad múltiple', una revisión crítica de la patología (Kopelman, Merskey) asume que su prevalencia hoy en día refleja a menudo:", o: ["Una moda de síntomas moldeada o reforzada por las expectativas sociales y los psiquiatras, como ocurrió con la anestesia en guante histérica.", "La prueba real de que el alma humana se parte en dos.", "Una grave infección vírica que secciona el cuerpo calloso en Norteamérica."], c: 0, e: "La ciencia sugiere fuertemente que es a menudo un artefacto iatrogénico: la cultura clínica y mediática refuerza al paciente a interpretar sus disociaciones normales como 'identidades alternas'." },
+        { q: "La gran diferencia básica para distinguir clínicamente la pérdida de memoria en un cuadro psicógeno, frente a la de la temida amnesia orgánica clásica, es que en la amnesia de base biológica (por tumor, infarto o extirpación):", o: ["El recuerdo de la identidad personal del sujeto rara vez se pierde.", "La persona se vuelve superdotada en matemáticas de forma repentina.", "Solo se borran los idiomas extranjeros que el sujeto aprendió recientemente."], c: 0, e: "En la amnesia biológica/orgánica pura (por el daño en el hipocampo clásico), la persona no olvida ni su nombre ni que está casada (identidad), sino que falla en memorias específicas o aprender nuevas cosas." },
+        { q: "Conway y Addis evaluaron la memoria autobiográfica usando fMRI/EEG, demostrando que su activación requiere en las primeras fases áreas prefrontales y en las tardías:", o: ["Corteza occipital y temporal, lo que prueba la importancia vital que juega la imaginería visual retrospectiva en un recuerdo personal.", "Únicamente el ganglio de la base, indicando que el pasado es mero movimiento instintivo.", "Silencio total de ondas cerebrales Beta."], c: 0, e: "Se corrobora anatómicamente el gran peso de la visión y de las áreas posteriores de imaginería para 'vernos en nuestra vida' internamente." },
+        { q: "El experimento de Cabeza et al., en el que los universitarios veían fotografías del campus sacadas por ellos mismos frente a otras hechas por extraños, concluyó que las autorreferenciales reclutaban intensamente:", o: ["La vía acústica de Heschl.", "El córtex prefrontal medial (relacionado con el self) junto con las redes habituales de la memoria episódica.", "El cerebelo y la amígdala exclusiva para oler peligro inminente."], c: 1, e: "Si la foto es 'tuya', tu cerebro episódico se acopla inmediatamente con la región prefrontal medial que integra el 'Yo' autobiográfico." }
+    ];
+let questions=[...originalQuestions],current=0,score=0,missed=[],retryMode=false;
+
+function loadQuestion(){
+let q=questions[current];
+document.getElementById('prog').innerText=`Pregunta ${current+1} de ${questions.length}`;
+document.getElementById('fill').style.width=(current/questions.length*100)+'%';
+document.getElementById('mode').innerText=retryMode?'Modo repaso':'Modo completo';
+document.getElementById('q').innerText=`${current+1}. ${q.q}`;
+document.getElementById('fb').className='feedback';
+document.getElementById('fb').style.display='none';
+document.getElementById('next').style.display='none';
+let opts=document.getElementById('opts');opts.innerHTML='';
+q.o.forEach((o,i)=>{let b=document.createElement('button');b.className='opt';b.innerText=o;b.onclick=()=>answer(i,b);opts.appendChild(b);});
+}
+
+function answer(i,btn){
+let q=questions[current];
+let all=document.querySelectorAll('.opt');
+all.forEach(x=>x.disabled=true);
+if(i===q.c){
+btn.classList.add('correct');
+score++;
+document.getElementById('score').innerText='Puntuación: '+score;
+document.getElementById('fb').className='feedback show good';
+document.getElementById('fb').innerHTML='<b>Correcto.</b><br>'+q.e;
+}else{
+btn.classList.add('incorrect');
+all[q.c].classList.add('correct');
+if(!missed.some(m=>m.q===q.q)) missed.push(q);
+document.getElementById('fb').className='feedback show bad';
+document.getElementById('fb').innerHTML='<b>Incorrecto.</b><br><br>La respuesta correcta es: <b>'+q.o[q.c]+'</b><br><br>'+q.e;
+}
+document.getElementById('next').style.display='inline-block';
+document.getElementById('next').innerText=current===questions.length-1?'Ver resultados':'Siguiente';
+}
+
+function nextQuestion(){current++; if(current<questions.length) loadQuestion(); else showResults();}
+
+function showResults(){
+document.getElementById('quiz').style.display='none';
+document.getElementById('results').style.display='block';
+document.getElementById('fill').style.width='100%';
+let pct=Math.round(score/questions.length*100);
+document.getElementById('final').innerHTML=`${score}/${questions.length} · ${pct}%`;
+document.getElementById('medal').innerText=pct>=90?'🏆 Medalla de Oro · Dominio excelente':pct>=75?'🥈 Medalla de Plata · Muy buen nivel':pct>=60?'🥉 Medalla de Bronce · Base aprobada':'📚 Modo refuerzo · Conviene repasar';
+document.getElementById('msg').innerText='Tema 9: memoria autobiográfica, identidad, curva vital, HSAM, recuerdos flash, TEPT y amnesia psicógena.';
+document.getElementById('missed').innerHTML=missed.length?'<h3>Preguntas falladas: '+missed.length+'</h3><ul>'+missed.map((x,i)=>'<li>'+(i+1)+'. '+x.q+'</li>').join('')+'</ul>':'<b>Perfecto. Sin errores.</b>';
+document.getElementById('retry').style.display=missed.length?'inline-block':'none';
+}
+
+function retryMissed(){
+questions=[...missed];missed=[];current=0;score=0;retryMode=true;
+document.getElementById('score').innerText='Puntuación: 0';
+document.getElementById('results').style.display='none';
+document.getElementById('quiz').style.display='block';
+loadQuestion();
+}
+
+function restartQuiz(){
+questions=[...originalQuestions];current=0;score=0;missed=[];retryMode=false;
+document.getElementById('score').innerText='Puntuación: 0';
+document.getElementById('results').style.display='none';
+document.getElementById('quiz').style.display='block';
+loadQuestion();
+}
+loadQuestion();
+</script>
+</body>
+</html>

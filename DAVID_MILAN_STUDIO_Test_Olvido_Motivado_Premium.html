@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAVID MILÁN STUDIO | Olvido Motivado</title>
+<style>
+:root{--gold:#d4af37;--gold2:#f3d98b;--bg:#05070d;--bg2:#0b1323;--txt:#f5f5f5;--muted:#aab3c5;--ok:#33d17a;--bad:#ff6b6b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Segoe UI,sans-serif;min-height:100vh;background:
+radial-gradient(circle at top left,rgba(212,175,55,.20),transparent 30%),
+radial-gradient(circle at bottom right,rgba(50,90,180,.25),transparent 35%),
+linear-gradient(135deg,var(--bg),var(--bg2),#05070d);
+display:flex;justify-content:center;align-items:center;padding:30px;color:var(--txt)}
+.container{width:100%;max-width:1000px;background:rgba(255,255,255,.06);
+backdrop-filter:blur(18px);border:1px solid rgba(212,175,55,.25);
+border-radius:28px;padding:32px;box-shadow:0 25px 80px rgba(0,0,0,.45)}
+.brand{display:inline-block;padding:10px 18px;border-radius:999px;border:1px solid rgba(212,175,55,.4);color:var(--gold2);font-weight:800;letter-spacing:3px;margin-bottom:18px}
+h1{font-size:52px;background:linear-gradient(90deg,#fff,var(--gold2));-webkit-background-clip:text;color:transparent}
+h2{margin:8px 0 25px;color:var(--muted);font-weight:400}
+.top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.stat{padding:12px 16px;border-radius:14px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.1);color:var(--gold2);font-weight:700}
+.bar{height:10px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-bottom:20px}
+.fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:.3s}
+.card{padding:24px;border-radius:22px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.08)}
+.q{font-size:22px;font-weight:800;line-height:1.4;margin-bottom:20px}
+.options{display:grid;gap:12px}
+.opt{padding:15px;border-radius:16px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);cursor:pointer;color:white;text-align:left;font-size:15px;line-height:1.45}
+.opt:hover:not(:disabled){border-color:var(--gold);transform:translateY(-1px)}
+.opt:disabled{cursor:not-allowed;opacity:.95}
+.correct{background:rgba(51,209,122,.18)!important;border-color:var(--ok)!important}
+.incorrect{background:rgba(255,107,107,.18)!important;border-color:var(--bad)!important}
+.feedback{display:none;margin-top:18px;padding:18px;border-radius:16px;line-height:1.6}
+.show{display:block}
+.good{background:rgba(51,209,122,.12);border-left:5px solid var(--ok)}
+.bad{background:rgba(255,107,107,.12);border-left:5px solid var(--bad)}
+.controls{display:flex;justify-content:space-between;gap:10px;margin-top:20px;flex-wrap:wrap}
+.btn{padding:14px 22px;border:none;border-radius:14px;font-weight:800;cursor:pointer}
+.gold{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#111}
+.dark{background:rgba(255,255,255,.08);color:white;border:1px solid rgba(255,255,255,.12)}
+#results{display:none;text-align:center}
+.medal{margin:15px auto;padding:12px 20px;border-radius:999px;border:1px solid rgba(212,175,55,.35);display:inline-block;color:var(--gold2)}
+.missed{text-align:left;margin-top:20px;padding:18px;border-radius:16px;background:rgba(0,0,0,.2);line-height:1.55}
+.missed h3{color:var(--gold2);margin-bottom:10px}
+.missed ul{padding-left:20px}
+@media(max-width:650px){.container{padding:22px}h1{font-size:36px}.q{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="brand">DAVID MILÁN STUDIO</div>
+<h1>Mega-Test Premium</h1>
+<h2>Tema 8: Olvido Motivado</h2>
+
+<div id="quiz">
+<div class="top">
+<div class="stat" id="prog"></div>
+<div class="stat" id="score">Puntuación: 0</div>
+<div class="stat" id="mode">Modo completo</div>
+</div>
+<div class="bar"><div class="fill" id="fill"></div></div>
+<div class="card">
+<div class="q" id="q"></div>
+<div class="options" id="opts"></div>
+<div id="fb" class="feedback"></div>
+<div class="controls">
+<button class="btn dark" onclick="restartQuiz()">Reiniciar</button>
+<button class="btn gold" id="next" onclick="nextQuestion()" style="display:none">Siguiente</button>
+</div>
+</div>
+</div>
+
+<div id="results">
+<h2 id="final"></h2>
+<div class="medal" id="medal"></div>
+<p id="msg"></p>
+<div id="missed" class="missed"></div><br>
+<button class="btn dark" onclick="restartQuiz()">Volver a empezar</button>
+<button class="btn gold" id="retry" onclick="retryMissed()">Repasar falladas</button>
+</div>
+</div>
+
+<script>
+const originalQuestions=[
+        // INTRODUCCIÓN Y JILL PRICE
+        { q: "El caso de hipertimesia de Jill Price documenta con claridad:", o: ["Que una memoria perfecta garantiza la felicidad absoluta.", "El coste cognitivo y emocional de no poder olvidar, especialmente los recuerdos malos.", "Que el olvido incidental no existe en absoluto."], c: 1, e: "Jill Price documenta el coste cognitivo y emocional de no poder olvidar, indicando que no sólo sufría la persistencia de los buenos recuerdos, sino que anhelaba poder olvidar los malos." },
+        { q: "En la película '¡Olvídate de mí!' (Eternal Sunshine of the Spotless Mind) se ilustra una metáfora sobre:", o: ["La amnesia psicógena espontánea inducida por el estrés.", "El deseo profundamente humano de intervenir activamente para extirpar/borrar selectivamente recuerdos dolorosos.", "El síndrome de falsos recuerdos inducido por sugestión terapeútica."], c: 1, e: "La película ofrece una metáfora potente del fenómeno: el deseo humano de intervenir activamente para borrar selectivamente recuerdos dolorosos de la conciencia." },
+        { q: "La afirmación 'los individuos no son espectadores pasivos del paso de sus recuerdos a través del tiempo' implica que:", o: ["El olvido es puramente pasivo y biológico.", "Los seres humanos regulan de manera sistemática lo que codifican, lo que recuperan y lo que dejan de recuperar.", "El hipocampo destruye activamente neuronas durante la noche."], c: 1, e: "Implica que regulamos de manera sistemática lo que codificamos y recuperamos, y que somos 'cómplices' activos de nuestros fallos mnésicos." },
+        { q: "Cuando hablamos de 'olvido motivado', nos referimos a un mecanismo de control que se apoya en el córtex prefrontal lateral operando inhibitoriamente sobre:", o: ["El lóbulo occipital.", "El hipocampo.", "La amígdala cerebelosa."], c: 1, e: "Mecanismos inhibitorios de control cognitivo soportados por el córtex prefrontal lateral, operando en este caso sobre el hipocampo." },
+        
+        // REGULACIÓN EMOCIONAL Y SESGO DE POSITIVIDAD
+        { q: "Si evaluamos el contenido de la memoria autobiográfica a lo largo de la vida, descubriremos estadísticamente un:", o: ["Sesgo de negatividad traumática.", "Sesgo de positividad.", "Equilibrio absoluto neutro."], c: 1, e: "Una de las regularidades más robustas es el sesgo de positividad: recordamos con mayor facilidad los acontecimientos positivos que los negativos." },
+        { q: "Los estudios de Waldfogel (1948) y Bernsten (1996) mostraron sistemáticamente que los recuerdos que afloraban espontáneamente eran mayoritariamente:", o: ["Agradables/positivos (aprox. 50%).", "Desagradables/traumáticos.", "Estrictamente neutros."], c: 0, e: "En ambos estudios la asimetría fue consistente: aproximadamente el 49-50% de los recuerdos generados o espontáneos eran agradables." },
+        { q: "En el estudio clásico de Charles, Mather y Carstensen (2003) con imágenes de distintas valencias emocionales, se observó que:", o: ["Los jóvenes recordaban muchas más imágenes negativas que positivas.", "Los adultos mayores recordaban casi el doble de imágenes positivas que negativas en el recuerdo libre.", "La edad no afectaba en absoluto a la valencia del recuerdo."], c: 1, e: "Los adultos mayores recordaban casi el doble de imágenes positivas que negativas. El sesgo de positividad aumenta con la edad." },
+        { q: "En este mismo experimento de Carstensen, ¿qué ocurrió cuando se aplicó una prueba de RECONOCIMIENTO en lugar de recuerdo libre?", o: ["Los adultos mayores reconocieron las imágenes positivas y negativas con igual precisión.", "El sesgo de positividad se triplicó.", "Los mayores fueron incapaces de reconocer las imágenes positivas."], c: 0, e: "En reconocimiento, los adultos mayores reconocían las imágenes positivas y negativas con igual precisión. Todas estaban disponibles; el sesgo era de acceso en la recuperación libre." },
+        { q: "La teoría de la 'selectividad socioemocional' de Carstensen postula que el aumento del sesgo de positividad en mayores se debe a que:", o: ["Pierden neuronas en las áreas de dolor emocional.", "Al acortarse su horizonte temporal percibido, reorientan sus objetivos vitales hacia el mantenimiento del bienestar emocional.", "La sociedad les obliga a ser más felices."], c: 1, e: "A medida que el horizonte temporal percibido se acorta, reorientan sus objetivos hacia el mantenimiento del bienestar emocional, invirtiendo recursos en la regulación emocional." },
+        { q: "¿Requiere la regulación emocional y el olvido motivado de una deliberación consciente explícita en todos los casos?", o: ["Sí, si no hay voluntad consciente, es simplemente olvido incidental pasivo.", "No, todos estos mecanismos pueden operar con relativa automaticidad como un hábito consolidado a lo largo del tiempo.", "Sí, el individuo debe verbalizar su deseo de olvidar en voz alta."], c: 1, e: "Todos estos mecanismos pueden operar con relativa automaticidad, sin requerir deliberación consciente explícita, consolidándose como hábitos (desviar la atención, etc.)." },
+        { q: "¿El 'sesgo de positividad' se mantiene en pacientes que sufren un cuadro de depresión clínica activa?", o: ["Sí, porque es un sesgo biológico innato irrompible.", "No, de hecho, se invierte: los pacientes deprimidos recuperan más fácilmente contenidos negativos y tienen dificultad para evocar los positivos.", "Se mantiene exactamente igual pero con mayor amnesia general."], c: 1, e: "Los pacientes deprimidos invierten el sesgo de positividad habitual: recuperan más fácilmente los contenidos negativos, lo que agrava su depresión." },
+
+        // TERMINOLOGÍA
+        { q: "En la terminología contemporánea, ¿qué término se reserva para referirse a la exclusión INTENCIONAL y voluntaria de un contenido de la conciencia?", o: ["Represión.", "Supresión.", "Amnesia psicógena retroactiva."], c: 1, e: "Supresión denota procesos voluntarios y se sitúa en la zona del olvido intencional, siendo el objeto de estudio del paradigma think/no-think." },
+        { q: "El término 'represión' (de origen freudiano) asume que el contenido expulsado de la conciencia:", o: ["Es destruido irreversiblemente por el hipocampo.", "No se destruye, y puede seguir influyendo inconscientemente e incluso reemerger (retorno de lo reprimido).", "Se convierte automáticamente en una fobia específica animal."], c: 1, e: "Los contenidos reprimidos no se destruyen: siguen pudiendo influir en la conducta (sueños, lapsus) y pueden reemerger bajo ciertas condiciones." },
+        { q: "¿Cuál es la diferencia conceptual entre 'olvido motivado' y 'olvido intencional' en la literatura experimental?", o: ["Son sinónimos exactos.", "El olvido motivado es más amplio e incluye casos automáticos/inconscientes, mientras el intencional requiere un propósito consciente y explícito de olvidar.", "El olvido intencional solo se aplica a palabras y el motivado a imágenes."], c: 1, e: "El olvido motivado es una categoría amplia que engloba al intencional, pero también incluye el olvido que responde a motivaciones sin que medie una intención explícita de olvidar." },
+        { q: "La forma más profunda y clínica del olvido motivado, donde ocurren pérdidas mnésicas dramáticas sin que medie daño neurológico detectable, se denomina:", o: ["Interferencia proactiva severa.", "Síndrome Hipertimésico Fásico.", "Amnesia psicógena."], c: 2, e: "La amnesia psicógena es una manifestación clínica del olvido motivado caracterizada por olvido profundo de génesis psicológica, no biológica." },
+
+        // OLVIDO DIRIGIDO
+        { q: "¿Quién desarrolló a comienzos de los setenta el paradigma experimental del 'olvido dirigido' (directed forgetting)?", o: ["Sigmund Freud.", "Robert Bjork.", "Michael Anderson."], c: 1, e: "Fue desarrollado por Robert Bjork a comienzos de los años setenta." },
+        { q: "En el 'método de ítems' del olvido dirigido, ¿en qué momento se introduce la instrucción para recordar u olvidar?", o: ["Después de estudiar la lista completa de todos los ítems.", "Inmediatamente después de la presentación de cada ítem individual.", "Veinticuatro horas antes del experimento."], c: 1, e: "En el método de ítems, los participantes reciben una serie de estímulos presentados de uno en uno, y DESPUÉS de cada ítem aparece la señal de recordar/olvidar." },
+        { q: "Una característica clave del método de ítems es que el déficit de memoria (el efecto del olvido):", o: ["Solo se observa en el recuerdo libre.", "Se observa TAMBIÉN en pruebas de reconocimiento, lo que sugiere un problema en la codificación misma.", "Desaparece por completo en pruebas de reconocimiento."], c: 1, e: "El efecto se observa también en pruebas de reconocimiento, sugiriendo que el problema está en la codificación deficiente del ítem, no sólo en la recuperación." },
+        { q: "Según el experimento de Fawcett y Taylor (2008), que midió el tiempo de reacción ante un asterisco justo tras la instrucción de olvidar/recordar, la instrucción de 'olvidar' produjo:", o: ["Menor tiempo de reacción, demostrando que olvidar libera atención instantáneamente.", "Mayor tiempo de reacción, demostrando que olvidar consume recursos atencionales (supresión activa).", "El mismo tiempo de reacción."], c: 1, e: "Los participantes tardaban significativamente MÁS en responder al asterisco después de 'olvidar', indicando que olvidar consumía recursos (proceso activo de supresión de codificación)." },
+        { q: "Sedikides y Green (2000) descubrieron que la gente recuerda significativamente peor las afirmaciones desfavorables sobre sí misma que las favorables, un fenómeno llamado:", o: ["Amnesia psicógena situacional.", "Efecto de negligencia mnésica (mnemic neglect).", "Efecto de superioridad del rasgo personal."], c: 1, e: "Acuñaron el término efecto de negligencia mnésica: limitar activamente la codificación de retroalimentación negativa para proteger su autoconcepto." },
+        { q: "¿En el estudio de Sedikides y Green, desaparecía el sesgo/efecto de negligencia mnésica si se decía que el informe negativo era sobre OTRA persona?", o: ["Sí, en ese caso recordaban igualmente bien los rasgos positivos y negativos.", "No, el sesgo era biológico y afectaba a toda lectura negativa.", "Empeoraba y provocaba amnesia retroactiva general."], c: 0, e: "El sesgo desaparecía cuando el informe correspondía a otra persona, probando que es un proceso motivado para proteger la propia autoimagen." },
+        { q: "En el 'método de listas' del olvido dirigido, la instrucción de olvidar se presenta:", o: ["Después de estudiar una primera lista completa, antes de presentar una segunda lista.", "Detrás de cada palabra de la lista dos.", "Durante la fase de reconocimiento."], c: 0, e: "La instrucción se introduce como sorpresa después de que el participante haya estudiado una lista COMPLETA de ítems, antes de estudiar la lista 2." },
+        { q: "El método de listas típicamente produce dos efectos: un coste sobre el recuerdo de la Lista 1 y un...", o: ["Beneficio sobre el recuerdo de la Lista 2 (por liberación de interferencia proactiva).", "Coste equivalente sobre la Lista 2.", "Ceguera atencional inespecífica."], c: 0, e: "Se observa un beneficio sobre la segunda lista, ya que olvidar la primera lista libera al participante de la interferencia proactiva que esta habría ejercido." },
+        { q: "¿Desaparece el déficit de la primera lista (en el método de listas) si usamos una prueba de RECONOCIMIENTO en vez de recuerdo libre?", o: ["Sí, suele desaparecer, lo que sugiere que el problema es de acceso y no de codificación.", "No, se agrava el doble.", "El método de listas no puede evaluarse con reconocimiento."], c: 0, e: "A diferencia del método de ítems, los efectos del método de listas suelen desaparecer en el reconocimiento. La huella está disponible, el problema es el acceso." },
+        { q: "Sahakyan y Kelley (2002) propusieron que el déficit en el método de listas no requiere inhibición de ítems, sino que se explica por un:", o: ["Decaimiento temporal.", "Desplazamiento contextual.", "Daño cortical inducido."], c: 1, e: "Propusieron el desplazamiento contextual: la instrucción provoca un cambio de contexto mental que separa psicológicamente ambas listas, desalineando las claves de acceso." },
+        { q: "¿Cómo demostraron Sahakyan y Kelley que el mero cambio de marco mental basta para inducir olvido (sin instrucción de olvidar)?", o: ["Pidiendo a los sujetos que dedicaran un minuto a imaginar cómo sería su vida si fueran invisibles.", "Inyectándoles anestesia.", "Mostrando luces estroboscópicas."], c: 0, e: "Indujeron un desplazamiento contextual pidiendo que imaginaran ser invisibles. Ese mero cambio mental produjo un déficit comparable al del olvido dirigido." },
+
+        // DESPLAZAMIENTOS CONTEXTUALES
+        { q: "La demolición de la biblioteca del Instituto Columbine es un ejemplo socio-ambiental radical de una estrategia cotidiana para reducir la memoria dolorosa, llamada:", o: ["Represión freudiana profunda.", "Evitación del contexto (desplazamiento del entorno físico).", "Condicionamiento operante de aversión."], c: 1, e: "Transformar el entorno elimina los estímulos sensoriales y claves que reactivarían el recuerdo. Es una evitación y desplazamiento del contexto físico." },
+        { q: "¿En qué patología la evitación sistemática de los estímulos/claves asociadas al trauma se vuelve un factor de mantenimiento perjudicial?", o: ["Síndrome de Korsakoff.", "Demencia semántica progresiva.", "Trastorno de estrés postraumático (TEPT)."], c: 2, e: "En el TEPT, la evitación de recordatorios da un alivio inmediato que refuerza la conducta y bloquea el procesamiento emocional que permitiría superar el trauma." },
+
+        // THINK / NO-THINK
+        { q: "El paradigma Think/No-Think (Anderson y Green, 2001) se diseñó como el análogo en memoria de una tarea de control motor muy conocida, llamada:", o: ["Tarea de persecución rotatoria.", "Tarea Go/No-Go.", "Tarea de Stroop emocional."], c: 1, e: "Fue diseñado como el análogo mnésico de la tarea go/no-go (capacidad de inhibir/detener una respuesta motora prepotente)." },
+        { q: "Durante la fase principal del paradigma Think/No-Think, cuando la clave aparece en ROJO (condición no-think), la instrucción estricta al sujeto es:", o: ["Cerrar los ojos físicamente y no mirar la pantalla.", "Mirar la clave pero impedir activamente que el objetivo asociado entre en la conciencia.", "Decir en voz alta la primera palabra que se le ocurra."], c: 1, e: "Se exige mirar directamente a la clave pero impedir que el objetivo asociado entre en la conciencia." },
+        { q: "La diferencia de recuerdo entre los ítems de la condición 'think' y los ítems de la condición 'no-think' se denomina:", o: ["Efecto de primacía absoluta.", "Efecto total de control de la memoria.", "Olvido de recuperaciones previas."], c: 1, e: "La diferencia entre think y no-think es el efecto total de control de la memoria, demostrando cómo la intención modula la retención final." },
+        { q: "El hallazgo crítico del TNT es el 'efecto negativo de control' u 'olvido inducido por la supresión', que consiste en que:", o: ["Los ítems 'no-think' se recuperan PEOR que los ítems de control de la línea base.", "Los ítems 'think' se recuperan peor que los 'no-think'.", "Los ítems 'no-think' causan dolor de cabeza."], c: 0, e: "Los ítems no-think se recuperan PEOR que los de la línea base, mostrando que la instrucción activamente debilita/inhibe la memoria." },
+        { q: "Una propiedad fundamental del olvido inducido por la supresión (efecto no-think) es que es 'independiente de la clave' (cue independence). Esto significa que:", o: ["Sólo funciona si el test se hace en otro idioma.", "El déficit de recuperación se detecta también si evaluamos el ítem objetivo utilizando una pista semántica nueva e independiente que no se estudió.", "El recuerdo dependía del estado fisiológico (alcohol)."], c: 1, e: "El déficit se observa también con una clave independiente semánticamente relacionada (independent probe), apoyando que el propio ítem objetivo ha sido inhibido." },
+        { q: "Los estudios indican que el olvido inducido por la supresión en el paradigma TNT es una habilidad que está atenuada o reducida en personas con:", o: ["Alta inteligencia espacial.", "Trastorno por déficit de atención (TDAH).", "Trastornos alimentarios agudos."], c: 1, e: "Los adultos con TDAH muestran un olvido inducido por la supresión significativamente reducido, lo que es coherente con su déficit de control inhibitorio (prefrontal)." },
+        { q: "Benoit y Anderson (2012) distinguieron dos formas de supresión. Detener el proceso en sí mismo bloqueando la conciencia se llama ____, mientras que generar un pensamiento alternativo es ____:", o: ["Extinción retroactiva / Represión activa.", "Supresión directa / Sustitución de pensamiento.", "Olvido intencional / Desplazamiento contextual."], c: 1, e: "Detener el proceso = Supresión directa. Orientar la recuperación hacia un contenido asociado a la clave = Sustitución de pensamiento." },
+        { q: "A nivel de neuroimagen, la 'supresión directa' activa el córtex prefrontal lateral derecho y produce una ______ en el hipocampo.", o: ["Reducción de la activación.", "Hiperactivación masiva.", "Hemorragia focal."], c: 0, e: "La supresión directa activa el córtex prefrontal lateral derecho y produce una REDUCCIÓN concurrente de la activación hipocámpica (control inhibitorio top-down)." },
+        { q: "Por el contrario, la 'sustitución de pensamiento' en el paradigma TNT activa el prefrontal izquierdo y produce una ______ de la activación en el hipocampo.", o: ["Reducción drástica.", "Incremento (porque recluta activamente otra memoria).", "Desmielinización transitoria."], c: 1, e: "La sustitución de pensamiento involucra al prefrontal izquierdo con INCREMENTO (no reducción) de la activación hipocámpica, reflejando el reclutamiento activo del contenido alternativo." },
+
+        // AMNESIA PSICÓGENA
+        { q: "En el caso del paciente AMN (Markowitsch et al., 1998), la amnesia grave por un incendio leve en el sótano que le borró los últimos 6 años, se desencadenó porque:", o: ["Sufrió una leve hipoxia cerebral oculta por el humo.", "El estresor (el fuego) activó por asociación un trauma de infancia, un accidente con un coche en llamas.", "El paciente fue coaccionado por la mafia."], c: 1, e: "El desencadenante activó por asociación un trauma de la infancia profundamente almacenado (el coche en llamas cuando tenía 4 años)." },
+        { q: "La 'fuga disociativa' es una manifestación dramática de amnesia psicógena GLOBAL que se caracteriza porque el sujeto:", o: ["Pierde la capacidad absoluta de leer y escribir.", "Olvida su entera historia, incluyendo su propia identidad, y suele deambular sin saber quién es.", "Desarrolla falsas identidades criminales de forma consciente."], c: 1, e: "El sujeto olvida su identidad y su historia personal completa, frecuentemente siendo hallado deambulando y desorientado." },
+        { q: "A diferencia del síndrome amnésico orgánico clásico (lesión temporal medial), en la amnesia psicógena, la capacidad para almacenar nuevas experiencias (memoria anterógrada):", o: ["Desaparece por completo y el paciente no retiene nada nuevo.", "Permanece, en general, intacta.", "Se vuelve episódica invertida."], c: 1, e: "En la psicógena, la capacidad de aprendizaje de nueva información permanece intacta, lo que indica que fallan los procesos de recuperación retrógrada, no los de consolidación anterógrada." },
+        { q: "El estudio fMRI de Kikuchi et al. (2009) sobre caras de amnesia psicógena, detectó ante los rostros del 'periodo amnésico' un patrón de hiperactivación en el prefrontal lateral y reducción hipocámpica idéntico al observado en:", o: ["Las convulsiones tónico-clónicas.", "El olvido voluntario inducido por la supresión directa (Paradigma TNT).", "El aprendizaje procedimental de habilidades motoras."], c: 1, e: "Idéntico al patrón observado en los estudios de laboratorio sobre supresión de la recuperación (TNT), sugiriendo que la amnesia psicógena despliega involuntariamente los mismos mecanismos inhibitorios." },
+        
+        // FACTORES QUE FAVORECEN LA RECUPERACIÓN
+        { q: "Según Pavlov y las replicaciones de Wheeler, una memoria episódica aparentemente bloqueada o extinguida puede volver a reemerger espontáneamente debido a:", o: ["El mero paso del tiempo sin intervención adicional.", "Una lesión inducida en la amígdala.", "El consumo excesivo de azúcar."], c: 0, e: "La 'recuperación espontánea' ocurre cuando una memoria o respuesta previamente inaccesible reemerge con el paso del tiempo sin intervención deliberada." },
+        { q: "Según MacLeod y Macrae (2001), ¿cuál es el mecanismo cognitivo subyacente que permite la 'recuperación espontánea' de memorias temporalmente silenciadas?", o: ["La neurogénesis masiva en el córtex motor.", "La disipación gradual o temporal de la inhibición sobre la huella.", "La codificación semántica redundante retroactiva."], c: 1, e: "El olvido motivado opera parcialmente mediante procesos inhibitorios transitorios. Con el tiempo, la inhibición se disipa naturalmente, permitiendo reemerger a la memoria." },
+        { q: "El término definido como 'recordar de nuevo lo olvidado en una prueba posterior sin reaprendizaje' es:", o: ["Facilitación fonológica.", "Reminiscencia.", "Desplazamiento episódico."], c: 1, e: "Ballard (1913) definió reminiscencia como recordar de nuevo lo olvidado sin reaprendizaje (cuando esto excede al olvido generalizado, se llama hipermnesia)." },
+        { q: "El fenómeno de la 'hipermnesia', ilustrado de forma dramática en el estudiante Kleinbard (Erdelyi y Kleinbard, 1978), demuestra que:", o: ["Repetir los intentos de recuperación durante días MEJORA significativamente el recuerdo total.", "El estrés de los exámenes borra la memoria progresivamente.", "Solo recordamos lo que escuchamos auditivamente."], c: 0, e: "La repetición de intentos de recuperación mejoró su recuerdo del 48% al 80% en una semana. El recuerdo total aumentó, demostrando la hipermnesia." },
+        { q: "El estudio de Henkel (2004) advierte que los repetidos intentos de recuperar visualmente la memoria (hipermnesia) acarrean el riesgo clínico y forense de incrementar:", o: ["El olvido inducido por recuperación retrospectiva.", "Los errores de atribución de fuente (confundir haber imaginado un objeto con haberlo visto realmente).", "La amnesia psicógena situacional focal."], c: 1, e: "Con cada prueba repetida, aumentaba la probabilidad de que afirmaran haber visto algo que sólo habían imaginado (error de atribución de fuente o error reconstructivo)." },
+        { q: "En el experimento de Smith y Moynan (2008), los sujetos omitieron recuperar las categorías emocionales tras ser sometidos a interferencia. ¿Qué pasó cuando se les ofrecieron los NOMBRES de esas categorías como claves?", o: ["El bloqueo fue irreversible y siguieron sin recordar nada.", "Recuperaron prácticamente todos los ejemplares con tasas altísimas, demostrando que la huella estaba disponible, sólo inaccesible.", "Sufrieron ataques de pánico disociativo."], c: 1, e: "Recuperaron prácticamente los mismos ejemplares que los controles. La retención estaba preservada (disponible); al ofrecer la clave, la memoria emergió al instante." },
+        { q: "Por tanto, los estudios sobre reinstauración contextual demuestran globalmente que el olvido motivado y dirigido habitualmente:", o: ["Destruye por completo (borra) la disponibilidad de la huella.", "Reduce la accesibilidad de las memorias, sin afectar sustancialmente a su disponibilidad real.", "Corrompe la estructura química de los ganglios basales."], c: 1, e: "Reduce la accesibilidad (la capacidad de encontrarla) sin alterar la disponibilidad (la persistencia en el almacén)." },
+
+        // RECUERDOS RECUPERADOS Y ESTUDIOS DE GERAERTS
+        { q: "Los estudios de corroboración independiente de recuerdos de abuso en la infancia realizados por Geraerts et al. (2007) revelaron que la tasa de corroboración para los recuperados mediante TERAPIA SUGESTIVA fue:", o: ["Aproximadamente del 45% (igual a la continua).", "Superior al 80%, demostrando la gran eficacia de la hipnosis.", "Del 0%."], c: 2, e: "Los recuerdos recuperados en terapia sugestiva se corroboraron en un 0% de los casos. Esto no implica necesariamente falsedad absoluta, pero carecen completamente de evidencia independiente." },
+        { q: "En este mismo estudio de Geraerts, los recuerdos que emergieron de forma ESPONTÁNEA fuera del entorno terapéutico, alcanzaron una tasa de corroboración independiente de:", o: ["Aproximadamente el 37%, tasa muy comparable a la memoria continua de abuso (45%).", "El 0%.", "Un escaso 5%."], c: 0, e: "La memoria continua se corroboró en un 45% y la recuperación espontánea fuera de terapia en un 37%, mostrando que los recuerdos espontáneos merecen altísima credibilidad clínica." },
+        { q: "Geraerts et al. (2006) estudiaron por qué ciertas personas creen que recuperan una memoria 'por primera vez en su vida'. Descubrieron que estas personas son especialmente vulnerables a:", o: ["Una confabulación frontotemporal grave.", "Olvidar recuperaciones previas del mismo recuerdo si el marco emocional actual es diferente al de las ocasiones anteriores.", "Creer en vidas pasadas sugeridas por videntes."], c: 1, e: "Demostraron un olvido de recuperaciones previas: si el marco emocional cambiaba, la persona olvidaba que ya había pensado en el suceso antes, experimentándolo ilusoriamente como un descubrimiento primigenio." },
+        { q: "De acuerdo con el modelo de Geraerts, ¿por qué los sujetos de recuperación espontánea olvidaban tan fácilmente que ya habían recordado el trauma en ocasiones previas?", o: ["Porque abusaban sistemáticamente del alcohol y la hipnosis recreativa.", "Porque mostraban una capacidad SUPERIOR para la supresión de pensamientos desagradables, bloqueando la consolidación tanto del trauma como del acto de recuperarlo.", "Porque tenían un volumen hipocampal anormalmente grande."], c: 1, e: "Son mejores suprimiendo pensamientos. Al suprimir el recuerdo del trauma rápidamente cuando emergía, también bloqueaban la consolidación en memoria del hecho de haberlo recuperado, olvidando el propio acto." }
+    ];
+let questions=[...originalQuestions],current=0,score=0,missed=[],retryMode=false;
+
+function loadQuestion(){
+let q=questions[current];
+document.getElementById('prog').innerText=`Pregunta ${current+1} de ${questions.length}`;
+document.getElementById('fill').style.width=(current/questions.length*100)+'%';
+document.getElementById('mode').innerText=retryMode?'Modo repaso':'Modo completo';
+document.getElementById('q').innerText=`${current+1}. ${q.q}`;
+document.getElementById('fb').className='feedback';
+document.getElementById('fb').style.display='none';
+document.getElementById('next').style.display='none';
+let opts=document.getElementById('opts');opts.innerHTML='';
+q.o.forEach((o,i)=>{let b=document.createElement('button');b.className='opt';b.innerText=o;b.onclick=()=>answer(i,b);opts.appendChild(b);});
+}
+
+function answer(i,btn){
+let q=questions[current];
+let all=document.querySelectorAll('.opt');
+all.forEach(x=>x.disabled=true);
+if(i===q.c){
+btn.classList.add('correct');
+score++;
+document.getElementById('score').innerText='Puntuación: '+score;
+document.getElementById('fb').className='feedback show good';
+document.getElementById('fb').innerHTML='<b>Correcto.</b><br>'+q.e;
+}else{
+btn.classList.add('incorrect');
+all[q.c].classList.add('correct');
+if(!missed.some(m=>m.q===q.q)) missed.push(q);
+document.getElementById('fb').className='feedback show bad';
+document.getElementById('fb').innerHTML='<b>Incorrecto.</b><br><br>La respuesta correcta es: <b>'+q.o[q.c]+'</b><br><br>'+q.e;
+}
+document.getElementById('next').style.display='inline-block';
+document.getElementById('next').innerText=current===questions.length-1?'Ver resultados':'Siguiente';
+}
+
+function nextQuestion(){current++; if(current<questions.length) loadQuestion(); else showResults();}
+
+function showResults(){
+document.getElementById('quiz').style.display='none';
+document.getElementById('results').style.display='block';
+document.getElementById('fill').style.width='100%';
+let pct=Math.round(score/questions.length*100);
+document.getElementById('final').innerHTML=`${score}/${questions.length} · ${pct}%`;
+document.getElementById('medal').innerText=pct>=90?'🏆 Medalla de Oro · Dominio excelente':pct>=75?'🥈 Medalla de Plata · Muy buen nivel':pct>=60?'🥉 Medalla de Bronce · Base aprobada':'📚 Modo refuerzo · Conviene repasar';
+document.getElementById('msg').innerText='Tema 8: olvido motivado, supresión, represión, olvido dirigido, Think/No-Think, amnesia psicógena y recuerdos recuperados.';
+document.getElementById('missed').innerHTML=missed.length?'<h3>Preguntas falladas: '+missed.length+'</h3><ul>'+missed.map((x,i)=>'<li>'+(i+1)+'. '+x.q+'</li>').join('')+'</ul>':'<b>Perfecto. Sin errores.</b>';
+document.getElementById('retry').style.display=missed.length?'inline-block':'none';
+}
+
+function retryMissed(){
+questions=[...missed];missed=[];current=0;score=0;retryMode=true;
+document.getElementById('score').innerText='Puntuación: 0';
+document.getElementById('results').style.display='none';
+document.getElementById('quiz').style.display='block';
+loadQuestion();
+}
+
+function restartQuiz(){
+questions=[...originalQuestions];current=0;score=0;missed=[];retryMode=false;
+document.getElementById('score').innerText='Puntuación: 0';
+document.getElementById('results').style.display='none';
+document.getElementById('quiz').style.display='block';
+loadQuestion();
+}
+loadQuestion();
+</script>
+</body>
+</html>

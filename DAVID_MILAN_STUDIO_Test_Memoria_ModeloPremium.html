@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mega-Test: 80 Preguntas de Consolidación | DAVID MILÁN STUDIO</title>
+<style>
+:root{
+--bg:#05070d;--bg2:#0b1323;--gold:#d4af37;--gold2:#f3d98b;--white:#f8f4e8;
+--muted:#aab3c5;--green:#33d17a;--red:#ff6b6b;--blue:#4da3ff
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+min-height:100vh;
+font-family:'Segoe UI',Arial,sans-serif;
+background:
+radial-gradient(circle at top left,rgba(212,175,55,.22),transparent 34%),
+radial-gradient(circle at bottom right,rgba(30,90,180,.28),transparent 38%),
+linear-gradient(135deg,var(--bg),var(--bg2),#05070d);
+color:var(--white);
+display:flex;
+justify-content:center;
+align-items:center;
+padding:35px 18px;
+}
+.quiz-container{
+width:100%;
+max-width:980px;
+background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.035));
+border:1px solid rgba(212,175,55,.28);
+border-radius:30px;
+padding:34px;
+box-shadow:0 30px 90px rgba(0,0,0,.45);
+backdrop-filter:blur(18px);
+}
+.brand{
+display:inline-block;
+padding:10px 18px;
+border-radius:999px;
+border:1px solid rgba(212,175,55,.45);
+color:var(--gold2);
+letter-spacing:3px;
+font-weight:800;
+font-size:13px;
+margin-bottom:18px;
+background:rgba(255,255,255,.04);
+}
+h1{
+font-size:clamp(30px,5vw,54px);
+line-height:1;
+margin-bottom:10px;
+letter-spacing:-1px;
+background:linear-gradient(90deg,#fff,var(--gold2));
+-webkit-background-clip:text;
+color:transparent;
+}
+h2{
+font-size:17px;
+color:var(--muted);
+font-weight:400;
+margin-bottom:26px;
+}
+.topbar{
+display:flex;
+justify-content:space-between;
+gap:16px;
+align-items:center;
+flex-wrap:wrap;
+margin-bottom:24px;
+}
+.stat{
+padding:12px 16px;
+border-radius:16px;
+background:rgba(0,0,0,.22);
+border:1px solid rgba(255,255,255,.1);
+color:var(--gold2);
+font-weight:800;
+}
+.progress-wrap{
+height:10px;
+background:rgba(255,255,255,.09);
+border-radius:999px;
+overflow:hidden;
+margin-bottom:24px;
+}
+.progress-bar{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,var(--gold),var(--gold2));
+border-radius:999px;
+transition:.35s ease;
+}
+.question-card{
+background:rgba(4,8,16,.55);
+border:1px solid rgba(255,255,255,.1);
+border-radius:24px;
+padding:26px;
+}
+.question{
+font-size:21px;
+font-weight:800;
+line-height:1.45;
+margin-bottom:22px;
+}
+.options{
+display:grid;
+gap:13px;
+}
+.option-btn{
+border:1px solid rgba(255,255,255,.12);
+border-radius:18px;
+padding:16px 18px;
+background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.035));
+color:var(--white);
+font-size:16px;
+text-align:left;
+cursor:pointer;
+transition:.25s ease;
+}
+.option-btn:hover:not(:disabled){
+transform:translateY(-2px);
+border-color:rgba(212,175,55,.65);
+box-shadow:0 12px 30px rgba(212,175,55,.12);
+}
+.option-btn:disabled{cursor:not-allowed;opacity:.95}
+.correct{
+background:rgba(51,209,122,.16)!important;
+border-color:var(--green)!important;
+color:#dfffea!important;
+}
+.incorrect{
+background:rgba(255,107,107,.16)!important;
+border-color:var(--red)!important;
+color:#ffe0e0!important;
+}
+.feedback{
+display:none;
+margin-top:22px;
+padding:20px;
+border-radius:20px;
+line-height:1.65;
+font-size:15px;
+}
+.feedback.show{display:block}
+.feedback-correct{
+background:rgba(51,209,122,.12);
+border-left:5px solid var(--green);
+}
+.feedback-incorrect{
+background:rgba(255,107,107,.12);
+border-left:5px solid var(--red);
+}
+.feedback strong{font-size:18px}
+.solution-label{
+display:block;
+margin-top:12px;
+color:var(--gold2);
+font-weight:900;
+}
+.controls{
+margin-top:22px;
+display:flex;
+justify-content:space-between;
+gap:14px;
+flex-wrap:wrap;
+align-items:center;
+}
+.btn{
+border:none;
+border-radius:16px;
+padding:14px 22px;
+font-weight:900;
+font-size:15px;
+cursor:pointer;
+transition:.25s ease;
+}
+.btn:hover{transform:translateY(-2px)}
+.next-btn{
+display:none;
+background:linear-gradient(135deg,var(--gold2),var(--gold));
+color:#080b12;
+}
+.secondary-btn{
+background:rgba(255,255,255,.08);
+color:var(--white);
+border:1px solid rgba(255,255,255,.14);
+}
+.score-container{
+display:none;
+text-align:center;
+padding:24px;
+}
+.score-text{
+font-size:30px;
+font-weight:900;
+color:var(--gold2);
+margin-bottom:18px;
+}
+.result-message{
+color:var(--muted);
+font-size:17px;
+line-height:1.6;
+margin-bottom:24px;
+}
+.medal{
+display:inline-block;
+margin:14px 0 10px;
+padding:12px 18px;
+border-radius:999px;
+border:1px solid rgba(212,175,55,.45);
+background:rgba(212,175,55,.10);
+color:var(--gold2);
+font-weight:900;
+}
+.missed-box{
+text-align:left;
+margin:24px 0;
+padding:20px;
+border-radius:20px;
+background:rgba(0,0,0,.22);
+border:1px solid rgba(255,255,255,.1);
+}
+.missed-box h3{
+color:var(--gold2);
+margin-bottom:12px;
+}
+.missed-box ul{
+padding-left:20px;
+color:#dbe2f2;
+line-height:1.6;
+}
+.mode-label{color:var(--blue);font-weight:900}
+@media(max-width:650px){
+.quiz-container{padding:22px}
+.question-card{padding:20px}
+.question{font-size:18px}
+}
+</style>
+</head>
+<body>
+<div class="quiz-container">
+  <div class="brand">DAVID MILÁN STUDIO</div>
+  <h1>Mega-Test Premium</h1>
+  <h2>Tema 1: ¿Qué es la memoria?</h2>
+
+  <div id="quiz-screen">
+    <div class="topbar">
+      <div class="stat" id="progress-text">Pregunta 1</div>
+      <div class="stat" id="score-tracker">Puntuación: 0</div>
+      <div class="stat" id="mode-text">Modo completo</div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div class="question-card">
+      <div class="question" id="question-text"></div>
+      <div class="options" id="options-container"></div>
+      <div id="feedback-container" class="feedback"></div>
+
+      <div class="controls">
+        <button class="btn secondary-btn" onclick="restartQuiz()">Reiniciar test</button>
+        <button id="next-btn" class="btn next-btn" onclick="nextQuestion()">Siguiente pregunta</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="result-screen" class="score-container">
+    <div class="score-text" id="final-score"></div>
+    <div class="medal" id="medal-text"></div>
+    <div class="result-message" id="final-message"></div>
+    <div id="missed-summary" class="missed-box"></div>
+    <div class="controls" style="justify-content:center;">
+      <button class="btn secondary-btn" onclick="restartQuiz()">Volver a intentar todo</button>
+      <button class="btn next-btn" id="retry-missed-btn" onclick="retryMissed()">Reintentar preguntas falladas</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const originalQuestions = [
+        // 1. La memoria como objeto de estudio
+        { q: "A menudo nos quejamos de nuestra memoria y atribuimos a su supuesta debilidad errores que, según el texto, en realidad son consecuencia de:", o: ["Su funcionamiento adaptativo.", "Un fallo biológico inevitable.", "La falta de atención infantil."], c: 0, e: "Nuestra memoria prioriza la información emocionalmente relevante, descartando lo prescindible. Sus errores son consecuencia de su funcionamiento adaptativo." },
+        { q: "¿Cuántos «pecados» de la memoria (como la transitoriedad o el sesgo) describió Schacter en 2001, argumentando que en su mayoría no son fallos en sentido estricto?", o: ["Cinco.", "Siete.", "Diez."], c: 1, e: "Schacter (2001) describió los siete «pecados» de la memoria, argumentando que son consecuencias inevitables de las propiedades que hacen a la memoria rica y flexible." },
+        { q: "Según la idea central del inicio del tema, ¿por qué ocurren los olvidos más frecuentes de la memoria?", o: ["Porque la capacidad de retención decae bruscamente a los 30 años.", "Porque la memoria es un sistema pasivo que se satura con facilidad.", "Porque la memoria selecciona y prioriza lo relevante, descartando lo prescindible."], c: 2, e: "Los olvidos tienen una lógica funcional: nuestra memoria prioriza la información emocionalmente relevante o frecuentemente utilizada, descartando lo que resulta prescindible." },
+
+        // 2. Clive Wearing
+        { q: "¿Cuál fue la causa de la devastadora amnesia que sufrió el músico Clive Wearing en 1985?", o: ["Una encefalitis provocada por el virus del herpes simple.", "Un traumatismo craneoencefálico grave.", "La enfermedad de Alzheimer de inicio temprano."], c: 0, e: "En 1985, sufrió una encefalitis provocada por el virus del herpes simple, que inflamó el tejido cerebral." },
+        { q: "Clive Wearing perdió la capacidad de retener nuevas experiencias. ¿A qué tipo de memoria corresponde esta pérdida?", o: ["Memoria semántica.", "Memoria episódica (amnesia anterógrada severa).", "Memoria procedimental motora."], c: 1, e: "Lo que perdió: la capacidad de formar nuevos recuerdos episódicos (amnesia anterógrada severa)." },
+        { q: "A pesar de su profunda amnesia, Clive Wearing seguía siendo capaz de dirigir un coro y tocar el teclado. ¿Qué nos indica esto?", o: ["Que fingía parte de su amnesia.", "Que las habilidades musicales residen exclusivamente en el hemisferio derecho.", "Que la memoria no es un sistema unitario, ya que conservó la memoria procedimental."], c: 2, e: "Demuestra que sus habilidades musicales (subsistema procedimental) se preservaron, apuntando a que la memoria no es un sistema unitario, sino un conjunto de sistemas independientes." },
+        { q: "Además de sus habilidades musicales, ¿qué otro tipo de conocimiento general conservó Clive Wearing (por ejemplo, saber que estudió en Cambridge)?", o: ["El conocimiento semántico biográfico de carácter general.", "La memoria olfativa episódica.", "El recuerdo de los eventos de la última semana."], c: 0, e: "Lo que conservó: el conocimiento semántico biográfico de carácter general (sabía que había estudiado en Cambridge)." },
+        { q: "¿Cómo describía Clive Wearing su propia vida debido a su amnesia profunda?", o: ["Como 'un sueño muy plácido'.", "Como 'estar ciego ante el futuro'.", "Como 'el infierno en la tierra', anclado en un presente continuo."], c: 2, e: "Describía su vida como «el infierno en la tierra»: estar permanentemente anclado en un presente sin pasado ni futuro." },
+
+        // 3. ¿Qué es la memoria? Definición
+        { q: "El proceso mediante el cual la información del entorno se transforma en una representación mental que puede ser retenida se denomina:", o: ["Almacenamiento.", "Codificación.", "Recuperación."], c: 1, e: "Codificación: proceso mediante el cual la información del entorno se transforma en una representación mental que puede ser retenida." },
+        { q: "El mantenimiento de la información a lo largo del tiempo se conoce como:", o: ["Codificación.", "Almacenamiento.", "Reconstrucción."], c: 1, e: "Almacenamiento: mantenimiento de la información a lo largo del tiempo. No es pasivo." },
+        { q: "La recuperación de la memoria no es una reproducción fiel del pasado, sino una:", o: ["Grabación pasiva exacta.", "Lectura de archivos fijos en el cerebro.", "Reconstrucción activa influida por conocimientos previos y expectativas."], c: 2, e: "La recuperación no es una reproducción fiel del pasado, sino una reconstrucción activa influida por conocimientos previos, expectativas y contexto actual." },
+        { q: "¿De qué proceso o procesos depende lo que una persona logra recuperar finalmente de su memoria?", o: ["Solo de la atención en el momento del evento.", "De la interacción continua y recíproca entre codificación, almacenamiento y recuperación.", "Estrictamente del componente genético celular."], c: 1, e: "La interacción entre codificación, almacenamiento y recuperación es continua y recíproca: cada uno depende e influye en los demás." },
+
+        // 4. Teorías, mapas y modelos
+        { q: "Para explicar el papel de las teorías en psicología de la memoria, Baddeley utiliza la analogía de que las teorías son como:", o: ["Cámaras de vídeo.", "Mapas.", "Ordenadores."], c: 1, e: "Baddeley propone una analogía especialmente útil: las teorías son como mapas. Simplifican la realidad para cumplir un propósito." },
+        { q: "La visión según la cual toda explicación psicológica debería reducirse exclusivamente a explicaciones fisiológicas o bioquímicas se denomina:", o: ["Constructivismo.", "Ecologismo.", "Reduccionismo."], c: 2, e: "Reduccionismo, la visión según la cual toda explicación psicológica debería reducirse a explicaciones fisiológicas, estas a bioquímicas, etc." },
+        { q: "A partir de los años cincuenta, ¿qué proporcionó un lenguaje común y permitió el desarrollo de modelos formales en la psicología de la memoria?", o: ["El uso del ordenador como metáfora de la mente.", "La teoría psicoanalítica del inconsciente.", "El descubrimiento del ADN."], c: 0, e: "El uso del ordenador como metáfora de la mente proporcionó un lenguaje común para describir procesos cognitivos." },
+
+        // 5. Historia
+        { q: "Antes de que se convirtiera en una ciencia experimental, el estudio de la memoria era dominio de la filosofía, que lo abordaba principalmente mediante:", o: ["La neurocirugía.", "La estadística inferencial.", "La introspección."], c: 2, e: "Durante siglos, el tema fue dominio de la filosofía, que lo abordó principalmente mediante la introspección." },
+        { q: "¿Quién fue el primero en demostrar empíricamente que la memoria podía estudiarse de forma experimental, usando sílabas sin sentido?", o: ["Endel Tulving.", "Hermann Ebbinghaus.", "Alan Turing."], c: 1, e: "Hermann Ebbinghaus (1850–1909) fue el primero en demostrar que la memoria podía estudiarse de forma experimental... desarrolló las sílabas sin sentido." },
+        { q: "Según la curva del olvido de Ebbinghaus, ¿en qué momento ocurre la mayor pérdida de información tras el aprendizaje?", o: ["Tras varios meses.", "En las primeras horas.", "Al dormir esa misma noche."], c: 1, e: "La mayor pérdida de información ocurre en las primeras horas; a partir de entonces, el olvido se ralentiza progresivamente." },
+        { q: "El método que empleó Ebbinghaus para detectar huellas mnésicas inconscientes midiendo cuánto tiempo menos necesitaba para volver a aprender el material se denomina:", o: ["Método del ahorro (savings).", "Práctica masiva.", "Recuerdo de reconocimiento polar."], c: 0, e: "El método del ahorro (savings): medía cuánto tiempo menos necesitaba para reaprender el material. Anticipó la memoria implícita." },
+        { q: "¿Qué efecto demostró Ebbinghaus que prueba que estudiar a lo largo del tiempo es más eficaz que concentrar el estudio en una sola sesión?", o: ["El efecto de primacía.", "El efecto de posición serial.", "El efecto del espaciado."], c: 2, e: "El efecto del espaciado: distribuir el estudio a lo largo del tiempo es más eficaz que concentrarlo en una sola sesión." },
+        { q: "El efecto de posición serial dictamina que en una lista de elementos se recuerdan mejor:", o: ["Solo los elementos del centro de la lista.", "Los elementos del principio (primacía) y del final (recencia).", "Los elementos que tienen contenido emocional negativo."], c: 1, e: "Efecto de posición serial: los elementos del principio (primacía) y del final (recencia) se recuerdan mejor que los del medio." },
+        { q: "Los psicólogos de la Gestalt aplicaron al estudio de la memoria los principios de la percepción, oponiéndose al asociacionismo al defender que:", o: ["La mente es un mero mosaico de asociaciones elementales.", "El todo es cualitativamente diferente de la suma de sus partes.", "El aprendizaje solo ocurre por ensayo y error continuo."], c: 1, e: "Rechazaban la idea de que la mente fuera un mosaico y defendían que el todo es cualitativamente diferente de la suma de sus partes." },
+        { q: "Frederick Bartlett (1932) criticó el uso de sílabas sin sentido. En sus experimentos utilizó material rico en significado, destacando el uso de:", o: ["Listas de dígitos numéricos inversos.", "Cuentos populares no familiares, como «The War of the Ghosts».", "Sonidos rítmicos de metrónomo."], c: 1, e: "Bartlett utilizó materiales complejos: cuentos populares de culturas no familiares, como «The War of the Ghosts»." },
+        { q: "Para explicar que las personas distorsionaban los cuentos adaptándolos a sus marcos culturales, Bartlett propuso el concepto de:", o: ["Esquema.", "Condicionamiento.", "Sufijo semántico."], c: 0, e: "Bartlett propuso el concepto de esquema: una estructura de conocimiento almacenada que guía la interpretación y recuperación." },
+        { q: "En el inicio de la revolución cognitiva, ¿qué psicólogo propuso en 1943 el uso de modelos computacionales para representar procesos mentales?", o: ["Ulric Neisser.", "George Miller.", "Kenneth Craik."], c: 2, e: "El psicólogo escocés Kenneth Craik (1943) propuso el uso de modelos computacionales para representar los procesos mentales." },
+        { q: "El libro 'Cognitive Psychology' de 1967 sistematizó el enfoque de la mente análoga al ordenador. Su autor fue:", o: ["Donald Broadbent.", "Ulric Neisser.", "Hermann Ebbinghaus."], c: 1, e: "Neisser (1967), Cognitive Psychology: sistematizó el nuevo enfoque y le dio nombre." },
+        { q: "El modelo de Atkinson y Shiffrin (1968), que distinguía un flujo lineal (Sensorial -> MCP -> MLP), recibió la denominación de:", o: ["Modelo de huella múltiple.", "Modelo conexionista profundo.", "Modelo modal."], c: 2, e: "El modelo más influyente de este período fue el de Atkinson y Shiffrin (1968), denominado «modelo modal»." },
+
+        // 6. Sistemas y Subsistemas
+        { q: "La estructura general del 'modelo modal' propone la siguiente arquitectura en tres etapas:", o: ["MCP -> Sensorial -> MLP.", "Memoria sensorial -> MCP -> MLP.", "Memoria episódica -> Semántica -> Implícita."], c: 1, e: "El esquema clásico del modelo modal propone: Memoria sensorial → Memoria a corto plazo (MCP) → Memoria a largo plazo (MLP)." },
+        { q: "La memoria sensorial actúa como un 'buffer perceptivo' de muy breve duración cuya función es:", o: ["Almacenar datos semánticos de por vida.", "Permitir integrar la información de estímulos sucesivos y construir una representación coherente del entorno.", "Repetir vocalmente la información para que pase a la memoria de trabajo."], c: 1, e: "Actúa como un «buffer perceptivo» que permite integrar la información proveniente de estímulos sucesivos y construir una representación coherente." },
+        { q: "La memoria icónica (almacén visual de muy corta duración: 250-500 ms) fue estudiada extensamente con el procedimiento de 'informe parcial' por:", o: ["George Sperling.", "Alan Baddeley.", "Michael Turvey."], c: 0, e: "Sperling (1960) estableció sus características mediante la técnica del informe parcial con matrices de letras." },
+        { q: "En el experimento de Sperling sobre la memoria icónica, ¿qué indicaba a los sujetos qué fila de letras debían reportar tras desaparecer la matriz?", o: ["Un destello visual de colores.", "Una señal sonora (tono alto, medio o bajo).", "Una vibración táctil."], c: 1, e: "Sperling: inmediatamente después de la presentación, una señal sonora (tono alto, medio o bajo) indicaba la fila a reportar." },
+        { q: "El fenómeno por el cual un campo luminoso posterior al estímulo interfiere y borra la memoria icónica se denomina:", o: ["Enmascaramiento.", "Supresión articulatoria.", "Priming perceptivo."], c: 0, e: "Sperling observó que un campo luminoso posterior al estímulo (enmascaramiento) interfería con la memoria icónica." },
+        { q: "La memoria ecoica (auditiva) tiene una duración mayor que la icónica. Se estima que dura en torno a:", o: ["250-500 milisegundos.", "2-4 segundos.", "Varios minutos."], c: 1, e: "La memoria ecoica tiene una duración algo mayor, en torno a 2–4 segundos, acorde a la naturaleza temporal del lenguaje hablado." },
+        { q: "El efecto de sufijo (estudiado por Crowder y Morton en memoria ecoica) demuestra que la retención final de la lista solo se perturba si el estímulo extra añadido al final es:", o: ["Un estímulo lingüístico (habla).", "Un zumbido mecánico de alta frecuencia.", "Un destello luminoso fuerte."], c: 0, e: "El sufijo visual o un zumbido no producían este efecto: solo los sufijos lingüísticos (habla) perturbaban la memoria ecoica." },
+        
+        { q: "En 1956, George Miller estableció que la capacidad de la MCP es de aproximadamente:", o: ["3 ± 1 unidades de información.", "7 ± 2 chunks (trozos).", "12 chunks exactos."], c: 1, e: "El trabajo clásico de George Miller (1956) estableció que la capacidad de la MCP se sitúa en torno a 7 ± 2 unidades o chunks." },
+        { q: "¿De qué depende la capacidad real de almacenar un 'chunk' de información en la memoria a corto plazo?", o: ["Solo de la genética del sujeto.", "Del conocimiento almacenado previamente en la MLP que permite agrupar los elementos.", "Del nivel de ruido ambiental exclusivo durante el recuerdo."], c: 1, e: "Un chunk depende del conocimiento almacenado en la MLP que permite agrupar elementos en unidades mayores (chunking)." },
+        { q: "Investigaciones más recientes de Cowan (2001) señalan que si se controla la posibilidad de ensayo verbal, la capacidad real de la MCP es de:", o: ["7 chunks exactos.", "3-4 chunks.", "1 chunk por cada lóbulo frontal."], c: 1, e: "Cowan sugiere que la capacidad efectiva es de en torno a 3–4 chunks cuando se controla la posibilidad de ensayo verbal." },
+        
+        { q: "Baddeley y Hitch (1974) formularon el modelo de la memoria de trabajo tras observar que ocupar toda la MCP con una tarea secundaria de dígitos:", o: ["Colapsaba totalmente el razonamiento y el aprendizaje.", "No deterioraba gravemente la ejecución de tareas cognitivas complejas.", "Borraba automáticamente todos los recuerdos autobiográficos."], c: 1, e: "Los experimentos mostraron que los participantes podían realizar tareas complejas incluso saturando la MCP. Esto sugirió que no era un sistema unitario." },
+        { q: "En el modelo multicomponente de la memoria de trabajo, el sistema atencional que coordina recursos y dirige la atención es:", o: ["El búfer episódico.", "El bucle fonológico.", "El ejecutivo central."], c: 2, e: "El ejecutivo central actúa como controlador general, dirige la atención, inhibe respuestas y coordina tareas." },
+        { q: "El bucle fonológico se divide en un almacén fonológico y un proceso de ensayo articulatorio. Las palabras que suenan parecido se recuerdan peor debido al:", o: ["Efecto de similitud fonológica.", "Efecto de supresión articulatoria.", "Efecto del enmascaramiento icónico."], c: 0, e: "El efecto de similitud fonológica (elementos que suenan parecido se confunden más) avala la existencia del bucle fonológico." },
+        { q: "¿Qué efecto deteriora la MCP verbal cuando al sujeto se le obliga a hablar (ej. decir 'bla, bla') durante la tarea de memorización?", o: ["Efecto de longitud de palabra.", "Efecto de primacía acústica.", "Efecto de supresión articulatoria."], c: 2, e: "El efecto de supresión articulatoria: el habla irrelevante deteriora la MCP verbal al bloquear el ensayo articulatorio." },
+        { q: "¿Qué componente de la memoria de trabajo almacena y manipula información sobre el 'qué' (aspecto) y el 'dónde' (ubicación)?", o: ["El búfer episódico.", "El ejecutivo central.", "La agenda visoespacial."], c: 2, e: "La agenda visoespacial: almacena y manipula información visual y espacial." },
+        { q: "El 'búfer episódico' fue añadido al modelo de Baddeley en el año 2000. Su función principal es:", o: ["Almacenar fonemas individualmente antes de la articulación.", "Actuar como interfaz multimodal integrando información (≈4 chunks) en episodios coherentes.", "Bloquear los reflejos espinales motores."], c: 1, e: "Búfer episódico: actúa como interfaz multimodal... integra información en episodios coherentes." },
+
+        // 6.3 MLP y Tulving
+        { q: "La clasificación más influyente de la memoria a largo plazo, que distingue entre memoria declarativa y no declarativa, fue propuesta por:", o: ["Alan Baddeley (1974).", "Larry Squire (1992).", "Endel Tulving (2002)."], c: 1, e: "La clasificación más influyente es la de Squire (1992), que distingue entre memoria declarativa y no declarativa." },
+        { q: "Endel Tulving (1972) propuso la división fundamental de la memoria explícita (declarativa) en dos subsistemas:", o: ["Iconica y Ecoica.", "Procedimental y Priming.", "Semántica y Episódica."], c: 2, e: "La distinción entre memoria semántica y episódica fue propuesta por Endel Tulving en 1972." },
+        { q: "El repositorio del conocimiento general del mundo, atemporal y carente de un contexto específico de adquisición, es la:", o: ["Memoria episódica.", "Memoria semántica.", "Memoria procedimental."], c: 1, e: "Memoria semántica. Es el repositorio del conocimiento general sobre el mundo... atemporal." },
+        { q: "La capacidad de recordar el 'cuándo', el 'dónde' y el 'cómo' de nuestras experiencias se denomina:", o: ["Memoria icónica.", "Memoria semántica.", "Memoria episódica."], c: 2, e: "Memoria episódica. Conserva el «cuándo», el «dónde» y el «cómo» de las experiencias." },
+        { q: "Para capturar la esencia de la memoria episódica, Tulving introdujo el concepto de la capacidad de 'revivir' mentalmente experiencias pasadas y proyectar el futuro:", o: ["El viaje mental en el tiempo (mental time travel).", "El paradigma de recuperación doble.", "El efecto del espaciado contextual."], c: 0, e: "Tulving introdujo el concepto de viaje mental en el tiempo (mental time travel) para capturar la esencia de la episódica." },
+        { q: "La amnesia anterógrada episódica severa (incapacidad para formar nuevos recuerdos biográficos) es típica tras daños específicos en:", o: ["El cerebelo y la amígdala.", "El hipocampo.", "Los ganglios basales."], c: 1, e: "Pacientes amnésicos como Clive Wearing o H.M. presentan amnesia episódica severa, siendo el sistema episódico el más vulnerable al daño hipocampal." },
+        { q: "Según el texto, la relación entre la memoria semántica y la episódica es:", o: ["Estrictamente lineal y excluyente.", "Inexistente, ocurren en áreas cerebrales diametralmente opuestas y sin contacto.", "Bidireccional (los episodios se abstraen y la semántica da el marco interpretativo)."], c: 2, e: "La relación es bidireccional. Los episodios repetidos se abstraen y pasan a semántica, mientras la semántica proporciona el marco interpretativo de los episodios." },
+        
+        { q: "La memoria que se expresa en el rendimiento conductual SIN necesidad de recuperación consciente del episodio de aprendizaje se conoce como:", o: ["Memoria implícita o no declarativa.", "Memoria episódica secundaria.", "Memoria semántica de acción."], c: 0, e: "La memoria implícita o no declarativa engloba formas de retención que se expresan en el rendimiento sin recuperación consciente." },
+        { q: "El condicionamiento clásico por el cual amnésicos aprenden a parpadear ante un tono, a pesar de no recordar el episodio, se sustenta biológicamente en:", o: ["La corteza prefrontal.", "El hipocampo bilateral.", "Circuitos cerebelosos y del tronco del encéfalo."], c: 2, e: "El condicionamiento clásico se sustenta en circuitos cerebelosos y del tronco del encéfalo, independientes del hipocampo." },
+        { q: "Las habilidades y destrezas motoras (aprendizaje procedimental) como ir en bicicleta se almacenan en:", o: ["El lóbulo occipital y temporal inferior.", "El hipocampo lateral.", "Los ganglios basales, cerebelo y corteza motora."], c: 2, e: "Este tipo de memoria se almacena en los ganglios basales, el cerebelo y la corteza motora." },
+        { q: "La principal característica definitoria de la memoria procedimental es que:", o: ["Su expresión no depende de la recuperación de un episodio específico de aprendizaje.", "No requiere en absoluto la intervención de la corteza motora.", "Solo se da en etapas tempranas de la vida."], c: 0, e: "La característica que lo define... es que su expresión no depende de la recuperación de un episodio específico de aprendizaje." },
+        { q: "La facilitación en el procesamiento de un estímulo como consecuencia de la exposición previa al mismo o a estímulos relacionados es el fenómeno de:", o: ["Enmascaramiento periférico.", "Priming.", "Chunking."], c: 1, e: "Priming: facilitación en el procesamiento de un estímulo como consecuencia de la exposición previa al mismo o a estímulos relacionados." },
+        { q: "En el experimento de Warrington y Weiskrantz (1968), pacientes amnésicos lograban completar correctamente fragmentos de palabras (BR___ por BRING). Esto demostró:", o: ["Un priming conservado a pesar de tener un recuerdo explícito deteriorado.", "Que la memoria implícita desaparece con la amnesia hipocampal.", "Que el condicionamiento clásico requiere repetición vocal."], c: 0, e: "Esta disociación entre recuerdo explícito (muy deteriorado) y priming (normal) es un argumento potente a favor de sistemas de memoria distintos." },
+        { q: "Si la presentación de la palabra 'médico' facilita posteriormente el procesamiento de la palabra 'enfermera', estamos ante un caso de:", o: ["Priming perceptivo.", "Priming de repetición.", "Priming semántico."], c: 2, e: "Priming semántico: la presentación de una palabra (médico) facilita el procesamiento de palabras conceptualmente relacionadas (enfermera)." },
+        { q: "La capacidad para extraer regularidades del entorno (como las frecuencias de aparición temporal de un patrón) sin conciencia de estar aprendiéndolas, se llama:", o: ["Memoria autobiográfica oculta.", "Aprendizaje estadístico implícito.", "Memoria episódica difusa."], c: 1, e: "Aprendizaje estadístico implícito: el sistema extrae regularidades estadísticas del entorno sin instrucción explícita ni conciencia." },
+
+        // 7. Más allá del laboratorio
+        { q: "¿Qué psicólogo inició en 1978 una conferencia afirmando provocadoramente que los psicólogos de laboratorio ignoraban los aspectos socialmente significativos de la memoria?", o: ["Ulric Neisser.", "Endel Tulving.", "Alan Baddeley."], c: 0, e: "En 1978, Ulric Neisser inauguró una conferencia afirmando: «Si X es un aspecto interesante o socialmente significativo de la memoria, los psicólogos apenas lo han estudiado»." },
+        { q: "Las investigaciones de Elizabeth Loftus (1979) revolucionaron la psicología forense al demostrar que la memoria en el testimonio ocular es:", o: ["Altamente maleable y susceptible de ser modificada por información o preguntas posteriores.", "Infalible a menos que exista daño orgánico demostrable.", "Exclusivamente fotográfica (memoria eidética pura)."], c: 0, e: "Elizabeth Loftus demostró que los recuerdos de los testigos son altamente maleables y susceptibles de ser modificados." },
+        { q: "El fenómeno caracterizado por la ausencia de recuerdos autobiográficos antes de los 2 o 3 años de vida recibe el nombre de:", o: ["Efecto de recencia invertido.", "Bache de memoria.", "Amnesia infantil."], c: 2, e: "Amnesia infantil: la ausencia de recuerdos antes de los 2–3 años." },
+        { q: "En los adultos mayores, se observa un recuerdo sorprendentemente elevado de los eventos ocurridos entre los 15 y 25 años. A esto se le denomina:", o: ["Curva del olvido de Ebbinghaus.", "Pico de reminiscencia.", "Efecto de primacía biográfica."], c: 1, e: "El pico de reminiscencia de los 15–25 años, frente al 'bache de memoria' de los años de mediana edad." },
+        { q: "Recordar realizar una acción o intención en el futuro (p. ej., 'tengo que tomar la medicación a las 18:00') se define como:", o: ["Memoria retrospectiva.", "Memoria de procedimental.", "Memoria prospectiva."], c: 2, e: "Memoria prospectiva: recordar hacer cosas en el futuro (tomar la medicación, llamar a alguien)." },
+
+        // 8. Neurociencia
+        { q: "El caso paradigmático del paciente H.M. (1953), que sufrió resección bilateral para tratar la epilepsia, confirmó el papel esencial en la consolidación de nuevos recuerdos episódicos de la siguiente estructura:", o: ["El hipocampo.", "La corteza motora suplementaria.", "El cerebelo posterior."], c: 0, e: "La resección bilateral del hipocampo fue fundamental para establecer el papel del hipocampo en la consolidación de nuevos recuerdos episódicos." },
+        { q: "La estructura cerebral que modula la consolidación de la memoria a través de conexiones directas y otorga viveza a los recuerdos con intensa carga emocional (ej. miedo) es:", o: ["La corteza occipital.", "El tálamo ventral.", "La amígdala."], c: 2, e: "La amígdala desempeña un papel crucial en la codificación de recuerdos con carga emocional intensa (miedo) modulando la consolidación en el hipocampo." },
+        { q: "Enfermedades como Parkinson y Huntington, que producen déficits específicos en el aprendizaje procedimental (habilidades motoras), afectan fisiológicamente a:", o: ["Los ganglios basales.", "El lóbulo prefrontal lateral.", "El área de Wernicke."], c: 0, e: "Las estructuras de los ganglios basales son esenciales para el aprendizaje de habilidades. Parkinson/Huntington producen déficits específicos en aprendizaje procedimental." },
+        { q: "El mantenimiento activo de la información en la memoria de trabajo y el control de las funciones del ejecutivo central implican especialmente a:", o: ["El hipocampo profundo.", "La amígdala basolateral.", "La corteza prefrontal lateral."], c: 2, e: "La corteza prefrontal lateral está especialmente implicada en el mantenimiento activo de la información en la memoria de trabajo (ejecutivo central)." },
+        { q: "Según estudios neurocientíficos recientes, la transferencia de información desde el hipocampo a la corteza neocortical para su almacenamiento a largo plazo se consolida sistémicamente durante:", o: ["El ejercicio aeróbico intenso.", "El sueño (especialmente ondas lentas y REM).", "Los momentos de máxima atención consciente diurna."], c: 1, e: "La investigación reciente ha mostrado que el sueño (ondas lentas y REM) desempeña un papel activo en la consolidación sistémica y transferencia al neocórtex." },
+        
+        // Final review questions & specific details
+        { q: "De acuerdo con el apartado 'Conceptos clave', el proceso por el cual el recuerdo de un estímulo decae bruscamente por la presentación de eventos que ocurren inmediatamente antes o después se llama:", o: ["Efecto de espaciado.", "Enmascaramiento (masking).", "Chunking acústico."], c: 1, e: "Enmascaramiento (masking): proceso por el que la percepción se ve perturbada por eventos que ocurren inmediatamente antes o después." },
+        { q: "La amnesia retrógrada suele presentar un 'gradiente temporal', lo cual significa empíricamente que:", o: ["Los recuerdos se pierden aleatoriamente sin patrón cronológico.", "Los recuerdos más remotos o antiguos se conservan mejor que los más recientes a la lesión.", "Se olvida absolutamente todo el pasado desde el día de nacimiento."], c: 1, e: "Suele tener gradiente temporal: los recuerdos más remotos se conservan mejor que los recientes." },
+        { q: "¿En qué subsistema de la MT impacta específicamente la recitación de sílabas irrelevantes ('bla, bla') de acuerdo al modelo de Baddeley?", o: ["En la agenda visoespacial, causando ceguera inatencional.", "En el ensayo articulatorio del bucle fonológico, causando supresión.", "En el búfer episódico, bloqueando la memoria prospectiva."], c: 1, e: "El efecto de supresión articulatoria (articulación de sílabas irrelevantes) bloquea el ensayo articulatorio subvocal del bucle fonológico." },
+        { q: "El llamado 'aprendizaje verbal' (verbal learning), activo en EE. UU. desde los años 30 a los 60 para estudiar asociaciones de listas, fue el heredero directo de la tradición de:", o: ["Ebbinghaus.", "Bartlett.", "Turing."], c: 0, e: "La tradición de Ebbinghaus fue desarrollada en Estados Unidos bajo la denominación de verbal learning." },
+        { q: "Mientras que la memoria implícita del 'condicionamiento' se almacena en el cerebelo y la amígdala, la memoria del 'priming' se asienta fundamentalmente en:", o: ["El tronco del encéfalo.", "La corteza neocortical.", "El nervio óptico."], c: 1, e: "La evidencia apoya que el priming se sustenta en la corteza neocortical." },
+        { q: "¿Qué nombre acuñaron los psicólogos conductistas al enfoque del aprendizaje verbal por centrarse en medir variables en lista sin formular grandes teorías cognitivas?", o: ["El modelo de redes semánticas.", "El empirismo del cinturón de polvo (dust bowl empiricism).", "La ecología del recuerdo puro."], c: 1, e: "Los críticos denominaron a esta tradición, con cierta ironía, «empirismo del cinturón de polvo» (dust bowl empiricism) por no pretender grandes teorías." },
+        { q: "Según las reflexiones de Baddeley planteadas en la introducción, decir 'tengo una memoria horrible' se admite socialmente sin problema porque:", o: ["Nadie cree en la neurociencia cognitiva real.", "La gente sabe que es una excusa para la falta de inteligencia y no lo cuestionan.", "Los fallos de la memoria son selectivos, funcionales y se asumen de forma muy cotidiana a diferencia de la estupidez general."], c: 2, e: "Baddeley señala que estamos dispuestos a decir «tengo una memoria horrible» pero no «soy estúpido», resaltando que los olvidos son cotidianos y tienen una lógica selectiva y funcional." },
+        { q: "Sperling en su experimento comprobó que la memoria icónica decae de forma casi inmediata. Si la señal sonora de informe parcial se retrasaba...:", o: ["Solo medio segundo, la ventaja sobre el recuerdo libre desaparecía casi por completo.", "Cinco segundos, los sujetos entraban en sueño paradójico.", "Media hora, aún conservaban la matriz visual idéntica."], c: 0, e: "Si la señal se retrasaba solo medio segundo, la ventaja sobre el recuerdo libre desaparecía casi por completo." }
+    ];
+
+let questions=[...originalQuestions],currentQuestion=0,score=0,answered=false,missedQuestions=[],retryMode=false;
+
+const questionText=document.getElementById('question-text'),
+optionsContainer=document.getElementById('options-container'),
+feedbackContainer=document.getElementById('feedback-container'),
+nextBtn=document.getElementById('next-btn'),
+progressText=document.getElementById('progress-text'),
+scoreTracker=document.getElementById('score-tracker'),
+quizScreen=document.getElementById('quiz-screen'),
+resultScreen=document.getElementById('result-screen'),
+finalScore=document.getElementById('final-score'),
+finalMessage=document.getElementById('final-message'),
+progressBar=document.getElementById('progress-bar'),
+missedSummary=document.getElementById('missed-summary'),
+retryMissedBtn=document.getElementById('retry-missed-btn'),
+modeText=document.getElementById('mode-text'),
+medalText=document.getElementById('medal-text');
+
+function loadQuestion(){
+answered=false;
+feedbackContainer.style.display='none';
+feedbackContainer.className='feedback';
+feedbackContainer.innerHTML='';
+nextBtn.style.display='none';
+
+const q=questions[currentQuestion],total=questions.length,percent=Math.round((currentQuestion/total)*100);
+progressText.innerText=`Pregunta ${currentQuestion+1} de ${total}`;
+progressBar.style.width=`${percent}%`;
+modeText.innerHTML=retryMode?'<span class="mode-label">Modo repaso: falladas</span>':'Modo completo';
+questionText.innerText=`${currentQuestion+1}. ${q.q}`;
+optionsContainer.innerHTML='';
+
+q.o.forEach((opt,index)=>{
+const btn=document.createElement('button');
+btn.className='option-btn';
+btn.innerText=opt;
+btn.onclick=()=>selectOption(index,btn);
+optionsContainer.appendChild(btn);
+});
+}
+
+function selectOption(index,btn){
+if(answered)return;
+answered=true;
+
+const q=questions[currentQuestion],allBtns=optionsContainer.querySelectorAll('.option-btn');
+allBtns.forEach(b=>b.disabled=true);
+
+const correctText=q.o[q.c];
+
+if(index===q.c){
+btn.classList.add('correct');
+score++;
+scoreTracker.innerText=`Puntuación: ${score}`;
+feedbackContainer.classList.add('show','feedback-correct');
+feedbackContainer.innerHTML=`<strong>Correcto.</strong><span class="solution-label">Por qué es correcto:</span>${q.e}`;
+}else{
+btn.classList.add('incorrect');
+allBtns[q.c].classList.add('correct');
+
+if(!missedQuestions.some(item=>item.q===q.q)){
+missedQuestions.push(q);
+}
+
+feedbackContainer.classList.add('show','feedback-incorrect');
+feedbackContainer.innerHTML=`<strong>Respuesta equivocada.</strong><br>Has marcado: <b>${q.o[index]}</b><br>La solución correcta es: <b>${correctText}</b><span class="solution-label">Por qué esa es la solución correcta:</span>${q.e}`;
+}
+
+nextBtn.style.display='block';
+nextBtn.innerText=currentQuestion===questions.length-1?'Ver resultados':'Siguiente pregunta';
+}
+
+function nextQuestion(){
+currentQuestion++;
+if(currentQuestion<questions.length){
+loadQuestion();
+}else{
+showResults();
+}
+}
+
+function showResults(){
+quizScreen.style.display='none';
+resultScreen.style.display='block';
+progressBar.style.width='100%';
+
+const percentage=Math.round((score/questions.length)*100);
+finalScore.innerHTML=`Has acertado ${score} de ${questions.length} preguntas (${percentage}%)`;
+
+if(percentage>=90)medalText.innerText='🏆 Medalla de Oro · Dominio excelente';
+else if(percentage>=75)medalText.innerText='🥈 Medalla de Plata · Muy buen nivel';
+else if(percentage>=60)medalText.innerText='🥉 Medalla de Bronce · Base aprobada';
+else medalText.innerText='📚 Modo refuerzo · Conviene repasar';
+
+let message='';
+if(percentage>=90)message='Extraordinario. Dominas el tema con un nivel excelente y global.';
+else if(percentage>=70)message='Buen resultado. Repasa las preguntas falladas para consolidar los matices importantes.';
+else message='Conviene repasar el tema con calma y volver a intentar las preguntas falladas.';
+
+finalMessage.innerText=message;
+
+if(missedQuestions.length>0){
+missedSummary.style.display='block';
+missedSummary.innerHTML=`<h3>Preguntas falladas: ${missedQuestions.length}</h3><ul>${missedQuestions.map((q,i)=>`<li>${i+1}. ${q.q}</li>`).join('')}</ul>`;
+retryMissedBtn.style.display='inline-block';
+}else{
+missedSummary.style.display='block';
+missedSummary.innerHTML='<h3>No has fallado ninguna pregunta.</h3><p>Resultado perfecto. No hay preguntas que reintentar.</p>';
+retryMissedBtn.style.display='none';
+}
+}
+
+function retryMissed(){
+if(missedQuestions.length===0)return;
+questions=[...missedQuestions];
+missedQuestions=[];
+currentQuestion=0;
+score=0;
+retryMode=true;
+scoreTracker.innerText='Puntuación: 0';
+resultScreen.style.display='none';
+quizScreen.style.display='block';
+nextBtn.innerText='Siguiente pregunta';
+loadQuestion();
+}
+
+function restartQuiz(){
+questions=[...originalQuestions];
+currentQuestion=0;
+score=0;
+answered=false;
+missedQuestions=[];
+retryMode=false;
+scoreTracker.innerText='Puntuación: 0';
+quizScreen.style.display='block';
+resultScreen.style.display='none';
+nextBtn.innerText='Siguiente pregunta';
+loadQuestion();
+}
+
+loadQuestion();
+</script>
+</body>
+</html>

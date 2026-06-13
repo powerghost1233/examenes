@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAVID MILÁN STUDIO | Recuperación</title>
+<style>
+:root{--gold:#d4af37;--gold2:#f3d98b;--bg:#05070d;--bg2:#0b1323;--txt:#f5f5f5;--muted:#aab3c5;--ok:#33d17a;--bad:#ff6b6b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Segoe UI,sans-serif;min-height:100vh;background:
+radial-gradient(circle at top left,rgba(212,175,55,.20),transparent 30%),
+radial-gradient(circle at bottom right,rgba(50,90,180,.25),transparent 35%),
+linear-gradient(135deg,var(--bg),var(--bg2),#05070d);
+display:flex;justify-content:center;align-items:center;padding:30px;color:var(--txt)}
+.container{width:100%;max-width:1000px;background:rgba(255,255,255,.06);
+backdrop-filter:blur(18px);border:1px solid rgba(212,175,55,.25);
+border-radius:28px;padding:32px;box-shadow:0 25px 80px rgba(0,0,0,.45)}
+.brand{display:inline-block;padding:10px 18px;border-radius:999px;border:1px solid rgba(212,175,55,.4);color:var(--gold2);font-weight:800;letter-spacing:3px;margin-bottom:18px}
+h1{font-size:52px;background:linear-gradient(90deg,#fff,var(--gold2));-webkit-background-clip:text;color:transparent}
+h2{margin:8px 0 25px;color:var(--muted);font-weight:400}
+.top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.stat{padding:12px 16px;border-radius:14px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.1);color:var(--gold2);font-weight:700}
+.bar{height:10px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-bottom:20px}
+.fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:.3s}
+.card{padding:24px;border-radius:22px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.08)}
+.q{font-size:22px;font-weight:800;line-height:1.4;margin-bottom:20px}
+.options{display:grid;gap:12px}
+.opt{padding:15px;border-radius:16px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);cursor:pointer;color:white;text-align:left;font-size:15px;line-height:1.45}
+.opt:hover:not(:disabled){border-color:var(--gold);transform:translateY(-1px)}
+.opt:disabled{cursor:not-allowed;opacity:.95}
+.correct{background:rgba(51,209,122,.18)!important;border-color:var(--ok)!important}
+.incorrect{background:rgba(255,107,107,.18)!important;border-color:var(--bad)!important}
+.feedback{display:none;margin-top:18px;padding:18px;border-radius:16px;line-height:1.6}
+.show{display:block}
+.good{background:rgba(51,209,122,.12);border-left:5px solid var(--ok)}
+.bad{background:rgba(255,107,107,.12);border-left:5px solid var(--bad)}
+.controls{display:flex;justify-content:space-between;gap:10px;margin-top:20px;flex-wrap:wrap}
+.btn{padding:14px 22px;border:none;border-radius:14px;font-weight:800;cursor:pointer}
+.gold{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#111}
+.dark{background:rgba(255,255,255,.08);color:white;border:1px solid rgba(255,255,255,.12)}
+#results{display:none;text-align:center}
+.medal{margin:15px auto;padding:12px 20px;border-radius:999px;border:1px solid rgba(212,175,55,.35);display:inline-block;color:var(--gold2)}
+.missed{text-align:left;margin-top:20px;padding:18px;border-radius:16px;background:rgba(0,0,0,.2);line-height:1.55}
+.missed h3{color:var(--gold2);margin-bottom:10px}
+.missed ul{padding-left:20px}
+@media(max-width:650px){.container{padding:22px}h1{font-size:36px}.q{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="brand">DAVID MILÁN STUDIO</div>
+<h1>Mega-Test Premium</h1>
+<h2>Tema 6: Recuperación (Mecanismos Neurocognitivos)</h2>
+
+<div id="quiz">
+<div class="top">
+<div class="stat" id="prog"></div>
+<div class="stat" id="score">Puntuación: 0</div>
+<div class="stat" id="mode">Modo completo</div>
+</div>
+<div class="bar"><div class="fill" id="fill"></div></div>
+<div class="card">
+<div class="q" id="q"></div>
+<div class="options" id="opts"></div>
+<div id="fb" class="feedback"></div>
+<div class="controls">
+<button class="btn dark" onclick="restartQuiz()">Reiniciar</button>
+<button class="btn gold" id="next" onclick="nextQuestion()" style="display:none">Siguiente</button>
+</div>
+</div>
+</div>
+
+<div id="results">
+<h2 id="final"></h2>
+<div class="medal" id="medal"></div>
+<p id="msg"></p>
+<div id="missed" class="missed"></div><br>
+<button class="btn dark" onclick="restartQuiz()">Volver a empezar</button>
+<button class="btn gold" id="retry" onclick="retryMissed()">Repasar falladas</button>
+</div>
+</div>
+
+<script>
+const originalQuestions=[
+        // 1. INTRODUCCIÓN
+        { q: "La anécdota de Michael C. Anderson buscando su pasaporte ilustra un punto crucial sobre la memoria, que es:", o: ["Que la codificación de objetos pequeños falla habitualmente.", "Que los recuerdos pueden estar perfectamente almacenados pero ser temporalmente inaccesibles en la recuperación.", "Que la memoria visual es inferior a la memoria espacial."], c: 1, e: "Ilustra que los recuerdos están almacenados perfectamente bien pero, por la razón que sea, tenemos dificultad para recuperarlos (accesibilidad frente a disponibilidad)." },
+        { q: "Subjetivamente, la evidencia más convincente de que nuestra memoria contiene información a la que no podemos acceder temporalmente es:", o: ["El fenómeno de la punta de la lengua (TOT).", "El síndrome de falsos recuerdos.", "La amnesia anterógrada periférica."], c: 0, e: "La evidencia más convincente proviene de la experiencia del fenómeno de la punta de la lengua (tip of the tongue, TOT), estudiado por Brown y McNeill (1966)." },
+        { q: "En el estudio de Brown y McNeill (1966) sobre el fenómeno TOT, cuando los participantes estaban en ese estado y se les pedía adivinar información como el número de sílabas o la letra inicial:", o: ["Fallaban siempre, demostrando un bloqueo cognitivo total.", "Eran consistentemente mucho mejores proporcionando tal información de lo que cabría esperar por azar.", "Respondían con palabras inventadas el 90% de las veces."], c: 1, e: "Eran consistentemente mucho mejores proporcionando tal información de lo que cabría esperar por azar, demostrando acceso parcial a la huella." },
+        { q: "Según los estudios clínicos (ej. Mangels et al., 1996), las personas que sufren daño en la corteza prefrontal presentan dificultades significativas para:", o: ["Consolidar nuevos recuerdos desde el momento de la lesión.", "Recuperar intencionalmente su pasado (conocimiento y eventos remotos), aunque los recuerdos estén bien almacenados.", "Reconocer rostros, pero no tienen problemas en el recuerdo libre."], c: 1, e: "Los pacientes con daño prefrontal sufren disrupciones en los procesos de recuperación necesarios para acceder intencionalmente a sus recuerdos, siendo uniformemente peores en el recuerdo de eventos remotos." },
+        { q: "En pacientes con daño prefrontal, a pesar de sus severas dificultades en el recuerdo libre de nombres de personas famosas:", o: ["Tampoco logran reconocerlos si se les presentan opciones.", "Podían fácilmente seleccionar los nombres correctos cuando se les presentaban para reconocimiento.", "Solo lograban reconocerlos si se les aplicaba un electroshock."], c: 1, e: "Podían fácilmente seleccionar los nombres correctos cuando se les presentaban para reconocimiento, demostrando que la información está almacenada pero falla el proceso de búsqueda guiada." },
+        
+        // 2. EL PROCESO DE RECUPERACIÓN: PRINCIPIOS GENERALES
+        { q: "Los fragmentos de información (como pistas o estímulos) que permiten acceder a un recuerdo almacenado se denominan:", o: ["Memorias objetivo (target memory).", "Claves de recuperación (retrieval cues).", "Engramas primarios."], c: 1, e: "Estos fragmentos de información que permiten acceder a un recuerdo se conocen como claves de recuperación (retrieval cues)." },
+        { q: "La propiedad de nuestra memoria que permite que cualquier aspecto del contenido de un recuerdo sirva como recordatorio para acceder a toda la experiencia se denomina:", o: ["Codificación serial obligatoria.", "Economía cognitiva.", "Memoria direccionable por contenido."], c: 2, e: "Cualquier aspecto del contenido puede servir como recordatorio... propiedad conocida como memoria direccionable por contenido (un «Google mental»)." },
+        { q: "En la arquitectura de la memoria, el estado interno variable de una huella que refleja lo 'excitada' que está y determina su accesibilidad se llama:", o: ["Nivel de activación.", "Umbral de decaimiento.", "Criterio Beta (β)."], c: 0, e: "El estado interno propio que refleja lo «excitada» o «activa» que está, se denomina nivel de activación." },
+        { q: "Durante el proceso de recuperación, la 'energía' fluye automáticamente a través de las conexiones asociativas desde la clave hacia otras memorias en paralelo. Este mecanismo es la:", o: ["Propagación de la activación.", "Ley del ejercicio.", "Recuperación reconstructiva ilusoria."], c: 0, e: "Esta propagación de la activación es como «energía» que fluye a través de las conexiones entre huellas. Si el objetivo acumula suficiente, será recuperado." },
+        { q: "Considerando un recuerdo como una colección de rasgos, el proceso por el cual la propagación de la activación desde unas claves conduce a la reinstauración de todos los rasgos faltantes se llama:", o: ["Codificación dual.", "Completamiento de patrones (pattern completion).", "Disociación de procesos."], c: 1, e: "El proceso por el cual la propagación... conduce a la reinstauración de los rasgos de una memoria se denomina completamiento de patrones." },
+        { q: "A diferencia de la recuperación incidental, la recuperación intencional requiere procesos adicionales de:", o: ["Percepción subliminal pura.", "Control cognitivo (como especificación, mantenimiento, resolución de interferencia y monitorización).", "Supresión articulatoria del bucle fonológico."], c: 1, e: "Durante la recuperación intencional se necesitan procesos adicionales de control cognitivo: especificación, mantenimiento, resolución de interferencia y monitorización." },
+        { q: "Dentro del control cognitivo de la recuperación, el proceso encargado de superar la intromisión de memorias competidoras que vienen a la mente en lugar del objetivo es:", o: ["El mantenimiento de la clave.", "La resolución de interferencia.", "La especificación de la clave."], c: 1, e: "Resolución de interferencia (interference resolution): superar la interferencia de memorias competidoras que vienen a la mente en lugar del objetivo." },
+        { q: "La «hipótesis de la reinstauración cortical» afirma que recordar una experiencia implica:", o: ["Reactivar las áreas de la neocorteza que procesaron perceptivamente los estímulos originales.", "Crear una huella completamente nueva en el lóbulo parietal.", "Transferir la información al cerebelo para su almacenaje definitivo."], c: 0, e: "La recuperación implica la reinstauración cortical del patrón de actividad neural presente en el momento de codificación (reactivar áreas de la neocorteza perceptiva)." },
+
+        // 3. FACTORES QUE DETERMINAN EL ÉXITO
+        { q: "Según los estudios de Fernandes y Moscovitch (2000, 2003) sobre la atención dividida durante la recuperación, realizar una tarea secundaria:", o: ["Perjudicaba el recuerdo entre un 30% y un 50%, especialmente si la tarea secundaria también usaba palabras.", "Mejoraba el recuerdo por el efecto de excitación paralela.", "No tenía absolutamente ningún efecto sobre el recuerdo."], c: 0, e: "Demostraron que una tarea secundaria durante la recuperación perjudicaba el recuerdo entre un 30% y un 50%, especialmente cuando los ítems de juicio también eran palabras." },
+        { q: "Al comparar los efectos de la atención dividida, los investigadores han encontrado una asimetría clave: dividir la atención...", o: ["Es mucho más disruptivo en la recuperación que en la codificación.", "Es menos disruptivo en la recuperación que en la codificación, indicando que recuperar requiere menos atención.", "Afecta por igual a ambos procesos, anulándolos por completo."], c: 1, e: "Dividir la atención en la recuperación es menos disruptivo que dividirla en la codificación... indicando que la recuperación puede frecuentemente proceder con menos atención." },
+        { q: "Si olvidaste devolver un libro y al pasar por la biblioteca no lo recuerdas, pero al llegar a casa y ver la mesa de tu cocina (donde pensaste en devolverlo) lo recuerdas de inmediato, esto ilustra la importancia de:", o: ["La criptomnesia espacial.", "La relevancia de las claves de recuperación.", "La monitorización de la fuente perceptiva."], c: 1, e: "Ilustra que las claves de recuperación (la biblioteca) son poco útiles si no están relacionadas o no fueron codificadas junto al objetivo (la mesa de la cocina sí lo fue)." },
+        { q: "El estudio de Badre y Wagner (2007) con resonancia magnética mostró que cuando las claves de recuperación son demasiado DÉBILES para activar el recuerdo automáticamente:", o: ["El hipocampo posterior se desconecta temporalmente.", "Se activa un proceso de recuperación controlada mediado por la parte anterior de la corteza prefrontal inferior izquierda.", "Se activa en exclusiva la amígdala cerebral derecha."], c: 1, e: "Cuando las claves son débiles... se activa un proceso de recuperación controlada mediado por la parte anterior de la corteza prefrontal inferior izquierda." },
+        { q: "Rubin y Wallace (1989) descubrieron que proporcionar dos claves relevantes (ej. semántica y rima) en lugar de una produce un efecto en la recuperación que es:", o: ["Negativo, porque las claves compiten entre sí.", "Exactamente la suma matemática de las probabilidades de cada clave.", "Superaditivo (ej. 97% combinadas frente al 14% y 19% por separado)."], c: 2, e: "Tener dos claves es frecuentemente mucho más beneficioso de lo que se esperaría si simplemente se sumaran las probabilidades (efecto superaditivo)." },
+        { q: "En recuerdo libre, las palabras de alta frecuencia de uso se recuerdan mejor que las de baja frecuencia. Esto se explica porque:", o: ["La fuerza de la memoria objetivo es mayor debido a su exposición repetida.", "Las palabras largas ocupan más espacio visual.", "El nivel de activación decae instantáneamente en las palabras cortas."], c: 0, e: "Se recuerdan mejor, probablemente porque están representadas más fuertemente debido a su exposición repetida (fuerza de la memoria objetivo)." },
+        { q: "Al escanear el cerebro durante la codificación, Wagner et al. (1998) encontraron una actividad mayor cerca del hipocampo para los ítems que luego fueron recordados frente a los olvidados. Este fenómeno se conoce como:", o: ["Reinstauración cortical tardía.", "Efecto de memoria subsecuente.", "Amnesia de la fuente focal."], c: 1, e: "Encontraron una actividad significativamente mayor cerca del hipocampo para los ítems recordados exitosamente... efecto de memoria subsecuente." },
+        { q: "El experimento de Anderson y Pichert (1978), donde los participantes leyeron una historia adoptando el rol de ladrón o de comprador de vivienda, demostró que:", o: ["Cambiar de perspectiva o 'estrategia de recuperación' en un segundo intento permitía recordar ítems relevantes para esa nueva perspectiva.", "La memoria humana es incapaz de recordar esquemas espaciales.", "Los pacientes prefrontales mienten sistemáticamente en las pruebas."], c: 0, e: "Quienes cambiaron a una perspectiva diferente recordaron significativamente más ítems relevantes para esa nueva perspectiva. La recuperación mejoró por un cambio de estrategia." },
+        { q: "Herron y Wilding (2006) midieron la actividad eléctrica cerebral y descubrieron que, para 'entrar en sintonía' y establecer un 'modo de recuperación', se observa actividad en:", o: ["La corteza occipital primaria.", "La corteza frontal derecha.", "El lóbulo temporal medial en exclusiva."], c: 1, e: "Encontraron una actividad positiva relativamente mayor sobre la corteza frontal derecha cuando las personas se preparaban para recuperar (modo de recuperación)." },
+
+        // 4 Y 5. CLAVES CONTEXTUALES Y TAREAS DE RECUPERACIÓN
+        { q: "Las circunstancias bajo las cuales un estímulo fue codificado (ubicación, estado emocional, pensamientos atencionales) actúan frecuentemente como:", o: ["Filtros distractores de la memoria.", "Claves contextuales.", "Déficits prefrontales."], c: 1, e: "El contexto se refiere a las circunstancias bajo las cuales un estímulo fue codificado. Estas actúan como claves contextuales." },
+        { q: "Las evaluaciones de memoria que piden explícitamente a los participantes que recuperen experiencias de su pasado (requiriendo contexto como clave) se denominan:", o: ["Pruebas indirectas (implícitas).", "Pruebas perceptivas de decisión léxica.", "Pruebas directas (explícitas)."], c: 2, e: "Las pruebas que piden a las personas que recuperen su pasado se denominan pruebas directas o explícitas." },
+        { q: "¿Cuál de las siguientes pruebas directas es la MÁS sensible a las habilidades de organización del sujeto y presenta mayores dificultades para los pacientes frontales?", o: ["Recuerdo libre (free recall).", "Recuerdo con claves (cued recall).", "Reconocimiento (recognition)."], c: 0, e: "El recuerdo libre... es muy sensible a las habilidades de organización... Los pacientes frontales tienen dificultades significativas con el recuerdo libre." },
+        { q: "Una prueba de completar fragmentos de palabras, donde se evalúa si el procesamiento mejora sin pedir recuerdo explícito del pasado, es una medida de:", o: ["Memoria dependiente del estado.", "Memoria episódica intencional.", "Pruebas indirectas/implícitas (memoria implícita)."], c: 2, e: "Pruebas indirectas/implícitas miden la influencia de la experiencia sin pedir recuerdo del pasado: completamiento de fragmentos, decisión léxica..." },
+        { q: "El fenómeno por el cual somos mejores procesando palabras previamente vistas en una prueba indirecta se conoce como facilitación por repetición (priming). A nivel neocortical, esto se asocia con:", o: ["Supresión por repetición (menor actividad neural por mayor eficiencia).", "Convulsiones eléctricas localizadas.", "Muerte neuronal programada (apoptosis)."], c: 0, e: "Las repeticiones de estímulos típicamente se asocian con una actividad neural reducida... un fenómeno conocido como supresión por repetición, que refleja una mayor eficiencia." },
+
+        // 6. CONTEXTO INCIDENTAL EN MEMORIA EPISÓDICA
+        { q: "El famoso experimento de Godden y Baddeley (1975) con buzos que aprendían palabras en la playa o bajo el agua demostró:", o: ["La memoria reconstructiva semántica.", "La memoria dependiente del contexto ambiental.", "La amnesia retrograda por presión de oxígeno."], c: 1, e: "Demostró la memoria dependiente del contexto ambiental: el material aprendido bajo el agua se recordaba mejor bajo el agua, y el aprendido en tierra, en tierra." },
+        { q: "Según las revisiones de Smith y Vela (2001), si aprendiste algo en un aula y te examinas en otra muy distinta, el efecto de dependencia del contexto ambiental se REDUCE enormemente si:", o: ["Haces ejercicio aeróbico intenso antes del examen.", "Realizas una reinstauración mental del contexto (imaginas el aula original).", "Ignoras las instrucciones del examen."], c: 1, e: "La mera reinstauración mental del contexto reduce enormemente los efectos de dependencia del contexto." },
+        { q: "El estudio de Goodwin et al. (1969) en el que bebedores empedernidos escondían alcohol estando borrachos y solo recordaban dónde estaba al volver a emborracharse, es evidencia de:", o: ["Memoria dependiente del contexto fisiológico o estado.", "Monitorización de fuente defectuosa.", "Efecto de memoria subsecuente."], c: 0, e: "Es evidencia de memoria dependiente del estado, donde el ambiente interno (estado fisiológico/farmacológico) actúa como contexto." },
+        { q: "Eich (1980) demostró de forma concluyente que los efectos de la memoria dependiente del estado (como el uso de sustancias) desaparecen cuando:", o: ["La memoria se evalúa mediante una prueba de reconocimiento (solo aparecen en recuerdo).", "Han pasado más de 24 horas desde la codificación.", "El participante tiene un estado de ánimo positivo."], c: 0, e: "Eich (1980) mostró que la dependencia del estado solo se observa cuando la memoria se evalúa mediante recuerdo; desaparece cuando se usa reconocimiento." },
+        { q: "Miles y Hardman (1998) encontraron efectos de memoria dependiente del estado utilizando no drogas, sino:", o: ["Dietas altas en azúcar.", "Ejercicio aeróbico (estado cardiovascular).", "Cambios bruscos de temperatura ambiental."], c: 1, e: "Miles y Hardman (1998) examinaron si el ejercicio aeróbico podría producir memoria dependiente del estado (estado cardiovascular)." },
+        { q: "Si una persona triste tiende a recordar con mayor facilidad incidentes infelices y fracasos de su vida, estamos ante un caso de:", o: ["Memoria dependiente del contexto cognitivo.", "Memoria congruente con el estado de ánimo.", "Supresión por repetición emocional."], c: 1, e: "La memoria congruente con el estado de ánimo se refiere a la mayor facilidad para recordar eventos cuyo tono emocional coincide con el estado de ánimo actual." },
+        { q: "La diferencia fundamental de la 'memoria DEPENDIENTE del estado de ánimo' (frente a la congruente) demostrada por Eich et al. (1994), es que el recuerdo es mejor cuando:", o: ["El evento es extremadamente feliz, sin importar cómo se sienta el sujeto.", "El estado de ánimo en la prueba coincide con el de la codificación, independientemente del tono emocional del contenido recordado (positivo, negativo o neutral).", "Solo se recuerdan palabras que designan emociones puras."], c: 1, e: "Para la dependiente, la facilidad con que se recuerda depende de la coincidencia de los estados de ánimo entre codificación y recuperación, independientemente de si el evento recordado era positivo, neutral o negativo." },
+        { q: "Marian y Neisser (2000) demostraron que los bilingües ruso-inglés generaban más memorias rusas si la entrevista era en ruso, demostrando la memoria dependiente del contexto:", o: ["Ambiental visual.", "Cognitivo o lingüístico.", "Congruente emocional."], c: 1, e: "El idioma en que se conversa favorece la recuperación de memorias adquiridas en ese idioma, demostrando la memoria dependiente del contexto cognitivo." },
+
+        // 7. MEMORIA RECONSTRUCTIVA
+        { q: "El término 'memoria reconstructiva' se refiere al aspecto activo e inferencial de la recuperación, en el cual:", o: ["Se recupera una copia fotográfica exacta del pasado mediante destellos de luz.", "Se rellenan los vacíos en la memoria ('descifrando') basándose en inferencias plausibles y conocimiento previo.", "El cerebro crea neuronas nuevas para cada palabra aprendida."], c: 1, e: "Se refiere al aspecto activo e inferencial... podemos recordar aspectos y vernos obligados a «descifrar» otros basándonos en inferencias plausibles." },
+        { q: "En el experimento de Dooling y Christiaansen (1977), los participantes afirmaban falsamente haber visto la frase 'Era sorda, muda y ciega' en el pasaje que leyeron si justo antes de la prueba se les decía que:", o: ["La historia era un cuento de ciencia ficción.", "La protagonista de la historia, 'Carol Harris', era en realidad Helen Keller.", "Habían suspendido el examen anterior."], c: 1, e: "Si se les decía que la historia era realmente sobre Helen Keller, el conocimiento previo activado condujo a errores de reconstrucción." },
+
+        // 8. MEMORIA DE RECONOCIMIENTO
+        { q: "En las pruebas de reconocimiento, a los ítems no estudiados (nuevos) que se mezclan con los antiguos para forzar la discriminación se les llama:", o: ["Distractores, señuelos o foils.", "Claves directas.", "Nodos asociativos marginales."], c: 0, e: "Los ítems no estudiados se llaman distractores, señuelos o foils." },
+        { q: "Según la teoría de detección de señales aplicada a la memoria de reconocimiento, la capacidad pura de discriminar entre la distribución de ítems 'antiguos' y 'nuevos' se mide con el parámetro:", o: ["Alfa (α).", "Beta (β).", "d' (d prima)."], c: 2, e: "La capacidad de discriminar se mide por la distancia entre las medias de ambas distribuciones, conocida como d' (d prima)." },
+        { q: "En la teoría de detección de señales, si un sujeto relaja o baja su criterio de respuesta (parámetro β), desplazándolo hacia la izquierda, el resultado esperado será:", o: ["Que aumenten tanto los aciertos como las falsas alarmas.", "Que disminuyan los aciertos a cero.", "Que su discriminabilidad d' aumente instantáneamente."], c: 0, e: "Si el criterio se relaja (desplaza hacia la izquierda), aumentan tanto los aciertos como las falsas alarmas." },
+        { q: "Un fenómeno intrigante de la memoria es que las palabras de BAJA frecuencia de uso se recuerdan peor en pruebas de recuerdo libre, pero sin embargo:", o: ["Se reconocen mejor en pruebas de reconocimiento que las palabras de alta frecuencia.", "Son imposibles de percibir visualmente.", "Desaparecen de la memoria de trabajo acústica."], c: 0, e: "En el recuerdo libre las altas se recuerdan mejor, pero en el reconocimiento ocurre lo contrario: las palabras de baja frecuencia se reconocen mejor (efecto de frecuencia de palabras en el reconocimiento)." },
+        { q: "Las teorías de proceso dual proponen que el reconocimiento no se basa en una sola variable continua, sino en dos procesos recuperativos distintos conocidos como:", o: ["Codificación visual y codificación acústica.", "Familiaridad y recolección.", "Sensación y Percepción subliminal."], c: 1, e: "Dos procesos contribuyen al reconocimiento: la familiaridad (rápida/automática) y la recolección (lenta/contextual)." },
+        { q: "En el procedimiento recordar/saber (Tulving, 1985), el sujeto debe contestar 'saber' (know) si:", o: ["Recuerda conscientemente los detalles del evento de estudio y el contexto.", "Simplemente el ítem le parece familiar o siente la fuerza del recuerdo, sin acceso a los detalles contextuales de cuando lo aprendió.", "Es una palabra de conocimiento general del mundo ajena a la lista."], c: 1, e: "Responder «saber» ocurre porque simplemente les parece familiar sin memoria de los detalles contextuales de la experiencia." },
+        { q: "El procedimiento metodológico ideado por Jacoby (1991) para aislar y estimar matemáticamente las contribuciones de recolección y familiaridad mediante instrucciones de 'inclusión' y 'exclusión' es:", o: ["El test de informe parcial.", "La técnica de Gating.", "El procedimiento de disociación de procesos (PDP)."], c: 2, e: "El procedimiento de disociación de procesos (PDP) de Jacoby (1991) utiliza condiciones de inclusión y exclusión para estimar matemáticamente las contribuciones." },
+        { q: "Se ha demostrado empíricamente que aplicar una tarea de distracción atencional al sujeto (atención disminuida) afecta o deteriora:", o: ["La familiaridad por completo, dejando intacta la recolección.", "Mucho más sensiblemente a las estimaciones de recolección, dejando a menudo la familiaridad intacta.", "Solamente a las pruebas indirectas de facilitación perceptiva."], c: 1, e: "Las estimaciones de recolección son mucho más sensibles a la disrupción por distracción que las de familiaridad (los mayores o distraídos muestran déficits en recolección, familiaridad intacta)." },
+        { q: "A nivel neuroanatómico en los lóbulos temporales mediales, la neuroimagen asocia el componente de la 'recolección' de forma crítica con:", o: ["El hipocampo.", "La corteza perirrinal.", "El cerebelo vermis."], c: 0, e: "La recolección depende críticamente del hipocampo, mientras que la familiaridad depende de la corteza perirrinal." },
+        { q: "El caso clínico del paciente Jon (amnésico del desarrollo con daño selectivo en el hipocampo pero corteza perirrinal preservada) ilustra perfectamente la disociación dual porque:", o: ["Falla en el reconocimiento absoluto de caras, pero puede recitar poesía.", "Presenta déficits profundos en la recolección episódica pero una familiaridad intacta para estímulos.", "Carece tanto de recolección como de familiaridad, confirmando que son lo mismo."], c: 1, e: "Presenta déficits profundos en la recolección episódica pero una familiaridad intacta... ilustrando esta disociación." },
+        { q: "En el estudio de resonancia magnética funcional de Eldridge et al. (2000), ¿qué actividad cerebral marcaba la diferencia cuando los sujetos afirmaban 'recordar' conscientemente (recolección) frente a solo 'saber' (familiaridad)?", o: ["Una activación significativamente mayor en el hipocampo para 'recordar'.", "Una desactivación total de los lóbulos temporales.", "Actividad exclusiva en el área de Broca."], c: 0, e: "Mostraban una activación hipocampal significativamente mayor cuando reclamaban recuerdo consciente («recordar») que cuando simplemente «sabían»." },
+        { q: "Por su parte, Montaldi et al. (2006) determinaron que la actividad que refleja proporcionalmente el 'grado de familiaridad' experimentado reside en:", o: ["La corteza motora suplementaria.", "La corteza perirrinal.", "La glándula pineal."], c: 1, e: "La actividad en la corteza perirrinal durante la recuperación, en cambio, se relaciona con el grado de familiaridad experimentado." },
+
+        // 9. MONITORIZACIÓN DE LA FUENTE
+        { q: "El proceso que utilizamos activamente para examinar los orígenes contextuales de lo que recuperamos (ej. ¿lo leí o me lo contaron?) se denomina:", o: ["Supresión por repetición de la fuente.", "Resolución de interferencia proactiva.", "Monitorización de la fuente (source monitoring)."], c: 2, e: "El proceso de examinar los orígenes de lo que recuperamos y decidir si proviene de una fuente particular se conoce como monitorización de la fuente." },
+        { q: "Según Johnson et al. (1993), al intentar distinguir si un recuerdo fue una experiencia real percibida o algo meramente imaginado, nuestro cerebro se guía por:", o: ["Una 'etiqueta' química grabada en cada engrama.", "La prevalencia relativa de detalle perceptivo (sugiere realidad) frente a la memoria de operaciones cognitivas (sugiere imaginación).", "El esfuerzo articulatorio al pronunciar el recuerdo."], c: 1, e: "Al decidir si algo fue real o imaginado, la prevalencia relativa de detalle perceptivo frente a memoria de operaciones cognitivas guiaría nuestra decisión." },
+        { q: "El estudio de Henkel, Franklin y Johnson (2000) demostró que cuando se induce a los sujetos a formar una imagen mental vívida de una palabra:", o: ["La olvidan más rápido que si no la imaginan.", "Desarrollan ceguera cortical transitoria.", "Es más probable que después afirmen erróneamente en una prueba que vieron físicamente una imagen del objeto."], c: 2, e: "Cuando se induce a formar una imagen mental... es más probable que después afirme erróneamente que vio una imagen del objeto (falsa atribución)." },
+        { q: "Las rupturas severas en los mecanismos de monitorización de la fuente (incapacidad de distinguir imaginación de percepción real) se señalan como parcialmente responsables de:", o: ["Delirios clínicos y alucinaciones en psicopatologías.", "El síndrome de Savant.", "La afasia de conducción."], c: 0, e: "Pueden ser parcialmente responsables de delirios en los que las personas no pueden distinguir sus imaginaciones de las ocurrencias verdaderas." },
+        { q: "El fenómeno denominado 'criptomnesia' (como el caso del músico George Harrison) es el resultado de un fallo en la atribución de fuente, en el cual una persona:", o: ["Olvida de forma intencional los traumas del pasado ocultándolos.", "Cree estar creando una idea o melodía nueva y original, cuando en realidad está recordando inconscientemente una obra ajena ya encontrada.", "Crea lenguajes secretos incomprensibles para los demás."], c: 1, e: "Criptomnesia: fenómeno en el que una persona cree estar creando algo nuevo pero en realidad está recordando una obra similar... ilustrando cómo la memoria puede influirnos inconscientemente." },
+        
+        // 10-12 CONCEPTOS FINALES Y PREGUNTAS DE SÍNTESIS
+        { q: "El 'Principio de especificidad de la codificación' formulado por Tulving y Thomson (1973) postula que:", o: ["Las claves semánticas puras siempre son mejores que las perceptivas.", "Solo se puede recuperar algo si se verbaliza explícitamente.", "Cuanto más similares son las claves disponibles en la recuperación a las condiciones presentes en la codificación, más efectivas serán."], c: 2, e: "Principio de especificidad de la codificación... cuanto más similares son las claves disponibles en la recuperación a las condiciones en la codificación, más efectivas." },
+        { q: "¿En qué prueba de recuperación se hace evidente que los procesos de control atencional, estrategia de búsqueda y resolución de interferencia son más indispensables?", o: ["Completamiento de fragmentos de palabras (implícita).", "Recuerdo libre (free recall).", "Decisión léxica (implícita)."], c: 1, e: "El recuerdo libre es muy sensible a las habilidades de organización... Los pacientes frontales (con fallos de control atencional) tienen dificultades significativas con él." },
+        { q: "¿Por qué el daño prefrontal afecta gravemente al recuerdo pero NO destruye la memoria de reconocimiento?", o: ["Porque el reconocimiento está dirigido por el cerebelo.", "Porque el reconocimiento presenta el estímulo intacto guiando el acceso, mientras que el recuerdo requiere una búsqueda y control autogenerados que el córtex frontal dañado ya no puede sostener.", "Porque los pacientes prefrontales desarrollan visión de rayos X."], c: 1, e: "El reconocimiento presenta el estímulo intacto... mientras el recuerdo libre es altamente dependiente de procesos controlados del prefrontal (especificación, mantenimiento, etc.)." },
+        { q: "¿Qué implica a nivel microscópico/neural la afirmación de que la recuperación funciona mediante 'completamiento de patrones'?", o: ["Que el cerebro dibuja literalmente líneas en la materia blanca.", "Que una parte del recuerdo (clave) activa conexiones que logran 'encender' el resto de los rasgos asociados que conforman el episodio completo.", "Que los astrocitos bloquean el flujo de sangre selectivamente."], c: 1, e: "Completamiento de patrones: propagación de la activación desde un conjunto de claves conduce a la reinstauración de los rasgos de una memoria, completando los componentes que faltan." },
+        { q: "¿Cuál de los siguientes ejemplos es una medida de memoria 'dependiente del contexto cognitivo' (según el experimento de Marian y Fausey)?", o: ["Recordar mejor los conceptos de biología en inglés si la asignatura se estudió originalmente en inglés.", "Recordar mejor una película triste cuando estás triste.", "Recordar mejor un trayecto en coche si has bebido la misma cantidad de alcohol."], c: 0, e: "Bilingües mejores recordando información académica evaluada en el mismo idioma de estudio. El idioma actúa como contexto cognitivo." },
+        { q: "En términos de la Teoría de Detección de Señales, si una memoria episódica fue procesada muy profundamente en la codificación y generó una fuerte actividad hipocampal, en la prueba de reconocimiento su distribución generará un d' (d prima):", o: ["Muy cercano a cero o nulo.", "Grande, mostrando alta discriminabilidad y distancia frente a la distribución de distractores (nuevos).", "Negativo."], c: 1, e: "Una codificación fuerte aumenta la distancia (d') entre la media de ítems antiguos y nuevos, mejorando la discriminabilidad pura." },
+        { q: "Si en un examen tipo test decides marcar como correctas solo aquellas respuestas de las que estás 100% seguro y dejas en blanco el resto para no penalizar, has adoptado un criterio (β) en la Teoría de Detección de Señales que es:", o: ["Relajado, aumentando aciertos y falsas alarmas.", "Estricto o duro, lo que disminuirá las falsas alarmas pero también puede disminuir los aciertos directos.", "Totalmente independiente del reconocimiento."], c: 1, e: "Si el criterio se endurece (desplaza hacia la derecha para exigir más familiaridad), disminuyen tanto las falsas alarmas como los aciertos." },
+        { q: "La afirmación 'la facilitación por repetición es frecuentemente sensible al ajuste perceptivo entre la codificación y la prueba' significa que:", o: ["El efecto de priming desaparece siempre en pacientes amnésicos.", "Cambiar de modalidad (ej. ver la palabra visualmente y luego escucharla) puede reducir los beneficios del priming implícito.", "El sujeto es consciente del ensayo a nivel metaperceptivo."], c: 1, e: "Sensible al ajuste perceptivo... por ejemplo, cambiar de modalidad auditiva a visual puede reducir los beneficios de la facilitación." },
+        { q: "La red de memoria episódica incluye fundamentalmente a los lóbulos temporales mediales (ej. hipocampo). Sin embargo, ¿qué zona actúa activamente como 'controlador' o regulador durante la búsqueda intencional de la huella?", o: ["La corteza prefrontal.", "El núcleo pulvinar del tálamo.", "El giro poscentral parietal."], c: 0, e: "Los procesos de control (especificación, resolución de interferencia, etc.) que dirigen la búsqueda están mediados por la corteza prefrontal." },
+        { q: "¿Qué evidencia apoya que la memoria humana actúa como una 'Memoria direccionable por contenido'?", o: ["El hecho de que los recuerdos se ordenan cronológicamente y no pueden saltarse etapas.", "El hecho de que un olor, una canción, un lugar o una persona pueden desencadenar directamente el recuerdo de una experiencia particular sin importar el orden temporal.", "Que el cerebro tiene direcciones IP asignadas a cada recuerdo semántico."], c: 1, e: "Memoria direccionable por contenido: cualquier aspecto del contenido de un recuerdo puede servir como recordatorio directo que permita acceder a la experiencia." },
+        { q: "Cuando buscas recuperar una memoria que ha sufrido interferencia de competidores, el proceso cognitivo implicado (resolución de interferencia) requiere activar fuertemente:", o: ["El lóbulo occipital lateral.", "La corteza prefrontal inferior izquierda (según Badre y Wagner).", "El hipotálamo ventromedial."], c: 1, e: "Resolución de interferencia/claves débiles activa un proceso controlado mediado por la parte anterior de la corteza prefrontal inferior izquierda (Badre y Wagner)." },
+        { q: "Si la codificación y la recuperación fuesen sistemas idénticos en demanda atencional, ¿qué asimetría en la distracción no se explicaría?", o: ["Que dividir la atención al memorizar (codificación) devasta el aprendizaje, pero dividir la atención al intentar recordar (recuperación) es sorprendentemente menos perjudicial.", "Que las personas sordas tienen mejor memoria táctil.", "Que los idiomas románicos se recuerdan mejor que los eslavos."], c: 0, e: "Dividir la atención en la recuperación es menos disruptivo que dividirla en la codificación, indicando que recuperar (guiado por claves) requiere a menudo menos atención inicial." },
+        { q: "¿Qué nombre recibe el efecto consistente en que dos claves (ej. sonido inicial y significado) impulsan la recuperación a un 97%, frente a la mera expectativa matemática de sumar sus probabilidades individuales (14% y 19%)?", o: ["Fenómeno TOT acústico.", "Supresión por repetición aditiva.", "Efecto superaditivo (Rubin y Wallace)."], c: 2, e: "La investigación sobre claves duales sugiere un efecto superaditivo (Rubin y Wallace), explicando por qué codificar elaborativamente (asociar con muchas claves) es tan potente." },
+        { q: "¿Qué término describe el sesgo en el recuerdo por el cual un estado afectivo negativo hace más accesibles los recuerdos de vivencias negativas del pasado?", o: ["Memoria congruente con el estado de ánimo.", "Amnesia retrógrada depresiva.", "Criptomnesia somática."], c: 0, e: "Memoria congruente con el estado de ánimo (mood-congruent memory): sesgo en el recuerdo... estado negativo hace más accesibles los recuerdos negativos (Blaney, 1986)." },
+        { q: "Respecto al concepto de la Reinstauración Cortical, 'estamos experimentando fantasmas de estados cerebrales pasados' (Danker y Anderson) alude a que:", o: ["Vemos visiones paranormales tras el daño hipocampal.", "Al recordar el color de una manzana, la corteza visual occipital procesadora del color vuelve a activarse como si la estuviéramos viendo.", "El lóbulo temporal pierde masa con el tiempo."], c: 1, e: "Reactivamos las áreas de la neocorteza que procesaron perceptivamente los estímulos originales, recreando esos «estados cerebrales» pasados visuales, auditivos, etc." }
+    ];
+let questions=[...originalQuestions],current=0,score=0,missed=[],retryMode=false;
+
+function loadQuestion(){
+let q=questions[current];
+document.getElementById('prog').innerText=`Pregunta ${current+1} de ${questions.length}`;
+document.getElementById('fill').style.width=(current/questions.length*100)+'%';
+document.getElementById('mode').innerText=retryMode?'Modo repaso':'Modo completo';
+document.getElementById('q').innerText=`${current+1}. ${q.q}`;
+document.getElementById('fb').className='feedback';
+document.getElementById('fb').style.display='none';
+document.getElementById('next').style.display='none';
+let opts=document.getElementById('opts');opts.innerHTML='';
+q.o.forEach((o,i)=>{let b=document.createElement('button');b.className='opt';b.innerText=o;b.onclick=()=>answer(i,b);opts.appendChild(b);});
+}
+
+function answer(i,btn){
+let q=questions[current];
+let all=document.querySelectorAll('.opt');
+all.forEach(x=>x.disabled=true);
+if(i===q.c){
+btn.classList.add('correct');
+score++;
+document.getElementById('score').innerText='Puntuación: '+score;
+document.getElementById('fb').className='feedback show good';
+document.getElementById('fb').innerHTML='<b>Correcto.</b><br>'+q.e;
+}else{
+btn.classList.add('incorrect');
+all[q.c].classList.add('correct');
+if(!missed.some(m=>m.q===q.q)) missed.push(q);
+document.getElementById('fb').className='feedback show bad';
+document.getElementById('fb').innerHTML='<b>Incorrecto.</b><br><br>La respuesta correcta es: <b>'+q.o[q.c]+'</b><br><br>'+q.e;
+}
+document.getElementById('next').style.display='inline-block';
+document.getElementById('next').innerText=current===questions.length-1?'Ver resultados':'Siguiente';
+}
+
+function nextQuestion(){current++; if(current<questions.length) loadQuestion(); else showResults();}
+
+function showResults(){
+document.getElementById('quiz').style.display='none';
+document.getElementById('results').style.display='block';
+document.getElementById('fill').style.width='100%';
+let pct=Math.round(score/questions.length*100);
+document.getElementById('final').innerHTML=`${score}/${questions.length} · ${pct}%`;
+document.getElementById('medal').innerText=pct>=90?'🏆 Medalla de Oro · Dominio excelente':pct>=75?'🥈 Medalla de Plata · Muy buen nivel':pct>=60?'🥉 Medalla de Bronce · Base aprobada':'📚 Modo refuerzo · Conviene repasar';
+document.getElementById('msg').innerText='Tema 6: recuperación, claves, reconocimiento, contexto, recolección, familiaridad y monitorización de fuente.';
+document.getElementById('missed').innerHTML=missed.length?'<h3>Preguntas falladas: '+missed.length+'</h3><ul>'+missed.map((x,i)=>'<li>'+(i+1)+'. '+x.q+'</li>').join('')+'</ul>':'<b>Perfecto. Sin errores.</b>';
+document.getElementById('retry').style.display=missed.length?'inline-block':'none';
+}
+
+function retryMissed(){
+questions=[...missed];missed=[];current=0;score=0;retryMode=true;
+document.getElementById('score').innerText='Puntuación: 0';
+document.getElementById('results').style.display='none';
+document.getElementById('quiz').style.display='block';
+loadQuestion();
+}
+
+function restartQuiz(){
+questions=[...originalQuestions];current=0;score=0;missed=[];retryMode=false;
+document.getElementById('score').innerText='Puntuación: 0';
+document.getElementById('results').style.display='none';
+document.getElementById('quiz').style.display='block';
+loadQuestion();
+}
+loadQuestion();
+</script>
+</body>
+</html>

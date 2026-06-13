@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAVID MILÁN STUDIO | Amnesia y Trastornos de la Memoria</title>
+<style>
+:root{--gold:#d4af37;--gold2:#f3d98b;--bg:#05070d;--bg2:#0b1323;--txt:#f5f5f5;--muted:#aab3c5;--ok:#33d17a;--bad:#ff6b6b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Segoe UI,sans-serif;min-height:100vh;background:
+radial-gradient(circle at top left,rgba(212,175,55,.20),transparent 30%),
+radial-gradient(circle at bottom right,rgba(50,90,180,.25),transparent 35%),
+linear-gradient(135deg,var(--bg),var(--bg2),#05070d);
+display:flex;justify-content:center;align-items:center;padding:30px;color:var(--txt)}
+.container{width:100%;max-width:1000px;background:rgba(255,255,255,.06);
+backdrop-filter:blur(18px);border:1px solid rgba(212,175,55,.25);
+border-radius:28px;padding:32px;box-shadow:0 25px 80px rgba(0,0,0,.45)}
+.brand{display:inline-block;padding:10px 18px;border-radius:999px;border:1px solid rgba(212,175,55,.4);color:var(--gold2);font-weight:800;letter-spacing:3px;margin-bottom:18px}
+h1{font-size:52px;background:linear-gradient(90deg,#fff,var(--gold2));-webkit-background-clip:text;color:transparent}
+h2{margin:8px 0 25px;color:var(--muted);font-weight:400}
+.top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.stat{padding:12px 16px;border-radius:14px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.1);color:var(--gold2);font-weight:700}
+.bar{height:10px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-bottom:20px}
+.fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:.3s}
+.card{padding:24px;border-radius:22px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.08)}
+.q{font-size:22px;font-weight:800;line-height:1.4;margin-bottom:20px}
+.options{display:grid;gap:12px}
+.opt{padding:15px;border-radius:16px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);cursor:pointer;color:white;text-align:left;font-size:15px;line-height:1.45}
+.opt:hover:not(:disabled){border-color:var(--gold);transform:translateY(-1px)}
+.opt:disabled{cursor:not-allowed;opacity:.95}
+.correct{background:rgba(51,209,122,.18)!important;border-color:var(--ok)!important}
+.incorrect{background:rgba(255,107,107,.18)!important;border-color:var(--bad)!important}
+.feedback{display:none;margin-top:18px;padding:18px;border-radius:16px;line-height:1.6}
+.show{display:block}
+.good{background:rgba(51,209,122,.12);border-left:5px solid var(--ok)}
+.bad{background:rgba(255,107,107,.12);border-left:5px solid var(--bad)}
+.controls{display:flex;justify-content:space-between;gap:10px;margin-top:20px;flex-wrap:wrap}
+.btn{padding:14px 22px;border:none;border-radius:14px;font-weight:800;cursor:pointer}
+.gold{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#111}
+.dark{background:rgba(255,255,255,.08);color:white;border:1px solid rgba(255,255,255,.12)}
+#results{display:none;text-align:center}
+.medal{margin:15px auto;padding:12px 20px;border-radius:999px;border:1px solid rgba(212,175,55,.35);display:inline-block;color:var(--gold2)}
+.missed{text-align:left;margin-top:20px;padding:18px;border-radius:16px;background:rgba(0,0,0,.2);line-height:1.55}
+.missed h3{color:var(--gold2);margin-bottom:10px}
+.missed ul{padding-left:20px}
+@media(max-width:650px){.container{padding:22px}h1{font-size:36px}.q{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="brand">DAVID MILÁN STUDIO</div>
+<h1>Mega-Test Premium</h1>
+<h2>Tema 10: Amnesia y Trastornos de la Memoria</h2>
+
+<div id="quiz">
+<div class="top">
+<div class="stat" id="prog"></div>
+<div class="stat" id="score">Puntuación: 0</div>
+<div class="stat" id="mode">Modo completo</div>
+</div>
+<div class="bar"><div class="fill" id="fill"></div></div>
+<div class="card">
+<div class="q" id="q"></div>
+<div class="options" id="opts"></div>
+<div id="fb" class="feedback"></div>
+<div class="controls">
+<button class="btn dark" onclick="restartQuiz()">Reiniciar</button>
+<button class="btn gold" id="next" onclick="nextQuestion()" style="display:none">Siguiente</button>
+</div>
+</div>
+</div>
+
+<div id="results">
+<h2 id="final"></h2>
+<div class="medal" id="medal"></div>
+<p id="msg"></p>
+<div id="missed" class="missed"></div><br>
+<button class="btn dark" onclick="restartQuiz()">Volver a empezar</button>
+<button class="btn gold" id="retry" onclick="retryMissed()">Repasar falladas</button>
+</div>
+</div>
+
+<script>
+const originalQuestions=[
+        // 1. INTRODUCCIÓN Y EL PACIENTE MELTZER (1-8)
+        { q: "El caso del psicólogo clínico Malcolm Meltzer, que sufrió un infarto y anoxia, ilustra las dificultades de los problemas de memoria. Tras despertar del coma, Meltzer:", o: ["Había olvidado completamente el idioma inglés.", "Sabía quién era, pero creía que tenía 33 años cuando en realidad tenía 44.", "Creía ser un niño de 5 años y no reconocía a su familia."], c: 1, e: "Meltzer recuperó la conciencia sabiendo quién era y reconociendo a su familia, pero creía que tenía 33 años en lugar de 44." },
+        { q: "A diferencia de un paciente amnésico puro, Meltzer también experimentaba graves problemas con su memoria de trabajo, lo cual se traducía en:", o: ["Que no podía coordinar movimientos musculares.", "Que le costaba mantener los hechos en mente, dificultando organizarlos o comparar variables.", "Que no podía ver objetos en su campo visual izquierdo."], c: 1, e: "Tenía problemas con su memoria de trabajo: le costaba mantener los hechos en mente, lo que dificultaba organizarlos y comparar cosas según varias variables." },
+        { q: "En la interacción social, los déficits de memoria de Meltzer provocaban frecuentemente que:", o: ["Insultara a la gente sin darse cuenta debido al síndrome de Tourette.", "Olvidara si la gente estaba casada o muerta, y terminara hablando solo de sí mismo y de su 'condición', volviendo su conversación aburrida.", "Solo se comunicara mediante lenguaje de signos."], c: 1, e: "No recordaba los nombres ni relaciones, temía preguntar por difuntos, y si no decía algo de inmediato lo olvidaba, tendiendo a hablar solo de sí mismo y aburriendo a los demás." },
+        { q: "Desde la perspectiva de la psicología cognitiva, ¿para qué ha sido históricamente crucial el estudio de pacientes con déficits de memoria (como HM o PV)?", o: ["Para demostrar que la memoria es un bloque unitario indivisible.", "Para fraccionar la memoria (separar corto plazo de largo plazo, memoria de trabajo, semántica, etc.) y comprender cómo funciona el cerebro sano.", "Para vender manuales de psicoanálisis."], c: 1, e: "El estudio de pacientes ha contribuido sustancialmente a comprender cómo funciona la memoria, fraccionando sistemas como corto/largo plazo o bucle fonológico." },
+        { q: "¿Cuál suele ser la actitud típica de los pacientes con problemas graves de memoria respecto a la investigación científica con ellos?", o: ["Suelen negarse a participar exigiendo cobrar altas sumas de dinero.", "Son casi invariablemente generosos al ayudar, aun sabiendo que es improbable que obtengan un beneficio directo para ellos mismos.", "Mienten sistemáticamente a los investigadores por paranoia."], c: 1, e: "Los pacientes son casi invariablemente generosos al ayudar a comprender la naturaleza de su déficit, aun sabiendo que es improbable que obtengan beneficio directo." },
+        { q: "Si eres el psicólogo clínico que atiende a un paciente de memoria 'el lunes por la mañana', tu primer paso esencial será:", o: ["Someterlo inmediatamente a cirugía cerebral.", "Iniciar una terapia de exposición con prevención de respuesta.", "Evaluar al paciente para contribuir al diagnóstico, identificar el problema y planificar el tratamiento."], c: 2, e: "Probablemente comenzaríamos evaluando al paciente para contribuir al diagnóstico, identificar problemas principales y conducir al tratamiento." },
+        { q: "Según el texto, al iniciar el contacto clínico y establecer expectativas con el paciente y su cuidador, el psicólogo debe dejar claro con tacto que:", o: ["Recuperará el 100% de su memoria en dos semanas.", "Una restitución o cura completa de la memoria es muy improbable.", "La amnesia se debe a factores kármicos no resueltos."], c: 1, e: "Debe dejar claro con tacto que una restitución completa de la memoria es muy improbable." },
+        { q: "A la hora de evaluar, ¿por qué es importante utilizar tests objetivos y no fiarse exclusivamente del relato del paciente?", o: ["Porque algunos pacientes son dolorosamente conscientes de sus dificultades, pero otros no lo son en absoluto (carecen de conciencia de déficit).", "Porque los pacientes son todos sociópatas mitómanos.", "Porque la ley prohíbe hablar con los pacientes."], c: 0, e: "El relato del paciente no necesariamente es fiable: algunos son dolorosamente conscientes de sus dificultades y otros no, creyendo que su memoria es perfecta." },
+
+        // 2. SÍNDROME AMNÉSICO Y AMNESIA DE LA FUENTE (9-20)
+        { q: "El problema para codificar, almacenar o recuperar información en curso que pueda usarse en el FUTURO (aprender cosas nuevas) se denomina:", o: ["Amnesia retrógrada.", "Amnesia de Broca.", "Amnesia anterógrada."], c: 2, e: "Amnesia anterógrada: problema para codificar, almacenar o recuperar información en curso que pueda usarse en el futuro." },
+        { q: "El paciente clínico HM es considerado el caso más clásico de:", o: ["Déficit puro de memoria de trabajo a corto plazo.", "Amnesia anterógrada densa (su capacidad de nuevo aprendizaje estaba muy restringida).", "Agnosia visual aperceptiva."], c: 1, e: "El paciente HM es un caso clásico de amnesia anterógrada con una capacidad de nuevo aprendizaje muy restringida." },
+        { q: "En el síndrome amnésico clásico en su forma 'pura', el sistema de memoria que está gravemente deteriorado es:", o: ["La memoria semántica.", "La memoria episódica.", "La memoria implícita procedimental."], c: 1, e: "Hay acuerdo general en que el síndrome amnésico implica una memoria episódica gravemente deteriorada, con las demás preservadas." },
+        { q: "En un paciente con un síndrome amnésico puro, la memoria de trabajo, la inteligencia, la memoria semántica y la implícita suelen estar:", o: ["Totalmente destruidas.", "Preservadas e intactas.", "Sustituidas por alucinaciones visuales."], c: 1, e: "En su forma pura, implica memoria episódica deteriorada, junto con memoria de trabajo, semántica, implícita e inteligencia preservadas." },
+        { q: "A nivel de mecanismo psicológico, se sospecha que la amnesia anterógrada altera la capacidad fundamental de:", o: ["Identificar los colores en la retina.", "Procesar la información de forma subconsciente.", "Asociar un evento o episodio específico con su contexto espacial y temporal (su localización y tiempo)."], c: 2, e: "Parece probable que la amnesia altere la capacidad de asociar un evento o episodio con su contexto, su localización en el tiempo y el espacio." },
+        { q: "En el ingenioso estudio de Huppert y Piercy (1978) se presentaban fotos a pacientes amnésicos y controles (algunas 1 vez, otras 2 veces). Los controles sabían qué foto se presentó cada día, pero los amnésicos:", o: ["Decían siempre que la foto 2 veces vista era del Día 2, confundiendo el 'grado de familiaridad' o fuerza con la 'recencia' temporal.", "Se negaron a mirar las fotos por fobia.", "Tenían recuerdos fotográficos exactos pero no podían hablar."], c: 0, e: "Los amnésicos confundían familiaridad con recencia: creían que las fotos vistas 2 veces pertenecían al Día 2, basándose en la fuerza de la imagen por carecer de memoria contextual." },
+        { q: "El fenómeno clínico por el cual un paciente amnésico es capaz de recordar un hecho (ej. 'La capital de Francia es París') pero es incapaz de recordar DÓNDE ni CUÁNDO le acaban de enseñar ese hecho, se denomina:", o: ["Amnesia procedimental.", "Ceguera atencional inespecífica.", "Amnesia de la fuente (source amnesia)."], c: 2, e: "La 'amnesia de la fuente' es la dificultad característica para recordar el origen de un recuerdo, recuperando el 'hecho' pero no la circunstancia en que lo aprendieron." },
+        { q: "Tulving describe la memoria episódica como un sistema de 'viaje mental en el tiempo'. Los pacientes amnésicos con daño hipocampal (Hassabis et al.):", o: ["Viajan al futuro perfectamente, pero no al pasado.", "Tienen también una gran dificultad para imaginar actividades o escenarios futuros integrados.", "Desarrollan la habilidad de leer la mente."], c: 1, e: "Tienen dificultad para imaginar actividades futuras: pueden imaginar componentes, pero no integrarlas en un todo espacial/escénico (por su daño hipocampal)." },
+        { q: "Para explicar este fallo, Baddeley propuso el 'modelo modal simplificado de amnesia', que asume que la memoria episódica necesita un:", o: ["Filtro de atención temprana atenuado.", "Mecanismo de 'pegamento mnemónico' para vincular y 'pegar' cada experiencia a su contexto específico.", "Corte del cuerpo calloso."], c: 1, e: "Asumía la necesidad de un 'pegamento mnemónico' para asociar ítems con su contexto, proporcionando una etiqueta contextual para recuperar episodios." },
+        { q: "En ese 'modelo modal simplificado', Baddeley asumía erróneamente que la memoria semántica:", o: ["Era innata de nacimiento.", "Desaparecía antes que la episódica.", "Representaba simplemente el 'residuo' de muchos episodios acumulados (asumiendo que sin memoria episódica no se formaría semántica)."], c: 2, e: "Asumía que la memoria semántica representa el residuo de muchos episodios acumulados con el tiempo." },
+        { q: "El 'modelo modal simplificado' también presuponía que el Recuerdo y el Reconocimiento:", o: ["Implicaban los mismos procesos de almacenamiento subyacentes.", "Estaban en dos hemisferios diferentes.", "Dependían del bulbo raquídeo."], c: 0, e: "Asumía que recuerdo y reconocimiento implican los mismos procesos de almacenamiento, solo que con distintas restricciones de recuperación." },
+        { q: "Según las definiciones del texto, un fallo en recuperar qué hiciste las pasadas vacaciones de verano sería un caso de:", o: ["Amnesia psicógena.", "Amnesia retrógrada.", "Amnesia anterógrada temprana."], c: 1, e: "Amnesia retrógrada: problema para acceder a eventos ocurridos en el pasado, típicamente antes de la enfermedad." },
+
+        // 3. CASO JON Y AMNESIA DEL DESARROLLO (21-28)
+        { q: "El caso del paciente Jon ('amnesia del desarrollo') se produjo porque nació prematuramente y sufrió anoxia. A nivel anatómico, su daño se limitó específicamente a:", o: ["El lóbulo frontal derecho.", "Una reducción a menos de la mitad del tamaño de su hipocampo (dejando intactas las cortezas adyacentes).", "Una sección total del cerebelo."], c: 1, e: "Daño sustancial en su hipocampo, que quedó con menos de la mitad del tamaño normal, siendo el límite del daño." },
+        { q: "A pesar de su amnesia grave episódica (y en claro desafío al modelo modal simplificado de Baddeley), Jon logró desarrollar a lo largo de su infancia:", o: ["La capacidad de levitar.", "Poderes de telepatía espacial.", "Una memoria semántica rica y una inteligencia por encima de la media."], c: 2, e: "Pese a su grado de amnesia episódica, Jon desarrolló una inteligencia por encima de la media y buenas habilidades de memoria semántica." },
+        { q: "¿Por qué el éxito semántico de Jon destruía el postulado del 'modelo modal' clásico?", o: ["Porque demostraba que la memoria procedimental requiere del hipocampo.", "Porque si su memoria episódica estaba rota de nacimiento, era imposible que hubiera acumulado los 'residuos episódicos' que el modelo exigía para formar la semántica.", "Porque demostraba que la amnesia es un mito."], c: 1, e: "Desafío 1: Si la memoria episódica está deteriorada, ¿cómo puede desarrollarse la semántica si (como asumía el modelo) se basa en una acumulación de episodios?" },
+        { q: "En las pruebas del 'Doors and People Test', se descubrió otra sorprendente disociación en Jon, ya que:", o: ["Su memoria visual era nula, pero su táctil perfecta.", "Su memoria de RECUERDO (recall) estaba muy deteriorada, pero su rendimiento en pruebas de RECONOCIMIENTO era normal.", "Solo podía recordar números pares."], c: 1, e: "Aunque su memoria de recuerdo estaba claramente deteriorada, su rendimiento de reconocimiento estaba dentro del rango normal." },
+        { q: "En experimentos con MEG y juicios de 'recordar/saber', se comprobó que cuando Jon decía 'recordar' una tarjeta, en realidad no experimentaba la recolección, sino que basaba su juicio en:", o: ["El tacto de la tarjeta.", "Un criterio de FUERZA y familiaridad de su imagen visual, careciendo del componente cerebral típico de 'recordar' y revivir episódicamente.", "Pura adivinación al azar."], c: 1, e: "Basaba su juicio en si la imagen visual era clara y brillante (criterio de fuerza/familiaridad), careciendo de la verdadera recolección autonoética." },
+        { q: "Para explicar por qué Jon conserva el RECONOCIMIENTO a pesar de su daño en el hipocampo, Aggleton y Brown propusieron que:", o: ["El hipocampo dirige el reconocimiento y la amígdala el recuerdo.", "El hipocampo es esencial para la recolección (recuerdo), pero los juicios de reconocimiento basados en familiaridad se apoyan en la corteza perirrinal adyacente (intacta en Jon).", "El reconocimiento se realiza en los músculos faciales."], c: 1, e: "Propusieron que los juicios basados en familiaridad (reconocimiento) podrían apoyarse en las regiones perirrinales adyacentes, que Jon tiene preservadas." },
+        { q: "A diferencia de Jon, ¿por qué la gran mayoría de los pacientes amnésicos adultos típicos fallan TANTO en el recuerdo COMO en el reconocimiento?", o: ["Porque sus lesiones de anoxia suelen destruir tanto el hipocampo como las cortezas perirrinales y entorrinales circundantes.", "Porque nunca aprendieron a leer correctamente.", "Porque pierden la visión a causa del accidente."], c: 0, e: "En Jon el daño se limita al hipocampo. En pacientes amnésicos adultos, el daño suele ser más extenso, afectando a las cortezas perirrinal/entorrinal adyacentes." },
+        { q: "El estudio de Horner et al. (2012) con magnetoencefalografía (MEG) concluyó que el volumen del hipocampo impacta críticamente sobre:", o: ["La memoria de ítems aislados.", "La digestión de grasas.", "La memoria de contexto, asociada a una señal hipocampal temprana (350 ms)."], c: 2, e: "Mostró que el volumen del hipocampo tenía un claro impacto sobre la memoria de contexto (con señal a 350 ms), pero mínimo en memoria de ítems." },
+
+        // 4. CONSOLIDACIÓN DE LA HUELLA (29-35)
+        { q: "La hipótesis central a nivel neurobiológico que explica por qué los recuerdos recientes se olvidan más en la amnesia anterógrada y en la retrógrada reciente es la:", o: ["Teoría de la represión primaria.", "Hipótesis de la Consolidación (las huellas son frágiles al inicio y se vuelven resistentes al olvido con el tiempo).", "Ley de efecto de Thorndike."], c: 1, e: "El concepto de consolidación: la hipótesis de que las huellas son inicialmente frágiles y se vuelven más resistentes al olvido a medida que pasa el tiempo." },
+        { q: "Como demostración del papel biológico de la consolidación, múltiples estudios han confirmado que la retención a largo plazo mejora significativamente si tras el aprendizaje hay:", o: ["Un electroshock.", "Una carrera de maratón.", "Un periodo de sueño."], c: 2, e: "Evidencia de la investigación sobre el sueño: cuando el aprendizaje va seguido de un periodo de sueño, la retención a largo plazo es mejor." },
+        { q: "El equipo del psicólogo Sergio Della Sala logró demostrar de forma asombrosa en Edimburgo que cuatro pacientes densamente amnésicos podían retener información casi al mismo nivel que los controles sanos, SIEMPRE QUE:", o: ["Se les diera la información cantando en rima.", "El aprendizaje fuera seguido inmediatamente de 1 hora de descanso en una habitación tranquila, oscura y sin interferencias.", "Se les prometiera una recompensa monetaria masiva."], c: 1, e: "Mejoraban enormemente si el aprendizaje iba seguido del traslado a una habitación tranquila, en penumbra y libre de interferencia." },
+        { q: "En los estudios de Della Sala con pacientes con Deterioro Cognitivo Leve (DCL), se comprobó que, debido a la vulnerabilidad de la huella, la interferencia producía un daño muchísimo mayor (más olvido) si esta ocurría:", o: ["En la última fase del descanso (casi al final).", "Justo en los primeros minutos críticos que siguen inmediatamente al aprendizaje (primera fase).", "Mientras dormían por la noche."], c: 1, e: "La interferencia durante la primera fase (inmediatamente tras aprender) causaba más olvido que si se producía en fases posteriores, probando la fragilidad inicial de consolidación." },
+        { q: "La consolidación que opera en el hipocampo de manera rápida a nivel celular y subcelular se basa en mecanismos fisiológicos como la:", o: ["Depresión cortical a largo plazo.", "Regeneración de vainas de mielina completas.", "Potenciación a Largo Plazo (LTP)."], c: 2, e: "Se presume que el proceso de consolidación hipocampal celular se basa en la potenciación a largo plazo (LTP)." },
+
+        // 5. AMNESIA RETRÓGRADA, LEY DE RIBOT Y AMI (36-44)
+        { q: "En general, si evaluamos la gravedad de la amnesia anterógrada de un paciente y la comparamos con la gravedad de su amnesia retrógrada, encontraremos:", o: ["Una correlación perfecta (si una es grave, la otra también es igual de grave).", "Que las gravedades no están muy correlacionadas entre sí, sugiriendo orígenes biológicos distintos.", "Que un paciente con amnesia nunca sufre las dos a la vez."], c: 1, e: "La gravedad de la anterógrada no está muy correlacionada con el grado de retrógrada, lo que sugiere orígenes distintos (casos puros de Baddeley & Wilson)." },
+        { q: "A diferencia de la amnesia anterógrada, el principal problema técnico para evaluar y medir con precisión la amnesia retrógrada es:", o: ["Que el experimentador no tiene control sobre cómo ni cuándo ocurrió el aprendizaje original del material (ya que pudo ocurrir años atrás).", "Que los pacientes mienten sobre el pasado.", "Que el electroencefalograma no mide hacia atrás."], c: 0, e: "El problema es que el examinador no suele tener control sobre el aprendizaje del material, ya que pudo ocurrir muchos años antes." },
+        { q: "El fenómeno clásico en la amnesia retrógrada por el cual los recuerdos más antiguos o remotos resisten el daño mejor que los adquiridos poco antes de la enfermedad se denomina:", o: ["Efecto de recencia prolongada.", "Gradiente de desaprendizaje.", "Ley de Ribot."], c: 2, e: "La ley de Ribot afirma que los recuerdos más antiguos son más duraderos y resistentes al daño que los adquiridos recientemente." },
+        { q: "Para resolver la dificultad clínica de medir el pasado de un paciente, Kopelman, Wilson y Baddeley desarrollaron un instrumento muy fiable llamado:", o: ["El test de manchas de Rorschach.", "El test del Trazo (TMT).", "La Entrevista de Memoria Autobiográfica (AMI)."], c: 2, e: "Desarrollaron la Entrevista de Memoria Autobiográfica (AMI) para sondear periodos remotos, intermedios y recientes." },
+        { q: "La AMI de Kopelman evalúa dos cosas de cada periodo vital. Por un lado pide recolectar 'eventos episódicos' y, por otro, pregunta información factual básica (ej. el nombre del primer colegio). Esta información factual se considera:", o: ["Memoria episódica pura.", "Memoria procedimental automática.", "Memoria semántica personal."], c: 2, e: "Son preguntas esencialmente factuales que sondean una forma de memoria semántica personal." },
+        { q: "Al aplicar la AMI a pacientes diagnosticados con Síndrome de Korsakoff, Kopelman demostró que la creencia común de que estos pacientes SIEMPRE mienten o inventan su pasado es falsa, porque:", o: ["Físicamente no pueden hablar.", "Producían recuerdos exactos o simplemente reconocían de forma honesta que no lo recordaban.", "Se enfadaban y lloraban ante las preguntas."], c: 1, e: "Incluso pacientes con Korsakoff, de quienes se cree que confabulan, producían recuerdos exactos o simplemente decían que no recordaban." },
+        { q: "El caso de la paciente italiana de De Renzi et al. demostró una curiosa disociación en el daño retrógrado: era incapaz de recordar nada sobre eventos públicos (noticias mundiales), pero:", o: ["Recordaba muy bien los eventos de su propia vida personal.", "Sabía tocar el piano perfectamente.", "Recordaba el futuro mediante intuición."], c: 0, e: "Recordaba muy bien los eventos de su vida personal pero apenas eventos públicos (excepto la boda de Lady Di que personalizó)." },
+
+        // 6. CONFABULACIÓN (45-52)
+        { q: "La producción clínica de un relato autobiográfico con información falsa, pero en el que el paciente cree firmemente y NO tiene intención de engañar, se llama:", o: ["Simulación.", "Paramnesia redúplicativa.", "Confabulación."], c: 2, e: "Confabulación ocurre cuando la información autobiográfica relatada es falsa pero no engañosa de forma intencionada." },
+        { q: "La 'confabulación espontánea', que suele ser florida, persistente y que se traduce a menudo en acciones motoras ilógicas (como el paciente RR que empujaba una silla creyendo ser ingeniero), está íntimamente vinculada a daño en:", o: ["El lóbulo occipital posterior.", "La médula espinal.", "Ambos lóbulos frontales (síndrome disejecutivo)."], c: 2, e: "La confabulación espontánea suele ser mucho más florida, menos común y suele estar vinculada a daño en el lóbulo frontal (síndrome disejecutivo)." },
+        { q: "El síndrome de Korsakoff, asociado clásicamente a dificultades de nuevo aprendizaje y relleno de huecos de memoria (amnesia diencefálica), tiene como origen biológico:", o: ["Un virus respiratorio.", "El alcoholismo crónico que provoca un déficit severo de vitamina B1 (tiamina).", "Una mutación en el ADN mitocondrial."], c: 1, e: "Síndrome de Korsakoff: su causa más común es el alcoholismo, especialmente cuando produce deficiencia de vitamina B1." },
+        { q: "Según la perspectiva disejecutiva (daño frontal), la confabulación ocurre principalmente por dos graves defectos: la dificultad para generar claves de recuperación apropiadas y...", o: ["La hiperactividad del área de Broca.", "La incapacidad crónica de monitorizar y evaluar críticamente el resultado del recuerdo (aceptando como real información inverosímil).", "El bloqueo de los receptores de dopamina en el estriado."], c: 1, e: "Falla de dos maneras: dificultad para generar claves y dificultad para evaluar el resultado de una búsqueda, aceptando información inverosímil (falla la monitorización)." },
+
+        // 7. MODELOS DE AMNESIA RETRÓGRADA (53-56)
+        { q: "El 'modelo estándar' de consolidación asume que existen dos procesos. ¿Cuál es el lento, que ocurre a largo plazo y transfiere la información desde el hipocampo hacia otras áreas del cerebro?", o: ["Consolidación celular o hipocampal.", "Consolidación de sistemas.", "Neurogénesis perirrinal."], c: 1, e: "La consolidación de sistemas es un proceso posterior, a largo plazo, que transfiere gradualmente la información desde el hipocampo a otras regiones (neocorteza)." },
+        { q: "Según el modelo estándar de consolidación de sistemas, el hipocampo actúa inicialmente como un intermediario o 'pegamento' rápido. ¿Dónde residirá el recuerdo de forma permanente y duradera una vez consolidado con los años?", o: ["En el cerebelo profundo.", "En el propio hipocampo para siempre.", "En la neocorteza (áreas corticales)."], c: 2, e: "Retenida en hipocampo mientras se transfiere gradualmente a áreas corticales. Este proceso continúa en neocorteza tras borrarse del hipocampo." },
+        { q: "El hecho de que los recuerdos corticales (consolidados) sean robustos y que el hipocampo solo contenga huellas recientes frágiles, proporciona una perfecta explicación biológica para:", o: ["El Síndrome de Tourette.", "La Ley de Ribot de la amnesia retrógrada.", "El priming subliminal visual."], c: 1, e: "Las huellas corticales son robustas, por lo que el daño hipocampal afectará a lo reciente no transferido pero dejará a salvo lo remoto. Esto explica la Ley de Ribot." },
+
+        // 8. TCE Y AMNESIA POSTRAUMÁTICA (57-64)
+        { q: "El daño primario y más generalizado en un Traumatismo Craneoencefálico (TCE) cerrado (como un accidente de tráfico) se produce porque:", o: ["El cerebro se asfixia por humo.", "El cráneo sufre micro-fracturas que dejan entrar bacterias.", "El golpe y las fuerzas rotacionales provocan cizallamiento y desgarro de las fibras nerviosas (sustancia blanca)."], c: 2, e: "Se daña la sustancia blanca que conecta áreas por cizallamiento y desgarro debido al golpe o desaceleración." },
+        { q: "Tras salir del coma, un paciente con TCE severo suele entrar en un estado de desorientación atencional y nulo aprendizaje nuevo conocido como:", o: ["Fuga disociativa somática.", "Amnesia postraumática (APT).", "Agnosia aperceptiva global."], c: 1, e: "Al recuperar la conciencia, entra en un estado de amnesia postraumática (APT), con atención perturbada y nuevo aprendizaje deteriorado." },
+        { q: "Al ir recuperando gradualmente la orientación, los pacientes en fase de APT recuperan la información en un orden típico que es:", o: ["Primero el tiempo, luego el lugar, luego la persona.", "Primero los conocimientos de matemáticas, luego los de literatura.", "Primero el conocimiento personal (quiénes son), después el lugar (dónde) y por último el tiempo."], c: 2, e: "Típicamente recuperaban primero el conocimiento personal, después el lugar, y por último la orientación temporal." },
+        { q: "En la fase aguda de la APT, si le pides a un joven que estime en qué fecha está, el error temporal sistemático se caracterizará por un sesgo de:", o: ["Desplazamiento hacia atrás en el tiempo (creer que está en el pasado).", "Desplazamiento hacia el futuro (creer en ciencia ficción).", "Congelación perceptiva inmediata."], c: 0, e: "La fecha estimada solía desplazarse hacia atrás, especialmente en casos severos, con errores de hasta 5 años (contrayéndose luego su amnesia retrógrada)." },
+        { q: "El inteligente estudio de Yarnell y Lynch con jugadores de fútbol americano que sufrían un choque en la cabeza reveló que, si se les preguntaba INSTANTÁNEAMENTE qué jugada hacían, lo recordaban, pero minutos después lo habían olvidado. Esto demostró que el trauma:", o: ["Impidió el 'registro' perceptivo original en la mente.", "No impide registrar la huella de memoria en el primer segundo, pero destruye y detiene el proceso de 'consolidación' celular necesario para conservarla.", "Causa mentira compulsiva post-colisión."], c: 1, e: "El jugador podía recordarlo de inmediato, pero no más tarde, consistente con una falta de consolidación temprana de la huella, pero no de registro." },
+        { q: "Las investigaciones recientes sobre jugadores profesionales de deportes de alto contacto advierten que sufrir un TCE recurrente y continuo a lo largo de los años:", o: ["Aumenta la plasticidad cerebral haciéndolos superdotados.", "No tiene ninguna secuela si ocurre de lunes a viernes.", "Aumenta gravemente el riesgo o vulnerabilidad posterior a padecer deterioro cognitivo y demencia al envejecer."], c: 2, e: "Una preocupación creciente es que un TCE recurrente pueda llevar a una vulnerabilidad posterior a la demencia (DCL en veteranos de la NFL)." },
+
+        // 9. ALZHEIMER: NEUROPATOLOGÍA Y DIAGNÓSTICO (65-73)
+        { q: "El diagnóstico clínico fiable y definitivo 100% de la enfermedad de Alzheimer (EA) tradicionalmente ha dependido de:", o: ["Un análisis de sangre rutinario de glóbulos blancos.", "El examen neuropatológico del cerebro tras la autopsia.", "Una entrevista de personalidad de Rorschach."], c: 1, e: "El diagnóstico definitivo depende actualmente de la autopsia, que revela placas amiloides y ovillos neurofibrilares." },
+        { q: "En la autopsia del Alzheimer, las proteínas anómalas que se desarrollan dentro de las neuronas, retorciendo y colapsando los microtúbulos internos hasta la muerte de la célula, reciben el nombre de:", o: ["Placas de beta amiloide tóxica.", "Ovillos neurofibrilares.", "Cuerpos amigdalinos gigantes."], c: 1, e: "Ovillos neurofibrilares: proteínas anómalas que retuercen y colapsan los microtúbulos hasta la muerte celular." },
+        { q: "El famoso 'Estudio de las Monjas' (Snowden) aportó un hallazgo fundamental que pone en duda que las placas y los ovillos sean la ÚNICA causa directa del deterioro cognitivo. ¿Por qué?", o: ["Porque descubrieron que el cerebro de la monja Hermana Mary, de 101 años, estaba lleno de placas y ovillos y, sin embargo, murió con una alta capacidad cognitiva intacta.", "Porque las monjas no tienen hipocampo anatómico visible.", "Porque demostró que el Alzheimer se cura rezando."], c: 0, e: "El caso de la hermana Mary, que mantuvo alta capacidad cognitiva pese a estar plagada de ovillos y placas en la autopsia, cuestiona la relación de causa directa absoluta." },
+        { q: "En el inicio biológico silencioso del Alzheimer (estadios de Braak), la destrucción celular ataca primeramente y se centra en:", o: ["El cerebelo vermis y la médula espinal motora.", "La corteza prefrontal lateral derecha.", "Los lóbulos temporales mediales y el hipocampo, causando los devastadores problemas iniciales de memoria."], c: 2, e: "Se desarrolla empezando en los lóbulos temporales mediales y el hipocampo, progresando luego a parietal y cortical general." },
+        { q: "La enfermedad 'Demencia Semántica', descrita por Snowden, Neary y Mann, se distingue clínicamente del Alzheimer típico porque en la demencia semántica:", o: ["La memoria episódica está gravemente afectada, pero entienden perfectamente las palabras.", "El paciente tiene movimientos espásticos pero no olvida nada.", "La memoria episódica está relativamente preservada al principio, ocurriendo el daño y la atrofia en el lóbulo temporal izquierdo anterior (pérdida conceptual pura)."], c: 2, e: "En la demencia semántica la memoria episódica está relativamente preservada y la atrofia ocurre en el lóbulo temporal izquierdo." },
+
+        // 10. ALZHEIMER: FUNCIONES Y REHABILITACIÓN (74-80)
+        { q: "Al examinar la Memoria de Trabajo del paciente de Alzheimer, Baddeley descubrió mediante tareas de 'doble tarea' (ej. amplitud de memoria mientras se hace tracking) que el paciente:", o: ["Rendía perfectamente en ambas, mostrando que su Ejecutivo Central era inmune.", "Mostraba un declive catastrófico al combinarlas, reflejando un fallo específico en el Ejecutivo Central para coordinar recursos.", "Mejoraba mágicamente su memoria debido al estrés."], c: 1, e: "Mostraban un declive marcado al combinar tareas, revelando el déficit específico en coordinar recursos en la Memoria de Trabajo (Ejecutivo Central)." },
+        { q: "El investigador Mario Parra demostró que el déficit cognitivo que alerta tempranamente del riesgo de un Alzheimer (incluso antes que otros síntomas) es el fallo de la memoria de trabajo visual para:", o: ["Reconocer rostros familiares.", "Mantener el 'ligamiento' (binding) de características unificadas (ej. la forma atada al color del objeto).", "Leer letras en voz alta."], c: 1, e: "El déficit de ligamiento (binding) de características como color y forma se ha mostrado sensible incluso en portadores genéticos presintomáticos." },
+        { q: "Los enfoques terapéuticos con fármacos (ej. donepezilo) diseñados para mantener niveles de acetilcolina en los cerebros con Alzheimer logran actualmente:", o: ["Curar definitivamente la amnesia si se toman a tiempo.", "Detener y congelar por completo el progreso biológico de las placas amiloides.", "Tan solo ralentizar ligeramente el curso de los síntomas, sin detener el avance de la enfermedad."], c: 2, e: "Por ahora los tratamientos solo parecen ralentizar el desarrollo temporalmente, no detener el progreso de la enfermedad." },
+        { q: "Una técnica de apoyo emocional/cognitiva en la que se ayuda al paciente con demencia a recolectar y organizar su pasado mediante libros de historia de vida con fotografías, sosteniendo así su sentido de identidad personal, se denomina:", o: ["Terapia del espejo frontal.", "Orientación a la Realidad (ROT) severa.", "Terapia de reminiscencia."], c: 2, e: "Terapia de reminiscencia: ayuda a mantener el sentido de identidad recolectando el pasado con fotos y recuerdos." },
+        { q: "Para rehabilitar y suplir los fallos de un paciente amnésico puro en la vida diaria (como JC, el estudiante de derecho), el apoyo compensatorio más importante, masivo y utilizado consiste en:", o: ["Recetarle anfetaminas diarias.", "El entrenamiento en Ayudas Externas (etiquetado de cajones, agendas, rutinas inamovibles, sistema NeuroPage).", "Aislarlo en una habitación insonorizada de por vida."], c: 1, e: "La principal vía de suplir la memoria son las ayudas externas (agendas, NeuroPage, rutinas de guardado, mensajes visuales)." },
+        { q: "Al aplicar una terapia para que el paciente amnésico interiorice nombres de cuidadores o rutinas en una residencia, Barbara Wilson descubrió, basándose en la ciencia cognitiva de la memoria implícita, que la mejor técnica es:", o: ["El aprendizaje con prueba y error (animarle a adivinar para que escarmiente y aprenda del fallo).", "Someterle a hipnosis profunda.", "El Aprendizaje Sin Errores (Errorless learning), dándole siempre la respuesta correcta de antemano."], c: 2, e: "Aprendizaje sin errores: evita que el paciente cometa errores dando la respuesta correcta, optimizando la implícita y minimizando persistencia de errores." },
+        { q: "¿Por qué el tradicional 'efecto de práctica de recuperación' o ensayo por error (que es excelente para estudiantes universitarios sanos) resulta PERJUDICIAL y contraproducente si lo aplicas en un paciente amnésico severo?", o: ["Porque el paciente desarrollará dolores de cabeza crónicos.", "Porque su memoria episódica está destruida y no pueden recordar que se equivocaron, lo que hace que los errores se afiancen fuertemente en su memoria implícita intacta de forma disruptiva.", "Porque el sistema visual no tolera el ensayo activo en ancianos."], c: 1, e: "La ausencia de episódica impide que recuerden que fue un error; el error se vuelve muy persistente e interfiere disruptivamente, haciendo inútil el adivinar." }
+    ];
+let questions=[...originalQuestions],current=0,score=0,missed=[],retryMode=false;
+
+function loadQuestion(){
+let q=questions[current];
+document.getElementById('prog').innerText=`Pregunta ${current+1} de ${questions.length}`;
+document.getElementById('fill').style.width=(current/questions.length*100)+'%';
+document.getElementById('mode').innerText=retryMode?'Modo repaso':'Modo completo';
+document.getElementById('q').innerText=`${current+1}. ${q.q}`;
+document.getElementById('fb').className='feedback';
+document.getElementById('fb').style.display='none';
+document.getElementById('next').style.display='none';
+let opts=document.getElementById('opts');opts.innerHTML='';
+q.o.forEach((o,i)=>{let b=document.createElement('button');b.className='opt';b.innerText=o;b.onclick=()=>answer(i,b);opts.appendChild(b);});
+}
+
+function answer(i,btn){
+let q=questions[current];
+let all=document.querySelectorAll('.opt');
+all.forEach(x=>x.disabled=true);
+if(i===q.c){
+btn.classList.add('correct');
+score++;
+document.getElementById('score').innerText='Puntuación: '+score;
+document.getElementById('fb').className='feedback show good';
+document.getElementById('fb').innerHTML='<b>Correcto.</b><br>'+q.e;
+}else{
+btn.classList.add('incorrect');
+all[q.c].classList.add('correct');
+if(!missed.some(m=>m.q===q.q)) missed.push(q);
+document.getElementById('fb').className='feedback show bad';
+document.getElementById('fb').innerHTML='<b>Incorrecto.</b><br><br>La respuesta correcta es: <b>'+q.o[q.c]+'</b><br><br>'+q.e;
+}
+document.getElementById('next').style.display='inline-block';
+document.getElementById('next').innerText=current===questions.length-1?'Ver resultados':'Siguiente';
+}
+
+function nextQuestion(){current++; if(current<questions.length) loadQuestion(); else showResults();}
+
+function showResults(){
+document.getElementById('quiz').style.display='none';
+document.getElementById('results').style.display='block';
+document.getElementById('fill').style.width='100%';
+let pct=Math.round(score/questions.length*100);
+document.getElementById('final').innerHTML=`${score}/${questions.length} · ${pct}%`;
+document.getElementById('medal').innerText=pct>=90?'🏆 Medalla de Oro · Dominio excelente':pct>=75?'🥈 Medalla de Plata · Muy buen nivel':pct>=60?'🥉 Medalla de Bronce · Base aprobada':'📚 Modo refuerzo · Conviene repasar';
+document.getElementById('msg').innerText='Tema 10: amnesia, síndromes clínicos, consolidación, daño hipocampal, Alzheimer, TCE y rehabilitación neuropsicológica.';
+document.getElementById('missed').innerHTML=missed.length?'<h3>Preguntas falladas: '+missed.length+'</h3><ul>'+missed.map((x,i)=>'<li>'+(i+1)+'. '+x.q+'</li>').join('')+'</ul>':'<b>Perfecto. Sin errores.</b>';
+document.getElementById('retry').style.display=missed.length?'inline-block':'none';
+}
+
+function retryMissed(){
+questions=[...missed];missed=[];current=0;score=0;retryMode=true;
+document.getElementById('score').innerText='Puntuación: 0';
+document.getElementById('results').style.display='none';
+document.getElementById('quiz').style.display='block';
+loadQuestion();
+}
+
+function restartQuiz(){
+questions=[...originalQuestions];current=0;score=0;missed=[];retryMode=false;
+document.getElementById('score').innerText='Puntuación: 0';
+document.getElementById('results').style.display='none';
+document.getElementById('quiz').style.display='block';
+loadQuestion();
+}
+loadQuestion();
+</script>
+</body>
+</html>

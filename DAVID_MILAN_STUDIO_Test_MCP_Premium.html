@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memoria a Corto Plazo Premium | DAVID MILÁN STUDIO</title>
+<style>
+:root{
+--bg:#05070d;--bg2:#0b1323;--gold:#d4af37;--gold2:#f3d98b;--white:#f8f4e8;
+--muted:#aab3c5;--green:#33d17a;--red:#ff6b6b;--blue:#4da3ff
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+min-height:100vh;font-family:'Segoe UI',Arial,sans-serif;
+background:radial-gradient(circle at top left,rgba(212,175,55,.22),transparent 34%),
+radial-gradient(circle at bottom right,rgba(30,90,180,.28),transparent 38%),
+linear-gradient(135deg,var(--bg),var(--bg2),#05070d);
+color:var(--white);display:flex;justify-content:center;align-items:center;padding:35px 18px
+}
+.quiz-container{
+width:100%;max-width:980px;
+background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.035));
+border:1px solid rgba(212,175,55,.28);border-radius:30px;padding:34px;
+box-shadow:0 30px 90px rgba(0,0,0,.45);backdrop-filter:blur(18px)
+}
+.brand{display:inline-block;padding:10px 18px;border-radius:999px;border:1px solid rgba(212,175,55,.45);color:var(--gold2);letter-spacing:3px;font-weight:800;font-size:13px;margin-bottom:18px;background:rgba(255,255,255,.04)}
+h1{font-size:clamp(30px,5vw,54px);line-height:1;margin-bottom:10px;letter-spacing:-1px;background:linear-gradient(90deg,#fff,var(--gold2));-webkit-background-clip:text;color:transparent}
+h2{font-size:17px;color:var(--muted);font-weight:400;margin-bottom:26px}
+.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:24px}
+.stat{padding:12px 16px;border-radius:16px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.1);color:var(--gold2);font-weight:800}
+.progress-wrap{height:10px;background:rgba(255,255,255,.09);border-radius:999px;overflow:hidden;margin-bottom:24px}
+.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:999px;transition:.35s ease}
+.question-card{background:rgba(4,8,16,.55);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:26px}
+.question{font-size:21px;font-weight:800;line-height:1.45;margin-bottom:22px}
+.options{display:grid;gap:13px}
+.option-btn{border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:16px 18px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.035));color:var(--white);font-size:16px;text-align:left;cursor:pointer;transition:.25s ease}
+.option-btn:hover:not(:disabled){transform:translateY(-2px);border-color:rgba(212,175,55,.65);box-shadow:0 12px 30px rgba(212,175,55,.12)}
+.option-btn:disabled{cursor:not-allowed;opacity:.95}
+.correct{background:rgba(51,209,122,.16)!important;border-color:var(--green)!important;color:#dfffea!important}
+.incorrect{background:rgba(255,107,107,.16)!important;border-color:var(--red)!important;color:#ffe0e0!important}
+.feedback{display:none;margin-top:22px;padding:20px;border-radius:20px;line-height:1.65;font-size:15px}
+.feedback.show{display:block}
+.feedback-correct{background:rgba(51,209,122,.12);border-left:5px solid var(--green)}
+.feedback-incorrect{background:rgba(255,107,107,.12);border-left:5px solid var(--red)}
+.feedback strong{font-size:18px}
+.solution-label{display:block;margin-top:12px;color:var(--gold2);font-weight:900}
+.controls{margin-top:22px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center}
+.btn{border:none;border-radius:16px;padding:14px 22px;font-weight:900;font-size:15px;cursor:pointer;transition:.25s ease}
+.btn:hover{transform:translateY(-2px)}
+.next-btn{display:none;background:linear-gradient(135deg,var(--gold2),var(--gold));color:#080b12}
+.secondary-btn{background:rgba(255,255,255,.08);color:var(--white);border:1px solid rgba(255,255,255,.14)}
+.score-container{display:none;text-align:center;padding:24px}
+.score-text{font-size:30px;font-weight:900;color:var(--gold2);margin-bottom:18px}
+.result-message{color:var(--muted);font-size:17px;line-height:1.6;margin-bottom:24px}
+.medal{display:inline-block;margin:14px 0 10px;padding:12px 18px;border-radius:999px;border:1px solid rgba(212,175,55,.45);background:rgba(212,175,55,.10);color:var(--gold2);font-weight:900}
+.missed-box{text-align:left;margin:24px 0;padding:20px;border-radius:20px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.1)}
+.missed-box h3{color:var(--gold2);margin-bottom:12px}
+.missed-box ul{padding-left:20px;color:#dbe2f2;line-height:1.6}
+.mode-label{color:var(--blue);font-weight:900}
+@media(max-width:650px){.quiz-container{padding:22px}.question-card{padding:20px}.question{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="quiz-container">
+  <div class="brand">DAVID MILÁN STUDIO</div>
+  <h1>Mega-Test Premium</h1>
+  <h2>Tema 2: Memoria a Corto Plazo (MCP)</h2>
+
+  <div id="quiz-screen">
+    <div class="topbar">
+      <div class="stat" id="progress-text">Pregunta 1</div>
+      <div class="stat" id="score-tracker">Puntuación: 0</div>
+      <div class="stat" id="mode-text">Modo completo</div>
+    </div>
+    <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+    <div class="question-card">
+      <div class="question" id="question-text"></div>
+      <div class="options" id="options-container"></div>
+      <div id="feedback-container" class="feedback"></div>
+      <div class="controls">
+        <button class="btn secondary-btn" onclick="restartQuiz()">Reiniciar test</button>
+        <button id="next-btn" class="btn next-btn" onclick="nextQuestion()">Siguiente pregunta</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="result-screen" class="score-container">
+    <div class="score-text" id="final-score"></div>
+    <div class="medal" id="medal-text"></div>
+    <div class="result-message" id="final-message"></div>
+    <div id="missed-summary" class="missed-box"></div>
+    <div class="controls" style="justify-content:center;">
+      <button class="btn secondary-btn" onclick="restartQuiz()">Volver a intentar todo</button>
+      <button class="btn next-btn" id="retry-missed-btn" onclick="retryMissed()">Reintentar preguntas falladas</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const originalQuestions = [
+        // INTRODUCCIÓN Y CONCEPTOS BÁSICOS
+        { q: "¿Quién diseñó en 1887 la primera prueba del 'span de dígitos' para evaluar las capacidades de sus alumnos?", o: ["Alan Baddeley.", "George Miller.", "John Jacobs."], c: 2, e: "En 1887, John Jacobs, un maestro londinense, diseñó esta sencilla prueba leyendo secuencias de dígitos para que los alumnos las repitieran inmediatamente." },
+        { q: "Actualmente, ¿en qué prueba de inteligencia a nivel mundial está incluida la tarea del span de dígitos?", o: ["Test de Rorschach.", "Escala de Inteligencia de Wechsler para Adultos (WAIS).", "Inventario Multifásico de Personalidad de Minnesota (MMPI)."], c: 1, e: "Forma parte de la Escala de Inteligencia de Wechsler para Adultos (WAIS), la prueba de inteligencia más empleada a nivel mundial." },
+        { q: "¿Qué predice con gran precisión la versión más exigente de la prueba, conocida como 'span de memoria de trabajo'?", o: ["Solamente la retención de imágenes estáticas.", "Habilidades cognitivas complejas como razonamiento, comprensión lectora y aprendizaje.", "El nivel de amnesia anterógrada periférica."], c: 1, e: "El span de memoria de trabajo exige mantener y manipular información simultáneamente, prediciendo habilidades cognitivas complejas (razonamiento, comprensión, etc.)." },
+        { q: "En psicología cognitiva, ¿cuál es la diferencia teórica fundamental entre la Memoria a Corto Plazo (MCP) y la Memoria de Trabajo (MT)?", o: ["La MCP almacena información durante años; la MT la almacena durante segundos.", "La MCP solo almacena información temporalmente; la MT además la manipula activamente como un espacio de trabajo mental.", "Son exactamente el mismo concepto pero con diferente nomenclatura según el continente."], c: 1, e: "La MCP se refiere al almacenamiento inmediato; la MT tiene una carga teórica explícita referida a almacenar y manipular activamente la información (espacio de trabajo mental)." },
+        { q: "En el lenguaje coloquial, afirmar 'tengo mala memoria a corto plazo porque he olvidado dónde dejé el coche esta mañana' es:", o: ["Clínicamente exacto.", "Un uso coloquial de un fenómeno que para la psicología pertenece a la memoria a largo plazo (MLP).", "Una prueba irrefutable de daño en el bucle fonológico."], c: 1, e: "Recordar dónde dejamos el coche o qué hicimos ayer es memoria a largo plazo (MLP). La MCP técnica implica retener durante segundos." },
+        
+        // SPAN DE MEMORIA Y CHUNKING
+        { q: "En condiciones normales, la mayoría de los adultos tienen un span de dígitos de:", o: ["Entre 2 y 3 elementos.", "Entre 6 y 7 elementos.", "Entre 12 y 15 elementos."], c: 1, e: "La mayoría de los adultos tienen un span de dígitos de entre 6 y 7 elementos." },
+        { q: "En una tarea de span de memoria estricta, ¿qué dos cosas debe recordar el sujeto de manera simultánea?", o: ["El color y el tamaño de la fuente tipográfica.", "El contenido (qué ítems son) y su posición secuencial (el orden).", "El significado profundo y la rima de los ítems."], c: 1, e: "Una tarea de span exige recordar qué elementos se presentaron (ítems) y la posición en que lo hicieron (orden serial)." },
+        { q: "Si a un sujeto español se le realizara la prueba de span de dígitos presentados en finlandés (idioma que desconoce), ¿qué ocurriría previsiblemente?", o: ["El span aumentaría por la novedad del estímulo.", "El span se reduciría drásticamente porque tendría que recordar sonidos desconocidos y su orden interno.", "El span se mantendría idéntico (6-7 ítems)."], c: 1, e: "Se reduciría drásticamente al tener que recordar tanto el orden de los sonidos extraños de cada número como el de los números entre sí." },
+        { q: "En 1956, George Miller propuso que la capacidad de la MCP se sitúa en:", o: ["El mágico número cuatro, más o menos uno.", "El mágico número siete, más o menos dos (unidades o chunks).", "Cero, porque la MCP no existe."], c: 1, e: "Miller propuso que la capacidad se sitúa en el 'número mágico siete, más o menos dos' unidades de información o chunks." },
+        { q: "¿Cómo se define funcionalmente un 'chunk' o unidad de información?", o: ["Como una unidad fonológica inalterable e independiente de la historia del sujeto.", "Cualquier conjunto de elementos que el sujeto trata como una unidad gracias a su conocimiento previo.", "El tiempo exacto en milisegundos que dura la huella de memoria."], c: 1, e: "Un chunk es cualquier conjunto de elementos que el sujeto puede tratar como una unidad gracias a su conocimiento previo (MLP)." },
+        { q: "El mecanismo de 'chunking' demuestra teóricamente que la capacidad de la MCP...", o: ["No está influida por nada.", "Está modulada activamente por el conocimiento y la experiencia previa almacenada en la MLP.", "Depende únicamente del volumen de la corteza occipital."], c: 1, e: "La eficacia del chunking depende directamente de la MLP, demostrando que la capacidad del sistema MCP está modulada por el conocimiento y la experiencia previa." },
+        { q: "Al diseñar números de teléfono o contraseñas, ¿qué patrón prosódico de agrupación facilita más la retención gracias a los ritmos naturales del habla?", o: ["Agrupaciones de siete en siete.", "Agrupaciones en tríos o bloques de 3 o 4 dígitos.", "Agrupar todos los pares al inicio y los impares al final."], c: 1, e: "La agrupación en tríos parece ser especialmente eficaz, posiblemente reflejando ritmos naturales del habla (ej. 791-684-352)." },
+
+        // EL BUCLE FONOLÓGICO Y SUS EFECTOS
+        { q: "¿Cuáles son los dos subcomponentes interrelacionados que conforman el bucle fonológico del modelo de Baddeley y Hitch?", o: ["Agenda visoespacial y ejecutivo central.", "Almacén fonológico y proceso de repaso articulatorio.", "Registro ecoico y filtro atencional."], c: 1, e: "El bucle fonológico se compone de dos subcomponentes interrelacionados: el almacén fonológico y el proceso de repaso articulatorio." },
+        { q: "¿Aproximadamente cuánto dura la huella en el 'almacén fonológico' si no es refrescada antes de desvanecerse por decaimiento?", o: ["Unos 2 segundos.", "Unos 30 segundos.", "De manera indefinida."], c: 0, e: "El almacén fonológico retiene representaciones basadas en el sonido durante un breve período de tiempo (aproximadamente 2 segundos)." },
+        { q: "¿Qué subcomponente del bucle actúa como equivalente cognitivo de 'repetir mentalmente' un número de teléfono prolongando su disponibilidad?", o: ["El ejecutivo central.", "La MCP espacial.", "El proceso de repaso articulatorio."], c: 2, e: "El proceso de repaso articulatorio (articulación silenciosa subvocal) reinscribe la información prolongando su disponibilidad." },
+        { q: "Según el modelo del bucle fonológico, la capacidad del span de dígitos (6 o 7) se explica por un límite de tipo:", o: ["Numérico estricto y universal.", "Temporal (se olvida lo que no da tiempo a pronunciar subvocalmente antes de decaer).", "Visual y perceptivo."], c: 1, e: "El límite es temporal: si aumenta el número de elementos, el tiempo de repaso crece y es más probable que los primeros se desvanezcan antes de refrescarse." },
+        { q: "Una predicción clave del bucle fonológico es que las personas que articulan físicamente más rápido...", o: ["Tienen un span de memoria menor.", "Deberían tener un span mayor porque repasan más elementos en el mismo tiempo.", "Sufran de tartamudez amnésica."], c: 1, e: "Baddeley et al. (1975) demostraron que el span predice mejor la velocidad de articulación que ninguna otra variable: a mayor velocidad, mayor span." },
+        { q: "¿A partir de qué tipo de estudio laboral originó Conrad (1964) el descubrimiento del efecto de similitud fonológica?", o: ["Evaluando a conductores de trenes.", "Investigando códigos postales de letras y números para telecomunicaciones británicas.", "Observando a músicos leyendo partituras."], c: 1, e: "Descubierto por Conrad en un contexto inesperado: investigando códigos de letras y números para servicios de correos y telecomunicaciones." },
+        { q: "El efecto de similitud fonológica se evidencia porque, incluso al presentar consonantes VISUALMENTE, los errores de los participantes...", o: ["Son visuales (confunden O con Q).", "Son fonológicos (confunden P con V porque suenan parecido).", "Nunca ocurren."], c: 1, e: "Los errores tendían a ser similares en sonido (la P se confundía con la V, no visualmente con la R), evidenciando codificación fonológica." },
+        { q: "En la MCP, se confunden fácilmente las palabras fonológicamente similares. ¿Ocurre lo mismo en la MCP si las palabras son SEMÁNTICAMENTE similares (ej. grande, enorme, alto)?", o: ["Sí, ambas bloquean el bucle.", "No, la similitud semántica no daña el recuerdo en la MCP, revelando que opera sobre el sonido.", "Destruye la recuperación a largo plazo."], c: 1, e: "La similitud semántica no daña el recuerdo en MCP, pero sí la fonológica; esta disociación indica que la MCP opera sobre sonidos, no significados." },
+        { q: "¿En qué momento se asume que se produce el error en el efecto de similitud fonológica?", o: ["Al momento de registrar visualmente.", "En el momento de la recuperación, al 'leer' información de ítems con muchos rasgos compartidos.", "Años después del evento."], c: 1, e: "Se asume que ocurre en la recuperación, cuando se lee la información: los elementos de sonidos similares comparten rasgos y se confunden entre sí." },
+        { q: "Según la arquitectura del bucle fonológico, la información auditiva accede al almacén de forma directa. ¿Y la información visual?", o: ["Accede de forma directa a través del nervio óptico.", "No puede acceder jamás.", "Accede de forma indirecta, mediante la articulación subvocal."], c: 2, e: "La información auditiva accede directamente; la visual accede de forma indirecta, mediante articulación subvocal." },
+        { q: "Si obligamos al sujeto a repetir 'the' en voz alta (supresión articulatoria), ¿qué pasa con el efecto de similitud fonológica para los estímulos VISUALES?", o: ["Desaparece, ya que los estímulos no pueden recodificarse fonológicamente.", "Se vuelve tres veces más fuerte.", "Afecta también a la memoria olfativa."], c: 0, e: "La supresión articulatoria elimina el efecto de similitud fonológica para estímulos visuales al bloquear su recodificación e ingreso al almacén." },
+        { q: "En cambio, si aplicamos supresión articulatoria, ¿qué ocurre con el efecto de similitud fonológica para los estímulos AUDITIVOS?", o: ["Desaparece por completo.", "No desaparece, ya que acceden directamente al almacén fonológico sin necesidad de articulación.", "Produce ceguera perceptiva temporal."], c: 1, e: "Para estímulos auditivos no desaparece, ya que la información entra directamente al almacén sin necesidad del repaso articulatorio." },
+        
+        { q: "El 'efecto de longitud de palabra' establece que el span de memoria es sistemáticamente...", o: ["Igual sin importar el tamaño de la palabra.", "Mayor para palabras largas por tener más significado.", "Menor para palabras largas que para palabras cortas (monosilábicas)."], c: 2, e: "El span de memoria es sistemáticamente menor para palabras largas que para palabras cortas (efecto de longitud de palabra)." },
+        { q: "En el efecto de longitud de palabra, el tiempo de decaimiento del repaso opera:", o: ["Solo al momento de inscribir el elemento.", "Tanto en el propio repaso (palabras largas tardan más) como durante la fase de recuerdo (tardan más en pronunciarse al reportar).", "Únicamente en el sueño."], c: 1, e: "Cowan et al. y Baddeley et al. confirmaron que las palabras largas producen olvido tanto durante el repaso como durante la recuperación al requerir más tiempo de pronunciación." },
+        { q: "Si aplicamos la 'supresión articulatoria' repitiendo 'the' en voz alta mientras estudiamos palabras cortas y largas, el efecto de longitud de palabra:", o: ["Se anula, porque bloqueamos el repaso articulatorio perdiendo la ventaja temporal de las cortas.", "Aumenta exageradamente.", "Afecta solo al español."], c: 0, e: "Cuando se elimina el repaso articulatorio mediante la supresión, no hay diferencia de tiempo entre palabras largas y cortas, anulando el efecto." },
+        
+        { q: "El 'efecto del sonido irrelevante' (Colle y Welsh) deteriora el recuerdo de series visuales cuando el sujeto escucha de fondo:", o: ["Solamente su propia voz grabada.", "Habla en un idioma extranjero (aunque se pida ignorarla).", "Exclusivamente el tic-tac de un reloj analógico."], c: 1, e: "Se evidenció al ver que los sujetos recordaban peor dígitos visuales al oír habla irrelevante en un idioma extranjero (Colle y Welsh, 1976)." },
+        { q: "¿Qué peculiaridad problemática para el modelo básico se observó respecto a la similitud en el sonido irrelevante (Jones y Macken)?", o: ["Que el sonido irrelevante bloqueaba la visión.", "Que palabras fonológicamente similares al material objetivo NO son más perturbadoras que las disimilares.", "Que el ruido blanco era lo más perjudicial."], c: 1, e: "El grado de deterioro no depende de la similitud fonológica: palabras similares no estorban más que disimilares, contradiciendo el mecanismo del almacén fonológico." },
+        { q: "Para resolver la anomalía del sonido irrelevante, Jones y Macken (1993) propusieron la 'hipótesis del cambio de estado'. Ésta establece que:", o: ["Cualquier sonido fuerte y ensordecedor daña el hipocampo.", "El daño ocurre cuando el sujeto cambia su estado emocional.", "Lo que deteriora la memoria no es el sonido en sí, sino el hecho de que fluctúe o cambie a lo largo del tiempo."], c: 2, e: "Hipótesis del cambio de estado: el deterioro proviene de cualquier sonido que fluctúe temporalmente, afectando al mecanismo del orden serial." },
+        { q: "¿Según la investigación (Salame y Baddeley), qué tipo de música de fondo interfiere MENOS en tareas de memoria de orden serial?", o: ["Música vocal pop.", "Música instrumental sin variaciones bruscas.", "Coros gregorianos."], c: 1, e: "La música vocal es más perturbadora que la instrumental; la instrumental sin variaciones bruscas interfiere menos." },
+
+        // EL PROBLEMA DEL ORDEN SERIAL
+        { q: "El problema de cómo el cerebro preserva la secuencia temporal en la que se produjeron los eventos se denomina:", o: ["Problema del orden serial (Lashley, 1951).", "Problema de la dualidad mnemotécnica.", "Sesgo de la recencia invertida."], c: 0, e: "El problema del orden serial (formulado por Lashley) busca explicar cómo un sistema en paralelo preserva la secuencia temporal." },
+        { q: "¿Qué mecanismo de orden serial propone que cada elemento se asocia al siguiente (A evoca B, B evoca C...)?", o: ["Contexto temporal.", "Modelo de primacía.", "Encadenamiento (chaining)."], c: 2, e: "El encadenamiento (chaining) propone asociar cada elemento al siguiente." },
+        { q: "¿Cuál es el principal fallo del modelo de encadenamiento (chaining) a la luz de la evidencia experimental?", o: ["Un solo error arrastraría todos los elementos posteriores perdiendo la cadena, cosa que no ocurre sistemáticamente en los datos.", "Que exige tener un léxico infinito.", "No predice errores en el primer elemento."], c: 0, e: "El problema serio es que un error arrastraría a los posteriores. La evidencia muestra que los errores no siguen ese patrón drástico." },
+        { q: "El mecanismo del 'contexto temporal' (Burgess y Hitch) asume que la recuperación del orden se basa en:", o: ["Recitar un alfabeto fijo de memoria.", "Asociar cada elemento a una señal de contexto que cambia progresivamente a lo largo de la lista.", "El volumen fonético de la palabra."], c: 1, e: "Contexto temporal: cada elemento se asocia a una señal de contexto progresiva; luego se 'recorre' ese contexto." },
+        { q: "El 'modelo de primacía' (Page y Norris) soluciona el orden asignando:", o: ["El mayor nivel de activación al primer elemento y seleccionándolos por orden de fuerza.", "Un color a cada letra.", "Mayor peso al último ítem (recencia invertida)."], c: 0, e: "El primero recibe la mayor activación, el segundo menos... Se selecciona el más activado, se suprime, y se pasa al siguiente." },
+
+        // TEORÍAS ALTERNATIVAS
+        { q: "La teoría alternativa O-OER (Jones) sostiene que la información verbal y visual se representan:", o: ["En hemisferios completamente aislados y herméticos.", "Como puntos en una superficie multimodal o representación común.", "Únicamente a través de conexiones de la corteza motora."], c: 1, e: "La O-OER asume una representación común (superficie multimodal) para modalidades verbales y visuales." },
+        { q: "¿Cuál es la principal debilidad empírica de la teoría O-OER al proponer una representación multimodal común?", o: ["No explica por qué existe el sueño REM.", "Las dobles disociaciones en pacientes (daño MCP verbal pero visual intacta y viceversa) prueban que los sistemas son independientes.", "Es una teoría que sólo sirve en niños."], c: 1, e: "La evidencia de disociaciones neuropsicológicas (KF vs LH/LE) demuestra que MCP verbal y visual son sistemas funcionalmente independientes." },
+        { q: "El 'modelo de rasgos' (Nairne) propone algo muy radical frente a los teóricos clásicos. ¿Qué rechaza?", o: ["Rechaza la existencia del olvido como fenómeno real.", "Rechaza la utilidad del conocimiento semántico.", "Rechaza la distinción entre MCP y MLP, basándose en la interferencia de rasgos de modalidad e independientes."], c: 2, e: "El modelo de rasgos de Nairne rechaza explícitamente la distinción estructural entre MCP y MLP." },
+        { q: "El 'modelo SIMPLE' de Brown, Neath y Chater formula el olvido basándose matemáticamente en:", o: ["La fuerza del impulso eléctrico talámico.", "La discriminabilidad temporal de los ítems relativos a sus competidores próximos.", "La similitud ortográfica pura de los textos."], c: 1, e: "El modelo SIMPLE es un modelo de olvido basado en la discriminabilidad temporal de los ítems." },
+
+        // RECUERDO LIBRE Y POSICIÓN SERIAL
+        { q: "En el paradigma de 'recuerdo libre', se presenta una lista larga y se le pide al sujeto que:", o: ["Recuerde las palabras en orden estrictamente inverso.", "Recuerde las palabras en cualquier orden.", "Evalúe el significado de cada palabra ignorando el resto."], c: 1, e: "El recuerdo libre elimina la restricción serial: el sujeto puede recordar los elementos en el orden que desee." },
+        { q: "La tendencia a recordar mucho mejor los últimos ítems de una lista libre se denomina:", o: ["Efecto von Restorff.", "Efecto de recencia.", "Priming de repetición."], c: 1, e: "El efecto de recencia: los últimos ítems de la lista se recuerdan mucho mejor." },
+        { q: "Según la interpretación clásica de Glanzer y Cunitz (1966), el efecto de primacía (recordar mejor los primeros ítems) se debe a que:", o: ["Se benefician de un repaso sostenido que facilita su consolidación y transferencia a la MLP.", "Se quedan atascados permanentemente en el bucle fonológico.", "Tienen mayor longitud de palabra."], c: 0, e: "Los primeros se benefician del repaso sostenido al principio, lo que facilita su transferencia a la MLP." },
+        { q: "Según la misma interpretación, los ítems finales del efecto de recencia inmediata se recuerdan bien porque:", o: ["Han sido guardados en la MLP semántica.", "Son los únicos que importan emocionalmente.", "Están todavía disponibles en la MCP en el momento de la prueba al no haber sido desplazados."], c: 2, e: "Los ítems finales (recencia) están todavía disponibles en la MCP en el momento del recuerdo inmediato." },
+        { q: "Si obligamos al sujeto a contar hacia atrás durante 10 segundos tras finalizar la lista antes de recordar, ¿qué efecto de posición serial desaparece selectivamente?", o: ["El efecto de primacía.", "El rendimiento de las palabras centrales.", "El efecto de recencia."], c: 2, e: "Una tarea de interferencia breve desplaza los ítems finales de la MCP, eliminando selectivamente la ventaja de la recencia inmediata." },
+        { q: "Rundus (1971) analizó experimentalmente el repaso en voz alta de los sujetos. ¿Qué descubrió?", o: ["Que los ítems finales se repasaban mucho más que los primeros.", "Que los primeros ítems se repasaban más veces, confirmando que la primacía depende del repaso acumulado.", "Que nadie repasa la información voluntariamente."], c: 1, e: "Descubrió que los primeros ítems se repasaban más veces que los del medio, explicando su mayor probabilidad de consolidación en MLP." },
+        { q: "En el recuerdo serial estricto (no libre), ¿qué efecto de posición domina claramente la curva de recuerdo?", o: ["El efecto de recencia.", "El efecto de primacía.", "El efecto Von Restorff."], c: 1, e: "En el recuerdo serial, el efecto de primacía es dominante y el de recencia mucho menos pronunciado (lo contrario que en libre)." },
+        { q: "Bjork y Whitten descubrieron la 'recencia a largo plazo'. Esto se evidenció al notar que el efecto de recencia reaparecía a pesar de haber:", o: ["Aplicado descargas eléctricas.", "Insertado 20 segundos de cuenta regresiva de interferencia ENTRE cada uno de los ítems de la lista.", "Acortado la lista a tres palabras."], c: 1, e: "La recencia a largo plazo surge incluso si se insertan tareas de interferencia (20 seg) entre cada uno de los ítems, que deberían haber vaciado la MCP." },
+        { q: "En el estudio de Baddeley e Hitch con jugadores de rugby, recordar los últimos partidos mejor que los anteriores (recencia a largo plazo) se explicaba fundamentalmente por:", o: ["La estrategia de discriminabilidad temporal (metáfora de los postes telegráficos) relativa a los competidores.", "La retención de años en un bucle fonológico infinito.", "El número de golpes en la cabeza recibidos."], c: 0, e: "El olvido se debe a interferencia de eventos similares, sugiriendo la metáfora de los postes telegráficos (discriminabilidad temporal de recuperación)." },
+
+        // MCP VISOESPACIAL
+        { q: "¿Qué sistema permite integrar los 'flashes' de las continuas fijaciones y movimientos sacádicos del ojo humano en una percepción coherente?", o: ["La memoria semántica categorial.", "El oído interno.", "La MCP visoespacial."], c: 2, e: "La MCP visoespacial integra la información de los movimientos sacádicos (2 por segundo) en una representación estable y coherente del entorno." },
+        { q: "Mediante paradigmas de 'detección de cambios' (cuadrados de colores), Luck y Vogel determinaron que la capacidad de la MCP visual es de:", o: ["Alrededor de 10 objetos.", "Aproximadamente 3 a 4 objetos.", "Solo 1 objeto exacto."], c: 1, e: "La MCP visual tiene una capacidad muy restringida de aproximadamente 3 a 4 objetos." },
+        { q: "Contrastando con la MCP visual, en los estudios de Standing sobre la MLP visual con 2560 diapositivas, los sujetos mostraron una capacidad:", o: ["Casi nula (15%).", "Idéntica (3 o 4 imágenes retenidas).", "Prácticamente ilimitada (obteniendo un 90% de aciertos días después)."], c: 2, e: "Frente a los 3-4 ítems de la MCP visual, la MLP visual mostró un rendimiento del 90% de aciertos sobre miles de diapositivas, demostrando capacidad casi ilimitada." },
+        { q: "Según Vogel, Woodman y Luck, ¿cuál es la velocidad a la que la MCP visual registra nueva información antes de saturarse a los 600 ms?", o: ["Aproximadamente 50 ms por objeto.", "Aproximadamente 2 segundos por rasgo.", "Instántanea (0 ms)."], c: 0, e: "Registra a una velocidad de aproximadamente 50 ms por objeto." },
+        { q: "Los estudios de potenciales relacionados con eventos (ERPs) indican que en la MCP visual el ensayo de la imagen...", o: ["No existe en absoluto, es puramente pasiva.", "Muestra un mantenimiento activo reflejado en la amplitud de la activación eléctrica, incrementada según los ítems.", "Consiste en articular la palabra subvocalmente."], c: 1, e: "La activación electrofisiológica persistía durante la retención y aumentaba hasta 4 ítems, sugiriendo mantenimiento activo análogo al repaso verbal." },
+        { q: "El concepto de 'binding' en la MCP visual hace referencia a:", o: ["La separación atencional de objetos solapados.", "El olvido por sobrecarga lumínica.", "La unión o ligadura de los distintos rasgos de un objeto (color, orientación, etc.) en una representación unificada."], c: 2, e: "Binding: la unión de los distintos rasgos de un objeto en una representación unificada." },
+        { q: "El experimento de Allen, Baddeley y Hitch sobre el 'binding' y la tarea concurrente de atención demostró que:", o: ["El binding (unir color y forma) requiere masivos recursos atencionales extra frente al rasgo aislado.", "La atención no interviene para mantener nada en MCP visual.", "La atención es necesaria para MANTENER la información, pero el proceso de formar vínculos (binding) parece automático."], c: 2, e: "La tarea concurrente deterioraba el rendimiento por igual en rasgos aislados o ligados. El mantenimiento cuesta atención, pero el vínculo en sí es automático." },
+        { q: "La MCP visoespacial alberga dos subsistemas disociables. El subsistema VISUAL almacena propiedades como forma o color. ¿A qué pregunta responde?", o: ["¿Dónde?", "¿Por qué?", "¿Qué?"], c: 2, e: "La MCP visual almacena propiedades perceptivas y responde al 'qué' (objetos)." },
+        { q: "El subsistema ESPACIAL almacena localización y trayectorias. ¿Qué pregunta funcional responde?", o: ["¿Qué?", "¿Dónde?", "¿Cómo?"], c: 1, e: "El subsistema espacial almacena información sobre localización y rutas, respondiendo al 'dónde'." },
+        { q: "Para evaluar la capacidad de la MCP ESPACIAL en pacientes y laboratorios se utiliza de manera clásica el:", o: ["Test de retención léxica.", "Test de Stroop.", "Test de bloques de Corsi."], c: 2, e: "Se evalúa clásicamente mediante el test de bloques de Corsi, donde el span típico es de unos 5 bloques." },
+        { q: "Klauer y Zhao y Della Sala et al. demostraron la doble disociación de la agenda visoespacial aplicando tareas concurrentes. Concluyeron que:", o: ["La tarea visual anula el span de Corsi y viceversa.", "La tarea espacial deteriora el span de Corsi, y la visual afecta la memoria para patrones/ideogramas.", "Todo se almacena unificadamente en el bucle fonológico."], c: 1, e: "Se encontró interferencia de modalidad específica: tarea espacial a Corsi y visual a ideogramas/patrones, probando la separación anatómico/funcional." },
+
+        // EVIDENCIA NEUROPSICOLÓGICA (PACIENTES CLÍNICOS)
+        { q: "La neuropsicología cognitiva argumenta a favor de la independencia funcional de dos sistemas de memoria gracias a observar daños cruzados selectivos. Esto se conoce como:", o: ["Efecto simple de interferencia.", "Doble disociación.", "Amnesia retrógrada simétrica."], c: 1, e: "Si el daño cerebral puede deteriorar un sistema A preservando B, y en otro paciente se daña B preservando A, es una doble disociación." },
+        { q: "El célebre paciente KF (Shallice y Warrington, 1970) presentaba un span de dígitos de solo 2 ítems, pero su MLP era normal. Su daño afectaba específicamente a:", o: ["El almacén fonológico auditivo (MCP verbal deteriorada, mejoraba si era visual).", "El sistema de reconocimiento de rostros.", "La capacidad de comprender la sintaxis procedimental."], c: 0, e: "Déficit en MCP verbal (almacén fonológico) pero su rendimiento en span mejoraba con presentación visual y su test de Corsi era normal." },
+        { q: "La paciente PV presentaba un déficit muy puro en la MCP fonológica con ausencia total del efecto de longitud de palabra. Sin embargo, su desempeño en resolver anagramas usando recencia a largo plazo demostró que:", o: ["La recencia a largo plazo no depende del almacén fonológico, sino de un mecanismo general de recuperación.", "La paciente simulaba su lesión cerebral.", "Los anagramas se resuelven en la médula espinal."], c: 0, e: "Mostraba recencia a largo plazo normal, apoyando que es independiente del almacén fonológico (la recencia inmediata sí estaba afectada)." },
+        { q: "El paciente LH (Farah et al., 1988), tras sufrir un traumatismo craneal severo, ilustra una disociación interna en la vía visoespacial, manifestando:", o: ["Incapacidad de ubicar rutas espaciales, pero reconocimiento visual perfecto de colores.", "Pérdida de la memoria visual de formas y colores (MCP visual), manteniendo intacta la espacial de localizaciones.", "Pérdida exclusiva del componente léxico del lenguaje."], c: 1, e: "LH perdió la capacidad de recordar colores y formas (MCP visual), mientras su memoria espacial de rutas seguía intacta." },
+        { q: "El caso fascinante de LE, una escultora de talento que sufrió daño por lupus, se caracterizó por un dramático cambio en sus obras, provocado por la pérdida de:", o: ["Toda capacidad espacial que le impedía moverse por la ciudad.", "Su destreza motora (apraxia ideomotora en ambas manos).", "La capacidad de formar y evocar imágenes visuales (perdió el 'mind's eye'), manteniendo perfecta su orientación espacial."], c: 2, e: "LE no podía recordar el aspecto o evocar imágenes visuales de sus esculturas o personas. Al conservar el sistema espacial, siguió orientándose y su estilo pasó a formas abstractas." },
+        { q: "Para confirmar la doble disociación visoespacial de LE y LH frente al sistema opuesto, el caso clínico del paciente MV es clave porque mostró:", o: ["MCP visual normal pero un daño gravísimo en la memoria espacial (Test de Corsi muy deteriorado).", "Ceguera cortical total pero con oído absoluto.", "Incapacidad para procesar verbos pero sí sustantivos."], c: 0, e: "MV presentó MCP visual normal pero Corsi muy deteriorado tras una lesión en el lóbulo frontal derecho, la pieza inversa de la doble disociación." },
+
+        // DETALLES Y CONCEPTOS FINALES PARA LAS 80
+        { q: "Señala la afirmación correcta sobre la MCP de acuerdo con lo expuesto en el texto:", o: ["Actúa como un buffer de duración infinita si la persona es superdotada.", "Retiene representaciones temporalmente, y sin compromiso activo, se pierden en segundos.", "Manipula toda la información semántica para razonamientos lógicos deductivos."], c: 1, e: "La MCP se refiere al almacenamiento inmediato durante segundos. La manipulación (razonamiento) se adjudica teóricamente a la MT." },
+        { q: "La agrupación de elementos inconexos como F R A C T O L I S T I C en las sílabas FRAC-TO-LIS-TIC es un claro ejemplo de:", o: ["Efecto de inhibición proactiva.", "Priming de red semántica.", "Chunking fonológico apoyado en la MLP."], c: 2, e: "Agrupar letras en sílabas pronunciables apoyándose en los hábitos del idioma es chunking." },
+        { q: "Si la lista de memoria es 'pot, lark, stick, nut, flow' se recordará mejor que si es 'opportunity, refrigerator, tuberculosis, university'. Esto prueba el efecto de:", o: ["Similitud semántica.", "Longitud de palabra.", "Nivel de procesamiento."], c: 1, e: "El efecto de longitud de palabra postula que el span de memoria es menor para palabras largas que exigen más tiempo de repaso articulatorio." },
+        { q: "¿En qué componente se asienta la capacidad de 'repetir mentalmente' un dato auditivo de forma silenciosa para que no decaiga?", o: ["En la corteza occipital primaria.", "En el proceso de repaso articulatorio del bucle fonológico.", "En el registro ecoico periférico."], c: 1, e: "Es el repaso articulatorio o repetición subvocal silenciosa." },
+        { q: "El 'efecto de longitud de palabra' fue originalmente investigado en profundidad por:", o: ["Conrad y Hull en correos británicos.", "Baddeley, Thomson y Buchanan (1975).", "Hermann Ebbinghaus."], c: 1, e: "Baddeley, Thomson y Buchanan investigaron el efecto comparando listas de palabras cortas y palabras polisilábicas." },
+        { q: "Al hablar del mecanismo de repaso en el bucle fonológico, la evidencia indica que las personas recuerdan en MCP aproximadamente...", o: ["Diez palabras, independientemente del tiempo que tarden en decirlas.", "Tantas palabras como sean capaces de pronunciar en dos segundos.", "Un número ilimitado de palabras concretas frente a abstractas."], c: 1, e: "El rendimiento se predice por la velocidad de articulación: se recuerda aproximadamente lo que se puede pronunciar en dos segundos." },
+        { q: "La 'supresión articulatoria' (p. ej., repetir rítmicamente 'la, la, la') es una herramienta experimental diseñada esencialmente para:", o: ["Aumentar la oxigenación cerebral del lóbulo frontal.", "Causar afasia de Wernicke temporal.", "Bloquear e inutilizar el mecanismo de repaso subvocal en el sistema."], c: 2, e: "Al forzar la articulación de habla irrelevante, el repaso subvocal queda bloqueado y el circuito no puede usarse para la tarea mnésica." },
+        { q: "¿Cuál de estos efectos NO se explica por la estructura clásica del bucle fonológico verbal según se discute en el texto?", o: ["Efecto de similitud fonológica.", "Efecto de posición espacial de Corsi.", "Efecto de longitud de palabra."], c: 1, e: "El test de bloques de Corsi es visoespacial; el bucle fonológico verbal explica la similitud fonológica, longitud de palabra y (aunque discutido) los daños del sonido irrelevante." },
+        { q: "¿A qué componente del modelo de MCP afecta de manera central y negativa un 'entorno ruidoso con voces habladas', según los estudios expuestos?", o: ["Específicamente al sistema que preserva el orden serial, al ser sensibles a los cambios de estado temporal (fluctuaciones).", "A la memoria a largo plazo semántica, borrando conceptos.", "Exclusivamente a los discos de Merkel en el nivel periférico táctil."], c: 0, e: "El ruido fluctuante (habla irrelevante) perjudica especialmente la memoria para el orden serial por su naturaleza de 'cambio de estado'." },
+        { q: "La evidencia que contradice el modelo de O-OER (Jones) es:", o: ["Que sí logra replicar el modelo de rasgos en animales.", "La separación probada de los sistemas verbal y visoespacial en clínica neuropsicológica.", "Su excesivo enfoque en las neuronas espejo."], c: 1, e: "Jones proponía una superficie común multimodal, pero la clínica evidencia que el daño en una vía (verbal/KF) preserva la otra (visual), probando sistemas distintos." },
+        { q: "El modelo SIMPLE (Brown, Neath y Chater, 2007) se ha elogiado porque fue uno de los primeros intentos serios de unificar teóricamente:", o: ["La neuroanatomía con la sociología.", "La MCP y la MLP bajo un único marco métrico de discriminabilidad temporal.", "El bucle fonológico con la agenda visoespacial estricta."], c: 1, e: "SIMPLE puede aplicarse tanto a MCP como MLP, siendo un valioso intento para unificar el olvido de ambas esferas." },
+        { q: "En la curva del efecto de posición serial clásica en una tarea de recuerdo libre de 20 ítems con recuerdo inmediato, se asume que los ítems centrales (del medio):", o: ["Se consolidan perfectamente por efecto Von Restorff.", "Son desplazados de la MCP sin haber recibido repaso suficiente para consolidarse en MLP.", "Se recuperan siempre los primeros por prioridad estocástica."], c: 1, e: "Llegan cuando el sujeto ya repasa otros, no se consolidan en MLP y la sobrecarga los empuja fuera de la MCP." },
+        { q: "Para eliminar la recencia inmediata y forzar que solo actúe la MLP, un experimentador debe:", o: ["Permitir al sujeto escribir lentamente sin pausa.", "Presentar una luz blanca cegadora por un microsegundo.", "Imponer una tarea de demora distorsionadora (ej. contar atrás por 10s) antes del recuerdo libre."], c: 2, e: "Postman y Phillips mostraron que 10 segundos de cuenta regresiva desplazan la disponibilidad final de la MCP, eliminando la recencia." },
+        { q: "Respecto a la MCP visual en nuestro comportamiento real, esta tiene un rol fundamental en procesos de:", o: ["La percepción y el escaneo ocular continuo del mundo (integrando sacadas).", "La construcción puramente verbal del ego.", "Exclusivamente soñar durante la fase REM y almacenar símbolos oníricos."], c: 0, e: "Juega un papel esencial en la percepción visual continua integrando las diferentes fijaciones y movimientos sacádicos rápidos (2 por seg)." },
+        { q: "¿En qué dimensión la MCP visual de Luck y Vogel se considera 'débil' frente a la impresionante MLP visual (Standing)?", o: ["En la nitidez de la rima poética.", "En su capacidad límite, estabilizada bruscamente alrededor de 3 o 4 objetos combinados.", "En la longitud de las dendritas frontales."], c: 1, e: "La MCP visual está estrictamente limitada a 3-4 objetos retenidos temporalmente, mientras la MLP codifica miles de imágenes de forma muy resistente." },
+        { q: "Un paciente amnésico como KF, cuyo déficit era un span fonológico reducidísimo (2), paradójicamente demostraba...", o: ["Una excelente capacidad para recitar grandes discursos abstractos.", "Un rendimiento sorprendentemente normal en MLP y en memoria visual/espacial (Corsi).", "Que el sistema de la MCP y MLP era el mismo único bloque indisoluble en el cerebro."], c: 1, e: "KF conservó el test de Corsi y su MLP general, lo cual reforzó la noción de independencia funcional de los sistemas (memoria multicomponente y disociada)." }
+    ];
+
+let questions=[...originalQuestions],currentQuestion=0,score=0,answered=false,missedQuestions=[],retryMode=false;
+const questionText=document.getElementById('question-text'),optionsContainer=document.getElementById('options-container'),feedbackContainer=document.getElementById('feedback-container'),nextBtn=document.getElementById('next-btn'),progressText=document.getElementById('progress-text'),scoreTracker=document.getElementById('score-tracker'),quizScreen=document.getElementById('quiz-screen'),resultScreen=document.getElementById('result-screen'),finalScore=document.getElementById('final-score'),finalMessage=document.getElementById('final-message'),progressBar=document.getElementById('progress-bar'),missedSummary=document.getElementById('missed-summary'),retryMissedBtn=document.getElementById('retry-missed-btn'),modeText=document.getElementById('mode-text'),medalText=document.getElementById('medal-text');
+
+function loadQuestion(){
+answered=false;feedbackContainer.style.display='none';feedbackContainer.className='feedback';feedbackContainer.innerHTML='';nextBtn.style.display='none';
+const q=questions[currentQuestion],total=questions.length,percent=Math.round((currentQuestion/total)*100);
+progressText.innerText=`Pregunta ${currentQuestion+1} de ${total}`;
+progressBar.style.width=`${percent}%`;
+modeText.innerHTML=retryMode?'<span class="mode-label">Modo repaso: falladas</span>':'Modo completo';
+questionText.innerText=`${currentQuestion+1}. ${q.q}`;
+optionsContainer.innerHTML='';
+q.o.forEach((opt,index)=>{const btn=document.createElement('button');btn.className='option-btn';btn.innerText=opt;btn.onclick=()=>selectOption(index,btn);optionsContainer.appendChild(btn);});
+}
+
+function selectOption(index,btn){
+if(answered)return;answered=true;
+const q=questions[currentQuestion],allBtns=optionsContainer.querySelectorAll('.option-btn');
+allBtns.forEach(b=>b.disabled=true);
+const correctText=q.o[q.c];
+if(index===q.c){
+btn.classList.add('correct');score++;scoreTracker.innerText=`Puntuación: ${score}`;
+feedbackContainer.classList.add('show','feedback-correct');
+feedbackContainer.innerHTML=`<strong>Correcto.</strong><span class="solution-label">Por qué es correcto:</span>${q.e}`;
+}else{
+btn.classList.add('incorrect');allBtns[q.c].classList.add('correct');
+if(!missedQuestions.some(item=>item.q===q.q)){missedQuestions.push(q)}
+feedbackContainer.classList.add('show','feedback-incorrect');
+feedbackContainer.innerHTML=`<strong>Respuesta equivocada.</strong><br>Has marcado: <b>${q.o[index]}</b><br>La solución correcta es: <b>${correctText}</b><span class="solution-label">Por qué esa es la solución correcta:</span>${q.e}`;
+}
+nextBtn.style.display='block';
+nextBtn.innerText=currentQuestion===questions.length-1?'Ver resultados':'Siguiente pregunta';
+}
+
+function nextQuestion(){currentQuestion++;if(currentQuestion<questions.length){loadQuestion()}else{showResults()}}
+
+function showResults(){
+quizScreen.style.display='none';resultScreen.style.display='block';progressBar.style.width='100%';
+const percentage=Math.round((score/questions.length)*100);
+finalScore.innerHTML=`Has acertado ${score} de ${questions.length} preguntas (${percentage}%)`;
+if(percentage>=90)medalText.innerText='🏆 Medalla de Oro · Dominio excelente';
+else if(percentage>=75)medalText.innerText='🥈 Medalla de Plata · Muy buen nivel';
+else if(percentage>=60)medalText.innerText='🥉 Medalla de Bronce · Base aprobada';
+else medalText.innerText='📚 Modo refuerzo · Conviene repasar';
+let message='';
+if(percentage>=90)message='Excelente rendimiento cognitivo. Dominas los modelos, efectos experimentales y evidencias clínicas de la memoria a corto plazo.';
+else if(percentage>=70)message='Muy buen trabajo. Repasa las falladas para afinar bucle fonológico, orden serial, MCP visual y disociaciones clínicas.';
+else message='Conviene repasar con calma los efectos de similitud, longitud, supresión articulatoria, orden serial y MCP visoespacial.';
+finalMessage.innerText=message;
+if(missedQuestions.length>0){
+missedSummary.style.display='block';
+missedSummary.innerHTML=`<h3>Preguntas falladas: ${missedQuestions.length}</h3><ul>${missedQuestions.map((q,i)=>`<li>${i+1}. ${q.q}</li>`).join('')}</ul>`;
+retryMissedBtn.style.display='inline-block';
+}else{
+missedSummary.style.display='block';
+missedSummary.innerHTML='<h3>No has fallado ninguna pregunta.</h3><p>Resultado perfecto. No hay preguntas que reintentar.</p>';
+retryMissedBtn.style.display='none';
+}
+}
+
+function retryMissed(){
+if(missedQuestions.length===0)return;
+questions=[...missedQuestions];missedQuestions=[];currentQuestion=0;score=0;retryMode=true;
+scoreTracker.innerText='Puntuación: 0';resultScreen.style.display='none';quizScreen.style.display='block';nextBtn.innerText='Siguiente pregunta';loadQuestion();
+}
+
+function restartQuiz(){
+questions=[...originalQuestions];currentQuestion=0;score=0;answered=false;missedQuestions=[];retryMode=false;
+scoreTracker.innerText='Puntuación: 0';quizScreen.style.display='block';resultScreen.style.display='none';nextBtn.innerText='Siguiente pregunta';loadQuestion();
+}
+
+loadQuestion();
+</script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAVID MILÁN STUDIO | Olvido Incidental</title>
+<style>
+:root{--gold:#d4af37;--gold2:#f3d98b;--bg:#05070d;--bg2:#0b1323;--txt:#f5f5f5;--muted:#aab3c5;--ok:#33d17a;--bad:#ff6b6b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Segoe UI,sans-serif;min-height:100vh;background:
+radial-gradient(circle at top left,rgba(212,175,55,.20),transparent 30%),
+radial-gradient(circle at bottom right,rgba(50,90,180,.25),transparent 35%),
+linear-gradient(135deg,var(--bg),var(--bg2),#05070d);
+display:flex;justify-content:center;align-items:center;padding:30px;color:var(--txt)}
+.container{width:100%;max-width:1000px;background:rgba(255,255,255,.06);
+backdrop-filter:blur(18px);border:1px solid rgba(212,175,55,.25);
+border-radius:28px;padding:32px;box-shadow:0 25px 80px rgba(0,0,0,.45)}
+.brand{display:inline-block;padding:10px 18px;border-radius:999px;border:1px solid rgba(212,175,55,.4);color:var(--gold2);font-weight:800;letter-spacing:3px;margin-bottom:18px}
+h1{font-size:52px;background:linear-gradient(90deg,#fff,var(--gold2));-webkit-background-clip:text;color:transparent}
+h2{margin:8px 0 25px;color:var(--muted);font-weight:400}
+.top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.stat{padding:12px 16px;border-radius:14px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.1);color:var(--gold2);font-weight:700}
+.bar{height:10px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-bottom:20px}
+.fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:.3s}
+.card{padding:24px;border-radius:22px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.08)}
+.q{font-size:22px;font-weight:800;line-height:1.4;margin-bottom:20px}
+.options{display:grid;gap:12px}
+.opt{padding:15px;border-radius:16px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);cursor:pointer;color:white;text-align:left;font-size:15px;line-height:1.45}
+.opt:hover:not(:disabled){border-color:var(--gold);transform:translateY(-1px)}
+.opt:disabled{cursor:not-allowed;opacity:.95}
+.correct{background:rgba(51,209,122,.18)!important;border-color:var(--ok)!important}
+.incorrect{background:rgba(255,107,107,.18)!important;border-color:var(--bad)!important}
+.feedback{display:none;margin-top:18px;padding:18px;border-radius:16px;line-height:1.6}
+.show{display:block}
+.good{background:rgba(51,209,122,.12);border-left:5px solid var(--ok)}
+.bad{background:rgba(255,107,107,.12);border-left:5px solid var(--bad)}
+.controls{display:flex;justify-content:space-between;gap:10px;margin-top:20px;flex-wrap:wrap}
+.btn{padding:14px 22px;border:none;border-radius:14px;font-weight:800;cursor:pointer}
+.gold{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#111}
+.dark{background:rgba(255,255,255,.08);color:white;border:1px solid rgba(255,255,255,.12)}
+#results{display:none;text-align:center}
+.medal{margin:15px auto;padding:12px 20px;border-radius:999px;border:1px solid rgba(212,175,55,.35);display:inline-block;color:var(--gold2)}
+.missed{text-align:left;margin-top:20px;padding:18px;border-radius:16px;background:rgba(0,0,0,.2);line-height:1.55}
+.missed h3{color:var(--gold2);margin-bottom:10px}
+.missed ul{padding-left:20px}
+@media(max-width:650px){.container{padding:22px}h1{font-size:36px}.q{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="brand">DAVID MILÁN STUDIO</div>
+<h1>Mega-Test Premium</h1>
+<h2>Tema 7: Olvido Incidental</h2>
+
+<div id="quiz">
+<div class="top">
+<div class="stat" id="prog"></div>
+<div class="stat" id="score">Puntuación: 0</div>
+<div class="stat" id="mode">Modo completo</div>
+</div>
+<div class="bar"><div class="fill" id="fill"></div></div>
+<div class="card">
+<div class="q" id="q"></div>
+<div class="options" id="opts"></div>
+<div id="fb" class="feedback"></div>
+<div class="controls">
+<button class="btn dark" onclick="restartQuiz()">Reiniciar</button>
+<button class="btn gold" id="next" onclick="nextQuestion()" style="display:none">Siguiente</button>
+</div>
+</div>
+</div>
+
+<div id="results">
+<h2 id="final"></h2>
+<div class="medal" id="medal"></div>
+<p id="msg"></p>
+<div id="missed" class="missed"></div><br>
+<button class="btn dark" onclick="restartQuiz()">Volver a empezar</button>
+<button class="btn gold" id="retry" onclick="retryMissed()">Repasar falladas</button>
+</div>
+</div>
+
+<script>
+const originalQuestions=[
+        // 1. INTRODUCCIÓN
+        { q: "¿Qué nombre recibe la forma de pérdida mnésica en la cual la información se pierde sin que medie ninguna intención de olvidar?", o: ["Olvido incidental.", "Olvido motivado.", "Amnesia anterógrada focal."], c: 0, e: "El olvido incidental ocurre sin que el sujeto tenga la intención explícita de olvidar; es el que nos sucede como subproducto ordinario del sistema." },
+        { q: "La metáfora cotidiana sobre el olvido asume que las memorias se deterioran por el mero paso del tiempo, como un cartel a la intemperie. ¿Es esto correcto según la psicología experimental?", o: ["Sí, el tiempo es la única variable causal del olvido.", "No, la mayor parte de lo que perdemos ocurre por las nuevas experiencias y la recuperación selectiva que tienen lugar durante ese tiempo.", "Sí, pero solo para la memoria semántica."], c: 1, e: "El hallazgo central es que no se pierde por el mero paso del tiempo, sino por lo que ocurre en ese tiempo (nuevos aprendizajes, cambios de contexto)." },
+        { q: "En la obra de Jorge Luis Borges, el personaje 'Funes el memorioso' padecía de una memoria absoluta. ¿Cuál era su principal problema cognitivo asociado?", o: ["Era incapaz de dormir.", "Era casi incapaz de pensar, ya que pensar requiere abstraer y olvidar los detalles irrelevantes.", "Había perdido su identidad personal."], c: 1, e: "Borges advierte que Funes era casi incapaz de pensar, porque pensar requiere abstraer y olvidar los detalles irrelevantes para que emerjan regularidades útiles." },
+
+        // 2. HIPERTIMESIA / HSAM
+        { q: "La condición de la paciente JP, documentada por Parker et al., caracterizada por una memoria autobiográfica extraordinaria se conoce clínicamente como:", o: ["Amnesia de la fuente.", "Síndrome de Korsakoff invertido.", "Síndrome hipertimésico (o HSAM)."], c: 2, e: "Se conoce como síndrome hipertimésico o memoria autobiográfica altamente superior (HSAM)." },
+        { q: "¿Tienen las personas con HSAM un rendimiento superior en la memorización de material arbitrario (ej. listas de palabras no relacionadas)?", o: ["Sí, su memoria es globalmente perfecta.", "No, su rendimiento es comparable al de la población normal.", "Sí, pero solo si las palabras riman."], c: 1, e: "Su superioridad no se extiende al material mnésico arbitrario, lo que muestra que no tienen un incremento global de la memoria." },
+        { q: "En cuanto al bienestar subjetivo, ¿qué coste describe la paciente JP sobre su memoria perfecta?", o: ["Le impide diferenciar el día de la noche.", "Le genera riqueza económica inagotable.", "Experimenta la vida en una 'pantalla dividida' donde las experiencias pasadas dolorosas reviven con viveza, sin esfuerzo ni control consciente."], c: 2, e: "JP relata que su memoria gobierna su vida como un sexto sentido, reviviendo episodios pasados dolorosos con la misma viveza y sin control." },
+        { q: "Según el estudio de Patihis et al. (2013), ¿las personas con HSAM están protegidas contra los falsos recuerdos y distorsiones mnésicas?", o: ["Sí, su memoria es una grabación inmutable.", "No, son igualmente susceptibles que los controles a producir falsos recuerdos.", "Solo están protegidos frente a recuerdos de antes de los 10 años."], c: 1, e: "Son igualmente susceptibles a producir falsos recuerdos, lo que indica que su hipertimesia se basa en consolidación y no en inmunidad reconstructiva." },
+        { q: "¿Qué síndrome delimita el extremo opuesto del continuo interindividual, designando a quienes no pueden revivir episodios vitales sin tener daño neurológico demostrable?", o: ["SDAM (Memoria autobiográfica deficitaria severa).", "Prosopagnosia autobiográfica.", "Amnesia global transitoria."], c: 0, e: "La variante complementaria es la Memoria autobiográfica deficitaria severa (SDAM)." },
+
+        // 3. CURVA DEL OLVIDO Y PERMASTORE
+        { q: "Hermann Ebbinghaus (1885) investigó el olvido utilizando como material:", o: ["Cuentos populares indios.", "Sílabas sin sentido (tríadas consonante-vocal-consonante).", "Fotografías de rostros aleatorios."], c: 1, e: "Utilizó sílabas sin sentido para evitar que las asociaciones preexistentes contaminaran la medida del aprendizaje." },
+        { q: "¿Qué forma geométrica o matemática describe de manera más precisa la curva del olvido de Ebbinghaus?", o: ["Una caída lineal constante.", "Una caída aproximadamente logarítmica (rápida al principio, que se ralentiza).", "Una curva en forma de U invertida."], c: 1, e: "La curva es aproximadamente logarítmica: la pérdida es máxima al principio y disminuye progresivamente." },
+        { q: "El estudio ecológico de Meeter et al. (2005) utilizó preguntas sobre sucesos públicos (noticias) a lo largo de 4 años. ¿Qué comprobaron respecto a la forma de la curva de Ebbinghaus?", o: ["Que solo se aplica a sílabas, no a la vida real.", "Que en la vida real la memoria sube con los años.", "Que se reproduce la forma clásica de caída pronunciada seguida de atenuación progresiva en materiales reales."], c: 2, e: "Los datos confirmaron la curva de Ebbinghaus generalizándose a memorias complejas, ecológicas y a intervalos largos." },
+        { q: "En ese mismo estudio de Meeter et al., al evaluar la memoria de los participantes, se constató que:", o: ["El recuerdo libre era muy superior al reconocimiento.", "El reconocimiento (52%) se mantenía notablemente más alto que el recuerdo libre (31%).", "Ambas medidas aportaban exactamente el mismo porcentaje."], c: 1, e: "El reconocimiento se mantuvo más alto, reflejando que esta prueba detecta más información residual que el recuerdo libre." },
+        { q: "Harry Bahrick denominó 'permastore' al fenómeno que observó al estudiar el recuerdo de idiomas o antiguos compañeros de clase tras 50 años. ¿En qué consiste el permastore?", o: ["En el desvanecimiento celular absoluto del hipocampo.", "En la capacidad de recordar sin necesidad de repasar en absoluto el primer día.", "En un estado donde la información bien aprendida cristaliza y resiste el paso del tiempo con eficacia notable durante décadas."], c: 2, e: "Designa un estado permanente o 'plateau' donde la información bien aprendida resiste el deterioro durante décadas." },
+        { q: "Según Bahrick, el nivel absoluto de retención que se alcanza una vez que se entra en el 'permastore' depende de:", o: ["El nivel inicial de aprendizaje o dominio durante la formación.", "La cantidad de estrés sufrida en el examen.", "La genética exclusivamente."], c: 0, e: "El nivel absoluto de retención tras el plateau depende del nivel inicial de aprendizaje. Cuanto mejor se aprende algo, más se conserva." },
+
+        // 4. DISPONIBILIDAD VS. ACCESIBILIDAD
+        { q: "La distinción entre 'disponibilidad' y 'accesibilidad' de una huella mnésica fue introducida por:", o: ["Ebbinghaus.", "Tulving.", "Anderson."], c: 1, e: "Endel Tulving introdujo en los años sesenta esta distinción clave." },
+        { q: "Según la distinción de Tulving, una huella está 'disponible' si:", o: ["Podemos recordarla inmediatamente en un test.", "Se encuentra almacenada en el sistema, independientemente de si podemos o no recuperarla.", "La hemos repetido en voz alta 5 veces."], c: 1, e: "Disponible significa que está almacenada en el sistema. Accesible significa que podemos recuperarla ahora mismo con claves." },
+        { q: "Desde un punto de vista puramente empírico y experimental, demostrar que una huella ha dejado de estar DISPONIBLE (pérdida total del almacenamiento) es:", o: ["Fácil, mediante fMRI.", "Imposible, ya que siempre cabe la posibilidad de que una clave adecuada futura la reactive.", "Posible solo con hipnosis profunda."], c: 1, e: "Es imposible demostrar empíricamente la indisponibilidad, porque no podemos probar todas las claves posibles del universo." },
+        { q: "Debido a esta imposibilidad metodológica y a sus consecuencias prácticas, la literatura científica contemporánea considera que el 'olvido' se produce cuando hay:", o: ["Muerte celular neuronal.", "Reducción o pérdida de la accesibilidad, aunque la huella pueda seguir disponible.", "Ausencia de consolidación en las primeras 24 horas."], c: 1, e: "En la literatura, cuando hablamos de olvido, nos referimos a la pérdida de accesibilidad." },
+        { q: "Si evaluamos a un individuo mediante 'recuerdo libre', probablemente:", o: ["Sobreestimaremos su memoria.", "Mediremos exactamente las huellas disponibles.", "Subestimaremos la cantidad de información que sigue disponible (en comparación con una prueba de reconocimiento)."], c: 2, e: "El recuerdo libre subestima la información disponible porque carece de claves directas." },
+        
+        // 5. CONSOLIDACIÓN Y RECUPERACIÓN
+        { q: "La 'ley de Jost' (1897) establece que, si dos memorias tienen idéntica fuerza aparente en un momento dado:", o: ["La más reciente será más duradera.", "Ambas se olvidarán al mismo ritmo.", "La más antigua de las dos será más duradera y se olvidará más lentamente."], c: 2, e: "A igualdad de fuerza, la memoria antigua es más resistente, lo que evidencia que las huellas supervivientes se hacen más sólidas." },
+        { q: "La 'consolidación sináptica' implica cambios estructurales a nivel de conexión neuronal y puede requerir desde horas hasta días. ¿Qué bloquea críticamente esta estabilización?", o: ["La ingesta de azúcar.", "Inhibidores de la síntesis de proteínas o traumatismos justo después del aprendizaje.", "Dormir menos de 10 horas."], c: 1, e: "Intervenciones que interfieran con la síntesis proteica pueden interrumpirla, causando amnesia." },
+        { q: "Según el modelo de la 'consolidación sistémica' (Squire), el hipocampo es inicialmente necesario para recuperar nuevas memorias episódicas, pero con el tiempo:", o: ["Asume el control absoluto de todas las memorias.", "Muere por apoptosis.", "Transfiere progresivamente esa función a los circuitos corticales, disminuyendo su propia contribución."], c: 2, e: "El hipocampo entrena a la corteza hasta que las conexiones intracorticales pueden sostener la recuperación sin mediación hipocámpica." },
+        { q: "La hipótesis de la consolidación sistémica explica por qué en los pacientes con daño en el lóbulo temporal medial (amnésicos) se observa:", o: ["Una memoria procedimental nula.", "Una amnesia retrógrada graduada (recuerdos remotos mejor conservados que los recientes).", "Un síndrome de hipertimesia tardía."], c: 1, e: "Muestran amnesia retrógrada graduada: los recuerdos remotos ya están en la corteza, mientras que los recientes dependían del dañado hipocampo." },
+        { q: "Nader et al. (2000) demostraron que cuando una huella ya consolidada se reactiva o se recupera, vuelve a entrar en un estado de vulnerabilidad. A este proceso se le denomina:", o: ["Reconsolidación.", "Potenciación a largo plazo inversa.", "Amnesia infantil."], c: 0, e: "La reconsolidación: cada vez que la huella se reactiva, debe ser restabilizada, abriendo una ventana de vulnerabilidad y actualización." },
+        { q: "El fenómeno conocido como 'efecto de la práctica de recuperación' (testing effect) postula que:", o: ["Releer apuntes pasivamente es superior a autoevaluarse.", "La recuperación activa de una huella refuerza su retención posterior en mayor medida que el simple reestudio.", "El test genera tanto estrés que destruye la consolidación."], c: 1, e: "La recuperación activa (evaluarse) protege y refuerza la huella mucho más que estudiar pasivamente el mismo material." },
+        { q: "El famoso estudio autobiográfico de Marigold Linton (1975) comprobó el efecto del testing effect. Ella demostró que los sucesos retestados 4 o más veces tenían una probabilidad de olvido de:", o: ["El 65%.", "Menos del 15% al cabo de 4 años.", "El 100%."], c: 1, e: "Los sucesos no retestados tenían un 65% de olvido, mientras que los probados 4 o más veces reducían el olvido a menos del 15%." },
+        { q: "Un riesgo asociado a recuperar frecuentemente una memoria (debido a la reconsolidación) es que:", o: ["Se borra automáticamente al mes.", "Podemos integrar en ella las inferencias inexactas reconstruidas en recuperaciones anteriores, alejándola del evento original.", "Provoca convulsiones epilépticas focales."], c: 1, e: "Si recuperamos inferencias erróneas, éstas se reconsolidan en la huella original, distorsionando el recuerdo (importante en testigos forenses)." },
+
+        // 6. DECAIMIENTO Y FLUCTUACIÓN CONTEXTUAL
+        { q: "La hipótesis clásica del 'decaimiento de la huella' (trace decay) atribuye la pérdida de memoria a:", o: ["La interferencia de nuevos conocimientos.", "El debilitamiento gradual de las huellas por el mero paso del tiempo.", "Las emociones reprimidas en el subconsciente."], c: 1, e: "Asume que la memoria se desvanece pasivamente con el tiempo como un cartel expuesto al sol." },
+        { q: "Frankland, Köhler y Josselyn han propuesto una reformulación neurogénica del decaimiento. Según ellos, el decaimiento hipocámpico podría deberse a:", o: ["El nacimiento e integración de nuevas neuronas (neurogénesis) en el hipocampo adulto que remodela la estructura original.", "La muerte masiva de neuronas por estrés.", "Una falta de mielinización temprana."], c: 0, e: "La neurogénesis introduce nuevas neuronas que diluyen el patrón de conexiones previo, dificultando la recuperación de las viejas memorias." },
+        { q: "La reformulación neurogénica ofrece una explicación biológicamente rica para un fenómeno muy común conocido como:", o: ["Amnesia retrógrada histérica.", "Amnesia infantil (gran dificultad para recordar antes de los 3-4 años).", "Efecto Von Restorff."], c: 1, e: "En la infancia la tasa de neurogénesis es altísima, lo que explicaría por qué los recuerdos de esos años no sobreviven la constante remodelación estructural." },
+        { q: "La 'fluctuación contextual' explica la curva del olvido argumentando que:", o: ["A medida que pasa el tiempo, nuestro contexto actual se desplaza, desalineándose del contexto en el que se codificó la memoria antigua, debilitando sus claves.", "El cerebro cambia de forma cada 10 años.", "Solo olvidamos lo que aprendemos en invierno."], c: 0, e: "El contexto (mental, físico, social) cambia gradualmente. Lo lejano tiene un contexto muy distinto al actual, perdiendo eficacia sus claves de recuperación." },
+        { q: "En el estudio de Delaney et al. sobre soñación diurna (daydreaming), ¿qué grupo mostró mayor olvido de la primera lista estudiada?", o: ["El grupo que leyó un texto en voz alta.", "El grupo que soñó despierto con vacaciones cercanas.", "El grupo que soñó despierto con vacaciones internacionales lejanas."], c: 2, e: "Soñar con vacaciones internacionales implica un mayor desplazamiento del contexto mental, produciendo el mayor olvido de la lista previa." },
+        { q: "El fenómeno de la fluctuación contextual ayuda a explicar experiencias cotidianas como:", o: ["Por qué recordamos siempre el número Pi.", "Por qué volver al barrio de la infancia reactiva recuerdos aparentemente perdidos.", "El síndrome del miembro fantasma."], c: 1, e: "Volver a un lugar restaura físicamente las claves contextuales originales que se habían desplazado, permitiendo reactivar las memorias." },
+
+        // 7. LA INTERFERENCIA
+        { q: "La 'suposición de competencia' (competition assumption) afirma que cuando una clave de recuperación está asociada a múltiples memorias:", o: ["Todas emergen armónicamente a la vez.", "Esas memorias compiten automáticamente entre sí por el acceso a la conciencia.", "El cerebro apaga el hipocampo para evitar sobrecalentamiento."], c: 1, e: "Las memorias asociadas a una misma clave compiten entre sí, y el recuerdo dependerá del número y la fuerza de esos rivales." },
+        { q: "El 'principio de sobrecarga de claves' explica por qué es más difícil recordar qué cenaste hace dos semanas que anoche. Se debe a que:", o: ["Aumenta el número de ítems (cenas rutinarias) asociados a una misma clave (lugar, hora), diluyendo su eficacia.", "Las proteínas se degradan en dos semanas.", "Las cenas de hace dos semanas nunca se codifican."], c: 0, e: "La sobrecarga de claves postula que la eficacia de una clave disminuye al aumentar el número de ítems asociados a ella." },
+        { q: "El deterioro del recuerdo de un material previamente aprendido como consecuencia del aprendizaje POSTERIOR de material similar se denomina:", o: ["Interferencia proactiva.", "Interferencia retroactiva.", "Inhibición part-set."], c: 1, e: "Retroactiva: lo nuevo afecta (hacia atrás) a lo viejo." },
+        { q: "El estudio de Baddeley y Hitch (1977) con jugadores de rugby, que preguntaba sobre los equipos rivales enfrentados, demostró que el olvido dependía de:", o: ["Exclusivamente el tiempo pasado en meses.", "El número de partidos nuevos jugados en medio, evidenciando la interferencia retroactiva ecológica.", "Los golpes en la cabeza sufridos."], c: 1, e: "Desacoplaron el tiempo de los partidos intermedios: el número de partidos intermedios (nuevas experiencias similares) era el motor del olvido." },
+        { q: "El deterioro en la retención de un material recientemente aprendido causado por el aprendizaje PREVIO (ej. intrusión de la contraseña vieja al teclear la nueva) es:", o: ["Interferencia retroactiva.", "Olvido motivado.", "Interferencia proactiva."], c: 2, e: "Proactiva: lo viejo afecta (hacia adelante) a lo nuevo." },
+        { q: "En su reanálisis de datos, Benton Underwood (1957) demostró que el porcentaje de olvido a 24 horas en experimentos clásicos estaba brutalmente condicionado por:", o: ["El número de horas que durmieron los participantes.", "La interferencia proactiva acumulada: participantes que ya habían hecho 20 experimentos recordaban un 20% frente al 80% de los novatos.", "El color de la sala."], c: 1, e: "Demostró que la historia de aprendizaje previa del sujeto generaba enorme interferencia proactiva sobre la nueva lista." },
+        { q: "El fenómeno por el cual presentar a un sujeto algunos miembros de un conjunto aprendido (como pistas) DIFICULTA que recupere el resto de los miembros se llama:", o: ["Part-set cuing impairment (deterioro por clave parcial).", "Facilitación mnésica residual.", "Aprendizaje dependiente del estado."], c: 0, e: "Es el part-set cuing impairment, descubierto por Slamecka (1968)." },
+        { q: "Según Bäuml y Aslan (2004), para que el efecto de 'part-set cuing' produzca realmente deterioro en los ítems no presentados, los ítems presentados deben ser:", o: ["Simplemente reestudiados de forma pasiva.", "Recuperados o utilizados activamente como claves de búsqueda en la memoria.", "Escritos al revés."], c: 1, e: "La mera reexposición (reestudio) no basta; el deterioro surge cuando se usan activamente en la recuperación de los demás." },
+        { q: "El fenómeno derivado de este mecanismo por el cual un grupo de personas recordando de forma conjunta produce MENOS ítems que la suma de sus recuerdos por separado se llama:", o: ["Amnesia social.", "Inhibición colaborativa.", "Sinergia mnésica."], c: 1, e: "La inhibición colaborativa: los recuerdos de unos miembros funcionan como claves parciales que bloquean a los demás." },
+
+        // 8. OLVIDO INDUCIDO POR LA RECUPERACIÓN (RIF)
+        { q: "El 'olvido inducido por la recuperación' (RIF), descubierto por Anderson et al., demuestra que:", o: ["Recordar algo refuerza la memoria de todo lo demás.", "Recordar selectivamente un contenido deteriora activamente la accesibilidad de otros contenidos relacionados.", "Recordar en voz alta borra la memoria ecoica."], c: 1, e: "La recuperación selectiva perjudica a los competidores semánticamente próximos que comparten la misma clave." },
+        { q: "En el paradigma de práctica de recuperación, ¿qué asimetría sorprendente se observa en el test final?", o: ["Los ítems no practicados de categorías practicadas se recuerdan PEOR que los ítems de categorías línea base (categorías ni tocadas).", "Todos los ítems empeoran por igual.", "Los ítems de la línea base desaparecen por completo."], c: 0, e: "El hecho de haber practicado 'naranja' perjudica a 'plátano' a niveles por debajo del nivel de 'ginebra' (que pertenece a una categoría no practicada en absoluto)." },
+        { q: "En las aplicaciones forenses y de testimonios (Shaw et al.), se ha comprobado que interrogar a un testigo selectivamente sobre algunos aspectos de una escena:", o: ["Mejora automáticamente el recuerdo de todo el escenario.", "No tiene impacto a menos que el testigo mienta.", "Puede deteriorar su memoria para otros aspectos de la escena no interrogados (RIF)."], c: 2, e: "La forma de interrogar no solo extrae información; el interrogatorio selectivo produce RIF sobre lo no interrogado, moldeando la memoria futura." },
+        { q: "Cuc, Koppel y Hirst investigaron el RIF 'socialmente compartido', comprobando que cuando una persona recuerda selectivamente en voz alta frente a otro:", o: ["Solo quien habla experimenta RIF.", "El observador silencioso o interlocutor también sufre el olvido inducido sobre lo no mencionado.", "La memoria se transfiere telepáticamente."], c: 1, e: "El observador escucha y recupera tácitamente junto al hablante, sometiendo su memoria al mismo mecanismo RIF." },
+        { q: "El silenciamiento selectivo de algunos hechos en la pedagogía, los medios o las familias, que modela la memoria individual debilitando lo omitido, se conoce como:", o: ["Olvido pasivo histórico.", "Silencios mnésicos.", "Efecto Von Restorff colectivo."], c: 1, e: "Se denomina 'silencios mnésicos' (Stone et al., 2012)." },
+
+        // 9. MECANISMOS DE INTERFERENCIA
+        { q: "La teoría clásica del 'bloqueo asociativo' (McGeoch) explica la interferencia argumentando que:", o: ["El cerebro destruye físicamente el recuerdo débil.", "Un competidor fuerte se impone reiteradamente en la conciencia e impide el acceso al objetivo, llevando al abandono de la búsqueda.", "Se produce un desaprendizaje por castigo químico."], c: 1, e: "Es la competición dependiente de la fuerza: el fuerte sale tantas veces a flote que bloquea el intento de llegar al débil." },
+        { q: "El 'desaprendizaje', propuesto por Melton e Irwin, sugiere que la interferencia retroactiva se produce porque:", o: ["La asociación entre una clave y una huella se debilita cada vez que esa huella se recupera en un contexto donde es incorrecta (como un error castigado).", "El hipocampo sufre neurogénesis masiva.", "Las contraseñas de ordenador se encriptan."], c: 0, e: "El desaprendizaje sugiere que el error debilita o desacopla la asociación." },
+        { q: "La perspectiva contemporánea que explica mejor el RIF es la 'inhibición'. Esta afirma que el olvido se debe a:", o: ["El decaimiento neuronal del lóbulo temporal.", "Un despliegue activo de procesos de control cognitivo que reduce la activación o accesibilidad del propio competidor para facilitar la respuesta correcta.", "La muerte del receptor de dopamina."], c: 1, e: "A diferencia del bloqueo (fuerza del rival), la inhibición implica silenciar/apagar activamente al rival conflictivo." },
+        { q: "Si el RIF se debiese solo al fortalecimiento de un competidor, no se produciría si cambiáramos la clave en la prueba final. Sin embargo, el RIF sí aparece con claves independientes. Esto se conoce como:", o: ["Dependencia de la atención.", "Independencia de la fuerza.", "Independencia de la clave."], c: 2, e: "La independencia de la clave demuestra que lo que se debilita no es el vínculo específico, sino el propio ítem competidor en sí mismo." },
+        { q: "Otra propiedad del RIF es la 'especificidad de la recuperación', que demuestra que el olvido en los ítems no practicados solo ocurre cuando:", o: ["El ítem practicado se fortalece mediante la recuperación activa, no mediante el simple reestudio pasivo.", "El participante duerme en medio de la prueba.", "Se utilizan pseudopalabras."], c: 0, e: "Si solo re-estudiamos, no hay olvido en los rivales; el RIF requiere el esfuerzo competitivo de intentar recuperar activamente." },
+        { q: "El brillante estudio de Storm et al. (2006) propuso ensayos de recuperación IMPOSIBLES (sin respuesta correcta). A pesar de ello, se produjo RIF. Esta propiedad es:", o: ["Independencia de la fuerza.", "Especificidad auditiva.", "Bloqueo estructural."], c: 0, e: "Independencia de la fuerza: el RIF ocurre por el intento de búsqueda en memoria resolviendo la competencia, no hace falta que se llegue a fortalecer el objetivo." },
+        { q: "Al introducir una tarea secundaria o estresante durante la práctica de recuperación, el RIF se reduce o desaparece. Esto demuestra la:", o: ["Inhibición dependiente del color.", "Dependencia de la atención.", "Interferencia somática."], c: 1, e: "La inhibición requiere recursos atencionales (control ejecutivo). Si se divide la atención, no se puede inhibir al rival." },
+        { q: "A nivel neural, el RIF y el control inhibitorio de memorias competidoras se correlacionan en resonancia funcional con la actividad de:", o: ["La corteza visual primaria.", "La corteza prefrontal ventrolateral (VLPFC) y la corteza cingulada anterior.", "El núcleo pulvinar del tálamo."], c: 1, e: "Kuhl et al. (2007) asociaron el esfuerzo inhibitorio con la actividad en la VLPFC bilateral y el cíngulo anterior." },
+        { q: "En el estudio de Kuhl et al., a medida que los competidores eran eficazmente inhibidos (tercera práctica respecto a la primera), la activación de la corteza prefrontal VLPFC:", o: ["Aumentaba exponencialmente.", "Se mantenía exactamente igual.", "Disminuía significativamente, reflejando un 'ahorro neural' porque el control necesario se reduce al apagar a los competidores."], c: 2, e: "El olvido exitoso del rival se refleja en que el cerebro requiere menos esfuerzo prefrontal para recuperar el objetivo." },
+        { q: "Desde una perspectiva funcional (Anderson, Bjork), ¿cómo debe interpretarse el olvido incidental mediado por la inhibición?", o: ["Como una tara biológica lamentable de la especie humana.", "Como un daño cerebral transitorio.", "Como un mecanismo profundamente adaptativo que prioriza la cognición eficiente apartando lo irrelevante."], c: 2, e: "El sistema cognitivo es eficiente cuando es capaz de inhibir/olvidar lo que ya no es relevante, permitiendo el flujo de la nueva información." }
+    ];
+let questions=[...originalQuestions],current=0,score=0,missed=[],retryMode=false;
+
+function loadQuestion(){
+let q=questions[current];
+document.getElementById('prog').innerText=`Pregunta ${current+1} de ${questions.length}`;
+document.getElementById('fill').style.width=(current/questions.length*100)+'%';
+document.getElementById('mode').innerText=retryMode?'Modo repaso':'Modo completo';
+document.getElementById('q').innerText=`${current+1}. ${q.q}`;
+document.getElementById('fb').className='feedback';
+document.getElementById('fb').style.display='none';
+document.getElementById('next').style.display='none';
+let opts=document.getElementById('opts');opts.innerHTML='';
+q.o.forEach((o,i)=>{let b=document.createElement('button');b.className='opt';b.innerText=o;b.onclick=()=>answer(i,b);opts.appendChild(b);});
+}
+
+function answer(i,btn){
+let q=questions[current];
+let all=document.querySelectorAll('.opt');
+all.forEach(x=>x.disabled=true);
+if(i===q.c){
+btn.classList.add('correct');
+score++;
+document.getElementById('score').innerText='Puntuación: '+score;
+document.getElementById('fb').className='feedback show good';
+document.getElementById('fb').innerHTML='<b>Correcto.</b><br>'+q.e;
+}else{
+btn.classList.add('incorrect');
+all[q.c].classList.add('correct');
+if(!missed.some(m=>m.q===q.q)) missed.push(q);
+document.getElementById('fb').className='feedback show bad';
+document.getElementById('fb').innerHTML='<b>Incorrecto.</b><br><br>La respuesta correcta es: <b>'+q.o[q.c]+'</b><br><br>'+q.e;
+}
+document.getElementById('next').style.display='inline-block';
+document.getElementById('next').innerText=current===questions.length-1?'Ver resultados':'Siguiente';
+}
+
+function nextQuestion(){current++; if(current<questions.length) loadQuestion(); else showResults();}
+
+function showResults(){
+document.getElementById('quiz').style.display='none';
+document.getElementById('results').style.display='block';
+document.getElementById('fill').style.width='100%';
+let pct=Math.round(score/questions.length*100);
+document.getElementById('final').innerHTML=`${score}/${questions.length} · ${pct}%`;
+document.getElementById('medal').innerText=pct>=90?'🏆 Medalla de Oro · Dominio excelente':pct>=75?'🥈 Medalla de Plata · Muy buen nivel':pct>=60?'🥉 Medalla de Bronce · Base aprobada':'📚 Modo refuerzo · Conviene repasar';
+document.getElementById('msg').innerText='Tema 7: olvido incidental, disponibilidad, accesibilidad, consolidación, interferencia, RIF e inhibición adaptativa.';
+document.getElementById('missed').innerHTML=missed.length?'<h3>Preguntas falladas: '+missed.length+'</h3><ul>'+missed.map((x,i)=>'<li>'+(i+1)+'. '+x.q+'</li>').join('')+'</ul>':'<b>Perfecto. Sin errores.</b>';
+document.getElementById('retry').style.display=missed.length?'inline-block':'none';
+}
+
+function retryMissed(){
+questions=[...missed];missed=[];current=0;score=0;retryMode=true;
+document.getElementById('score').innerText='Puntuación: 0';
+document.getElementById('results').style.display='none';
+document.getElementById('quiz').style.display='block';
+loadQuestion();
+}
+
+function restartQuiz(){
+questions=[...originalQuestions];current=0;score=0;missed=[];retryMode=false;
+document.getElementById('score').innerText='Puntuación: 0';
+document.getElementById('results').style.display='none';
+document.getElementById('quiz').style.display='block';
+loadQuestion();
+}
+loadQuestion();
+</script>
+</body>
+</html>

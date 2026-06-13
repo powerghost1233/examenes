@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memoria Episódica Premium | DAVID MILÁN STUDIO</title>
+<style>
+:root{
+--bg:#05070d;--bg2:#0b1323;--gold:#d4af37;--gold2:#f3d98b;--white:#f8f4e8;
+--muted:#aab3c5;--green:#33d17a;--red:#ff6b6b;--blue:#4da3ff
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+min-height:100vh;font-family:'Segoe UI',Arial,sans-serif;
+background:radial-gradient(circle at top left,rgba(212,175,55,.22),transparent 34%),
+radial-gradient(circle at bottom right,rgba(30,90,180,.28),transparent 38%),
+linear-gradient(135deg,var(--bg),var(--bg2),#05070d);
+color:var(--white);display:flex;justify-content:center;align-items:center;padding:35px 18px
+}
+.quiz-container{
+width:100%;max-width:980px;
+background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.035));
+border:1px solid rgba(212,175,55,.28);border-radius:30px;padding:34px;
+box-shadow:0 30px 90px rgba(0,0,0,.45);backdrop-filter:blur(18px)
+}
+.brand{display:inline-block;padding:10px 18px;border-radius:999px;border:1px solid rgba(212,175,55,.45);color:var(--gold2);letter-spacing:3px;font-weight:800;font-size:13px;margin-bottom:18px;background:rgba(255,255,255,.04)}
+h1{font-size:clamp(30px,5vw,54px);line-height:1;margin-bottom:10px;letter-spacing:-1px;background:linear-gradient(90deg,#fff,var(--gold2));-webkit-background-clip:text;color:transparent}
+h2{font-size:17px;color:var(--muted);font-weight:400;margin-bottom:26px}
+.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:24px}
+.stat{padding:12px 16px;border-radius:16px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.1);color:var(--gold2);font-weight:800}
+.progress-wrap{height:10px;background:rgba(255,255,255,.09);border-radius:999px;overflow:hidden;margin-bottom:24px}
+.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:999px;transition:.35s ease}
+.question-card{background:rgba(4,8,16,.55);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:26px}
+.question{font-size:21px;font-weight:800;line-height:1.45;margin-bottom:22px}
+.options{display:grid;gap:13px}
+.option-btn{border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:16px 18px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.035));color:var(--white);font-size:16px;text-align:left;cursor:pointer;transition:.25s ease}
+.option-btn:hover:not(:disabled){transform:translateY(-2px);border-color:rgba(212,175,55,.65);box-shadow:0 12px 30px rgba(212,175,55,.12)}
+.option-btn:disabled{cursor:not-allowed;opacity:.95}
+.correct{background:rgba(51,209,122,.16)!important;border-color:var(--green)!important;color:#dfffea!important}
+.incorrect{background:rgba(255,107,107,.16)!important;border-color:var(--red)!important;color:#ffe0e0!important}
+.feedback{display:none;margin-top:22px;padding:20px;border-radius:20px;line-height:1.65;font-size:15px}
+.feedback.show{display:block}
+.feedback-correct{background:rgba(51,209,122,.12);border-left:5px solid var(--green)}
+.feedback-incorrect{background:rgba(255,107,107,.12);border-left:5px solid var(--red)}
+.feedback strong{font-size:18px}
+.solution-label{display:block;margin-top:12px;color:var(--gold2);font-weight:900}
+.controls{margin-top:22px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center}
+.btn{border:none;border-radius:16px;padding:14px 22px;font-weight:900;font-size:15px;cursor:pointer;transition:.25s ease}
+.btn:hover{transform:translateY(-2px)}
+.next-btn{display:none;background:linear-gradient(135deg,var(--gold2),var(--gold));color:#080b12}
+.secondary-btn{background:rgba(255,255,255,.08);color:var(--white);border:1px solid rgba(255,255,255,.14)}
+.score-container{display:none;text-align:center;padding:24px}
+.score-text{font-size:30px;font-weight:900;color:var(--gold2);margin-bottom:18px}
+.result-message{color:var(--muted);font-size:17px;line-height:1.6;margin-bottom:24px}
+.medal{display:inline-block;margin:14px 0 10px;padding:12px 18px;border-radius:999px;border:1px solid rgba(212,175,55,.45);background:rgba(212,175,55,.10);color:var(--gold2);font-weight:900}
+.missed-box{text-align:left;margin:24px 0;padding:20px;border-radius:20px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.1)}
+.missed-box h3{color:var(--gold2);margin-bottom:12px}
+.missed-box ul{padding-left:20px;color:#dbe2f2;line-height:1.6}
+.mode-label{color:var(--blue);font-weight:900}
+@media(max-width:650px){.quiz-container{padding:22px}.question-card{padding:20px}.question{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="quiz-container">
+  <div class="brand">DAVID MILÁN STUDIO</div>
+  <h1>Mega-Test Premium</h1>
+  <h2>Tema 4: Memoria Episódica (Organización y Recuerdo)</h2>
+
+  <div id="quiz-screen">
+    <div class="topbar">
+      <div class="stat" id="progress-text">Pregunta 1</div>
+      <div class="stat" id="score-tracker">Puntuación: 0</div>
+      <div class="stat" id="mode-text">Modo completo</div>
+    </div>
+    <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+    <div class="question-card">
+      <div class="question" id="question-text"></div>
+      <div class="options" id="options-container"></div>
+      <div id="feedback-container" class="feedback"></div>
+      <div class="controls">
+        <button class="btn secondary-btn" onclick="restartQuiz()">Reiniciar test</button>
+        <button id="next-btn" class="btn next-btn" onclick="nextQuestion()">Siguiente pregunta</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="result-screen" class="score-container">
+    <div class="score-text" id="final-score"></div>
+    <div class="medal" id="medal-text"></div>
+    <div class="result-message" id="final-message"></div>
+    <div id="missed-summary" class="missed-box"></div>
+    <div class="controls" style="justify-content:center;">
+      <button class="btn secondary-btn" onclick="restartQuiz()">Volver a intentar todo</button>
+      <button class="btn next-btn" id="retry-missed-btn" onclick="retryMissed()">Reintentar preguntas falladas</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const originalQuestions = [
+        // 1. INTRODUCCIÓN
+        { q: "Endel Tulving acuñó el término 'memoria episódica' para diferenciar el recuerdo de eventos específicos de la memoria que almacena conocimiento generalizado. Esta última se denomina:", o: ["Memoria icónica.", "Memoria semántica.", "Memoria procedimental."], c: 1, e: "La memoria episódica se diferencia de la memoria semántica, que es la que almacena el conocimiento generalizado sobre el mundo." },
+        { q: "La capacidad de la memoria episódica de retroceder mentalmente para revivir experiencias y proyectarnos al futuro se denominó por Tulving como:", o: ["Ensayo elaborativo.", "Organización subjetiva.", "Viaje mental en el tiempo (mental time travel)."], c: 2, e: "Tulving lo denominó «viaje mental en el tiempo»: la capacidad de retroceder mentalmente y revivir experiencias pasadas, así como de proyectarnos hacia el futuro." },
+        { q: "Para que el sistema episódico distinga un evento particular de otros, requiere tres elementos fundamentales. ¿Cuáles son?", o: ["Codificación diferenciada, almacenamiento duradero y un método de búsqueda/recuperación.", "Bucle fonológico, agenda visoespacial y ejecutivo central.", "Codificación semántica, repaso de mantenimiento y consolidación sistémica."], c: 0, e: "Requiere tres elementos fundamentales: un sistema que permita codificar esa experiencia... un método para almacenar ese evento... y un método para buscar y recuperar ese recuerdo particular." },
+        { q: "En el estudio de Conway et al. sobre el material de un curso de psicología, ¿qué ocurría con la información tras unos meses (a diferencia del recuerdo reciente)?", o: ["Se olvidaba completamente debido al decaimiento.", "Se mantenía como un recuerdo episódico puro y detallado.", "Se separaba del recuerdo del evento de aprendizaje y se incorporaba a la memoria semántica."], c: 2, e: "Cuando se evaluó meses después, esta información se había separado del recuerdo del evento de aprendizaje y se había incorporado a la memoria semántica (al menos en buenos estudiantes)." },
+        { q: "La psicología de la memoria ha sido influenciada por dos tradiciones clásicas. ¿Cuál de ellas estudiaba la memoria con objetivos estrictamente controlados evitando el significado?", o: ["La tradición de Ebbinghaus.", "La tradición de Bartlett.", "La tradición de Craik y Lockhart."], c: 0, e: "La tradición de Ebbinghaus estudiaba la memoria mediante experimentos claramente especificados con objetivos estrictamente controlados, evitando el significado." },
+
+        // 2. ENFOQUE DE BARTLETT
+        { q: "Frente a Ebbinghaus, Frederick Bartlett fue pionero de un enfoque naturalista utilizando:", o: ["Sílabas sin sentido (CVC).", "Material complejo como dibujos y cuentos populares de culturas desconocidas.", "Secuencias de números aleatorios."], c: 1, e: "Bartlett eligió deliberadamente estudiar el recuerdo de material complejo, como dibujos y cuentos populares de culturas desconocidas." },
+        { q: "En su estudio clásico, Bartlett presentó a sus estudiantes un cuento nativo americano. ¿Cómo se titulaba?", o: ["La leyenda del zorro astuto.", "La guerra de los fantasmas.", "El mito de Gerald Martin."], c: 1, e: "Presentó a sus estudiantes un cuento popular de los nativos americanos titulado «La guerra de los fantasmas»." },
+        { q: "Al evaluar el recuerdo de este cuento, Bartlett encontró que la historia recordada por los participantes tendía a ser:", o: ["Más larga y detallada que el original.", "Exactamente igual, demostrando memoria fotográfica.", "Más corta, más coherente y ajustada al punto de vista del participante."], c: 2, e: "Lo que Bartlett encontró fue que la historia recordada siempre era más corta, más coherente y tendía a ajustarse más al punto de vista del participante que la historia original." },
+        { q: "El concepto propuesto por Bartlett que destaca que el participante no es pasivo, sino que intenta activamente captar la esencia y dar sentido al material, se llama:", o: ["Aprendizaje incidental.", "Esfuerzo por el significado (effort after meaning).", "Organización subjetiva."], c: 1, e: "Esfuerzo por el significado (effort after meaning): resalta el esfuerzo del participante por encontrar significado, intentando captar la esencia." },
+        { q: "Bartlett postuló un concepto clave para explicar cómo damos sentido al material nuevo basándonos en el conocimiento a largo plazo influido por la cultura. Se trata del concepto de:", o: ["Esquema.", "Dígito-span.", "Priming."], c: 0, e: "Concepto de esquema: una representación estructurada a largo plazo del conocimiento que es utilizada para dar sentido al material nuevo." },
+        { q: "En «La guerra de los fantasmas», la frase original «algo negro le salió de la boca» se recordaba frecuentemente como «echó espuma por la boca». Esto es un ejemplo de:", o: ["Extinción pavloviana.", "Distorsión esquemática para ajustarlo a las expectativas culturales.", "Efecto Hebb."], c: 1, e: "Los rasgos desconcertantes se racionalizaban distorsionándolos para ajustarlos a las expectativas del lector (interpretación culturalmente familiar)." },
+        { q: "Gauld y Stephenson (1967) criticaron metodológicamente a Bartlett, demostrando que gran parte de los errores se debían a:", o: ["El uso de palabras abstractas.", "Adivinación deliberada impulsada por instrucciones vagas.", "Una falla en la agenda visoespacial."], c: 1, e: "Gauld y Stephenson encontraron que instrucciones claras que enfatizaban la necesidad de un recuerdo preciso eliminaban casi la mitad de los errores, sugiriendo que eran adivinación deliberada." },
+        { q: "Sulin y Dooling (1974) presentaron una misma historia sobre un dictador llamándolo 'Gerald Martin' o 'Adolf Hitler'. ¿Qué observaron?", o: ["Que el nombre no influía en el recuerdo en absoluto.", "Los que leyeron 'Hitler' creían erróneamente haber leído sobre la persecución a los judíos, distorsionando el recuerdo por sus esquemas.", "Que los que leyeron 'Gerald Martin' recordaban la historia al revés."], c: 1, e: "Los participantes a quienes se dijo que trataba sobre Hitler eran mucho más propensos a creer incorrectamente que habían leído sobre la persecución a los judíos, debido a su conocimiento esquemático." },
+        { q: "¿En qué intervalo de retención descubrieron Sulin y Dooling que esta distorsión esquemática (sobre Hitler) era evidente?", o: ["Solo en un intervalo breve (cinco minutos).", "Tanto a los cinco minutos como a la semana.", "En un intervalo largo (una semana), pero no en el breve (cinco minutos)."], c: 2, e: "Su conocimiento esquemático sobre Hitler distorsionó sus recuerdos en un intervalo de retención largo (una semana), pero no en uno breve (cinco minutos)." },
+        { q: "En el estudio de Carmichael et al. (1932), se presentaban estímulos ambiguos (ej. un dibujo que podía ser 'gafas' o 'pesas'). ¿Qué ocurría al pedirles que los dibujaran de memoria?", o: ["Dibujaban círculos perfectos sin relación.", "Sus dibujos estaban fuertemente influenciados por la etiqueta verbal que les habían asignado.", "No lograban recordar nada."], c: 1, e: "Sus dibujos estaban fuertemente influenciados por la etiqueta que les habían asignado." },
+        { q: "Prentice (1954) repitió el experimento de los dibujos ambiguos pero evaluó la memoria mediante reconocimiento en lugar de recuerdo. ¿Qué sucedió?", o: ["El sesgo o efecto de la etiqueta verbal desapareció.", "El sesgo fue el doble de fuerte.", "Los participantes sufrieron amnesia temporal."], c: 0, e: "Cuando se utilizó reconocimiento en lugar de recuerdo... el efecto de la etiqueta desapareció. La información se almacenó bien, el sesgo ocurría en la recuperación al dibujar." },
+        { q: "Bower, Karlin y Dueck (1975) pidieron a participantes recordar patrones sin sentido llamados 'droodles'. El recuerdo mejoraba enormemente cuando:", o: ["Se les administraba cafeína.", "El droodle iba acompañado de una etiqueta interpretativa (claves contextuales).", "Se les pedía contar las líneas del dibujo."], c: 1, e: "El recuerdo mejoró enormemente cuando cada droodle iba acompañado de una etiqueta interpretativa... las claves activan esquemas apropiados." },
+
+        // 3. SIGNIFICADO E IMAGINERÍA
+        { q: "En 1928, Glaze demostró empíricamente que no todas las sílabas sin sentido eran iguales. Descubrió que:", o: ["Las que sugerían palabras significativas (alta asociación) eran más fáciles de recordar.", "Las más difíciles de pronunciar se recordaban mejor.", "Todas tenían exactamente la misma tasa de olvido."], c: 0, e: "Glaze hizo que evaluaran si la sílaba sugería palabras (ej. CAS sugiere castillo). Las sílabas clasificadas como más significativas son más fáciles de recordar." },
+        { q: "Deese (1959) demostró mediante el método de recuerdo libre que las listas de palabras altamente asociadas entre sí (ej. pan-mantequilla) eran:", o: ["Más difíciles de recordar por efecto de interferencia.", "Más fáciles de recordar que listas con pocas asociaciones.", "Recordadas exclusivamente si eran monosílabas."], c: 1, e: "Demostró que las listas de palabras altamente asociadas entre sí eran más fáciles de recordar que las listas con pocas asociaciones." },
+        { q: "Jenkins y Russell (1952) observaron que, en una lista mixta, palabras asociadas como 'hilo, aguja, remendar', aunque se presentaran separadas, tendían a:", o: ["Olvidarse juntas.", "Recordarse como un grupo o cluster.", "Provocar bloqueos perceptivos."], c: 1, e: "Tendían a recordarse como un grupo o cluster, demostrando el impacto de las asociaciones preexistentes." },
+        { q: "El investigador responsable de subrayar la enorme importancia de la imaginería visual en la memoria y proponer la hipótesis de codificación dual fue:", o: ["Allen Paivio.", "Endel Tulving.", "George Sperling."], c: 0, e: "Allen Paivio, el responsable de este descubrimiento, estudió la imaginabilidad y propuso la hipótesis de codificación dual." },
+        { q: "Según la hipótesis de codificación dual (dual-coding hypothesis) de Paivio, las palabras concretas e imaginables se aprenden mejor porque:", o: ["Tienen menos letras que las abstractas.", "Se codifican tanto visualmente como verbalmente, aportando dos rutas hacia la recuperación.", "Pasan directamente al hipocampo sin codificarse."], c: 1, e: "Pueden codificarse tanto visualmente como verbalmente... de modo que si una ruta se pierde, la otra podría sobrevivir y permitir el recuerdo." },
+        { q: "Según la hipótesis de codificación dual, palabras abstractas como 'virtud' o 'esperanza' se diferencian de las concretas en que:", o: ["Solo se codifican visualmente.", "Solo se codifican verbalmente, dejándoles una única ruta de recuperación.", "No pueden codificarse en la MLP."], c: 1, e: "Las palabras abstractas, en cambio, solo se codifican verbalmente, lo que les deja una única ruta de recuperación." },
+
+        // 4. PREDICTIBILIDAD
+        { q: "Una forma de medir el grado de redundancia o predictibilidad de un texto es eliminando cada quinta palabra para que el participante la adivine. ¿Cómo se llama esta técnica?", o: ["Método del ahorro.", "Tarea de Stroop.", "Técnica Cloze."], c: 2, e: "Técnica Cloze, en la que se presenta un pasaje del que se ha eliminado cada quinta palabra, y la tarea es adivinar las palabras que faltan." },
+        { q: "¿Qué relación demostró la técnica Cloze entre la redundancia de un texto y su memorabilidad?", o: ["A mayor redundancia y predictibilidad, más fácil es recordar el texto.", "La redundancia provoca olvido por aburrimiento.", "No hay ninguna relación entre la legibilidad y la memoria."], c: 0, e: "Cuanto más redundante y predecible es un fragmento de prosa, más fácil es recordarlo (Rubenstein y Aborn, 1958)." },
+
+        // 5. NIVELES DE PROCESAMIENTO
+        { q: "Para explicar por qué el significado facilita el aprendizaje, Craik y Lockhart (1972) propusieron que la durabilidad de la huella mnésica depende de:", o: ["La forma o nivel de profundidad en que se procesa el material.", "El almacén anatómico concreto donde reside.", "El número de veces exacto que se lee la palabra."], c: 0, e: "Enfatizando que la forma en que se procesa el material (niveles de profundidad) determina su durabilidad en la MLP." },
+        { q: "En el experimento de Craik y Tulving (1975) sobre los niveles de procesamiento, preguntar '¿Está esta palabra en mayúsculas?' induce un:", o: ["Procesamiento fonológico.", "Procesamiento visual superficial.", "Procesamiento semántico profundo."], c: 1, e: "Procesamiento visual superficial: ¿Está esta palabra en mayúsculas o minúsculas?" },
+        { q: "En el mismo experimento, preguntar '¿Esta palabra rima con perro?' corresponde a un nivel de procesamiento:", o: ["Visual.", "Semántico.", "Fonológico."], c: 2, e: "Procesamiento fonológico: ¿Esta palabra rima con «perro»?" },
+        { q: "En la evaluación final de Craik y Tulving, ¿qué nivel de procesamiento produjo el mejor recuerdo posterior?", o: ["El visual superficial.", "El fonológico.", "El semántico profundo (ej. ¿Encaja en la oración?)."], c: 2, e: "Craik y Tulving encontraron que cuanto mayor había sido la profundidad de procesamiento (semántico profundo), mejor era el recuerdo posterior." },
+        { q: "En el estudio de Craik y Tulving, el efecto de recuerdo profundo fue especialmente marcado para las preguntas cuya respuesta era 'sí'. ¿A qué se atribuye esto?", o: ["A que la palabra se integraba más estrechamente con la pregunta/oración, creando una imagen rica.", "A que la palabra 'sí' es más corta que 'no'.", "A un sesgo de positividad general."], c: 0, e: "Para los ítems positivos ('sí'), la palabra a recordar se integraba más estrechamente con la pregunta de codificación, como en 'El caballo vivía en un campo'." },
+        { q: "¿Mejora el recuerdo simplemente por dedicar más tiempo a la tarea (hipótesis del tiempo total)?", o: ["Sí, el tiempo total es el único factor determinante.", "No, Craik y Tulving demostraron que una tarea superficial lenta (ej. contar vocales) no mejoraba el recuerdo.", "Solo si el tiempo se gasta durmiendo."], c: 1, e: "Craik y Tulving enlentecieron tareas superficiales (contar vocales) y no encontraron mejor reconocimiento, descartando la hipótesis del tiempo total." },
+        { q: "Hyde y Jenkins (1973) estudiaron 22 tareas de codificación diferentes. Sus hallazgos concluyeron que el principio del nivel de procesamiento:", o: ["Tenía un apoyo general e influía notablemente sobre la memoria.", "Era falso y no se sostenía empíricamente.", "Solo funcionaba con números, no con palabras."], c: 0, e: "Encontraron apoyo general para una influencia importante del nivel de procesamiento sobre la memoria." },
+
+        // 6. LÍMITES DE LoP
+        { q: "Uno de los principales problemas o límites del enfoque de niveles de procesamiento es la dificultad objetiva para:", o: ["Medir la profundidad de procesamiento (ya que el tiempo no es un indicador válido).", "Encontrar participantes para los estudios.", "Diferenciar entre letras mayúsculas y minúsculas."], c: 0, e: "Un problema reconocido... es la dificultad de medir la profundidad de procesamiento, ya que utilizar el tiempo no funciona." },
+        { q: "Otra crítica a los niveles de procesamiento es que el cerebro no sigue siempre un orden serial estricto (visión, luego sonido, luego significado), sino que evidencia procesamiento:", o: ["Lineal regresivo.", "Exclusivamente acústico.", "En paralelo (varias características a la vez)."], c: 2, e: "Evidencia creciente sugiere que muchas características diferentes podrían procesarse al mismo tiempo, en lugar del orden serial estricto asumido." },
+
+        // 7. TAP
+        { q: "El principio que establece que para revelar el aprendizaje previo, los requisitos de la prueba deben coincidir con las condiciones de codificación se llama:", o: ["Disonancia cognitiva.", "Procesamiento apropiado para la transferencia (TAP).", "Teoría del decaimiento temporal."], c: 1, e: "Procesamiento apropiado para la transferencia (TAP): establece que los requisitos de procesamiento de la prueba deben coincidir con las condiciones de codificación." },
+        { q: "Morris, Bransford y Franks (1977) demostraron el TAP. Si la evaluación final consistía en una prueba de reconocimiento de RIMAS, ¿qué procesamiento previo era mejor?", o: ["El procesamiento semántico profundo.", "El procesamiento fonológico (basado en rimas) superó al semántico.", "Ninguno de los dos."], c: 1, e: "Ocurrió lo contrario con el reconocimiento de rimas: la tarea de codificación superficial basada en rimas condujo a un mejor rendimiento." },
+        { q: "Según la matización del principio TAP (Fisher y Craik, 1977), ¿el procesamiento profundo es inútil?", o: ["Sí, el procesamiento profundo no sirve de nada.", "No, solo tiene sentido hablar de eficiencia según cómo se evalúa, aunque el procesamiento profundo suele aportar una ventaja general.", "Depende únicamente de la edad del sujeto."], c: 1, e: "Ambos grupos coinciden en que solo tiene sentido hablar de eficiencia en el contexto de la evaluación, aunque el profundo tiende a aportar una ventaja en condiciones amplias." },
+
+        // 8. REPASO E INTENCIÓN
+        { q: "¿Por qué la codificación semántica profunda tiende a ser ventajosa en la mayoría de condiciones de prueba estándar (Craik y Tulving, 1975)?", o: ["Porque ignora las vocales.", "Porque permite crear un código más rico y elaborado, lo que facilita su recuperación.", "Porque inhibe la corteza visual primaria."], c: 1, e: "Sugieren que la codificación semántica es ventajosa porque permite un código más rico y elaborado, que a su vez se vuelve más fácilmente recuperable." },
+        { q: "La repetición mecánica de un número de teléfono para mantenerlo activo al mismo nivel de profundidad es un ejemplo de:", o: ["Repaso elaborativo.", "Organización jerárquica.", "Repaso de mantenimiento (maintenance rehearsal)."], c: 2, e: "Repaso de mantenimiento: implica continuar procesando un ítem al mismo nivel. La repetición mecánica de un número de teléfono sería un buen ejemplo." },
+        { q: "Vincular el material que se está aprendiendo con otros conocimientos en la memoria, generando conexiones significativas, se denomina:", o: ["Repaso de mantenimiento.", "Repaso elaborativo (elaborative rehearsal).", "Aprendizaje incidental rígido."], c: 1, e: "Repaso elaborativo: implica vincular el material que se está repasando con otro material en la memoria... mejora el aprendizaje a largo plazo." },
+        { q: "Glenberg et al. (1977) hicieron que los sujetos leyeran palabras repetidamente para impedirles repasar números. Al evaluar las palabras, hallaron que:", o: ["Un enorme aumento de repeticiones de mantenimiento condujo a una mejora masiva del recuerdo.", "Un aumento de 9 veces en las repeticiones solo incrementó el recuerdo un 1,5%, mostrando la ineficacia del repaso de mantenimiento para el recuerdo.", "Los participantes olvidaron cómo hablar."], c: 1, e: "Un aumento de nueve veces en el número de repeticiones condujo a solo un 1,5% de incremento en el recuerdo... demostrando que el repaso de mantenimiento aporta poco al aprendizaje a largo plazo." },
+        { q: "Sin embargo, el estudio de Mechanic demostró que el repaso de mantenimiento (repetir en voz alta) sí ayudaba a recordar cuando:", o: ["El material era palabras ya conocidas.", "Las sílabas eran sin sentido y desconocidas, reforzando su representación fonológica al no haber 'chunks' naturales.", "Se presentaban junto a imágenes violentas."], c: 1, e: "En Mechanic, las sílabas eran desconocidas y no formaban chunks... repetirlas probablemente reforzaba su representación en la MLP fonológica." },
+        { q: "El experimento de clasificación de tarjetas de Mandler (1967) comparó el aprendizaje incidental (organizar sin saber que habría prueba) con el intencional (saber que habrá prueba). ¿Qué demostró?", o: ["Que la intención de aprender es el único factor crítico para el éxito.", "Que organizar las palabras por significado de forma incidental lograba el mismo nivel de recuerdo que esforzarse intencionalmente por aprender.", "Que los participantes que no querían aprender bloquearon su memoria."], c: 1, e: "El grupo al que se pidió organizar las palabras por significado (incidental) lo hizo igual de bien que los participantes instruidos para aprender (intencional)." },
+        { q: "Por lo tanto, la implicación práctica principal del estudio de Mandler sobre la intención de aprender es que:", o: ["Lo importante no es el deseo o la intención, sino la forma en que se procesa y organiza el material.", "Basta con querer recordar algo para que se grave a fuego.", "La memoria humana es completamente aleatoria."], c: 0, e: "Lo importante no es el deseo de recordar, sino la forma en que se procesa el material." },
+
+        // 9. ORGANIZACIÓN
+        { q: "Tulving (1962) observó que, al presentar listas de palabras en orden mezclado repetidamente, los participantes tendían a crear agrupaciones consistentes entre ensayos. A esto lo denominó:", o: ["Procesamiento superficial.", "Técnica Cloze.", "Organización subjetiva."], c: 2, e: "El aprendizaje consistía en construir chunks cada vez más grandes, un proceso que Tulving denominó organización subjetiva." },
+        { q: "Si una lista contiene palabras vinculadas a una categoría (ej. hilo, alfiler, dedal), el recuerdo mejora por:", o: ["Organización categorial semántica.", "El efecto Von Restorff.", "La codificación acústica."], c: 0, e: "La organización tiende a reflejar variables semánticas. Si pertenecen a la misma categoría, el recuerdo será notablemente superior." },
+        { q: "Tulving y Pearlstone (1966) mostraron que si los participantes olvidaban una categoría entera durante el recuerdo, podían recuperar las palabras si:", o: ["Se les administraba un choque eléctrico.", "Se les proporcionaba el nombre de la categoría omitida como clave.", "Leían el texto al revés."], c: 1, e: "No estaban completamente olvidadas: cuando se proporcionaban los nombres de las categorías, se recordaban nuevas palabras de las categorías omitidas." },
+        { q: "Bower et al. (1969) organizaron palabras de minerales en una estructura lógica. Comparado con la presentación desordenada, el rendimiento fue:", o: ["Peor (19% frente a 65%).", "Idéntico, probando que la estructura no afecta la MLP.", "Mucho mejor (65% de aciertos frente al 19% del material desordenado)."], c: 2, e: "En la condición jerárquica promediaron un 65% de aciertos comparado con solo un 19% cuando las mismas palabras estaban desordenadas." },
+        { q: "Broadbent et al. (1978) demostraron que, si el material no permite una jerarquía pura, un beneficio considerable puede obtenerse estructurándolo en:", o: ["Una matriz (tabla cruzando categorías).", "Un bucle circular iterativo.", "Líneas de colores sin sentido."], c: 0, e: "Un beneficio considerable también puede obtenerse estructurando el material en una matriz (tabla cruzando categorías)." },
+        { q: "La 'técnica narrativa' consiste en vincular las palabras de una lista en una historia. Según Campoy y Baddeley, su desventaja es que:", o: ["Resulta muy exigente y existe el peligro de recordar palabras inventadas (intrusiones) que se incluyeron para hacer buena la historia.", "Solo funciona en sujetos bilingües.", "Causa amnesia temporal para los números."], c: 0, e: "Es bastante exigente... existe el peligro de recordar palabras que se incluyeron para hacer una buena historia pero que no estaban en la lista original." },
+        { q: "Un método más flexible para vincular ítems que crear historias es usar:", o: ["Repetición mecánica monosilábica.", "La imaginería visual (imaginarlos interactuando, aunque sea de forma absurda).", "El olvido motivado."], c: 1, e: "Un método más flexible es el basado en la imaginería visual, en el que los ítems se vinculan imaginándolos interactuando (ej. un cisne en moto)." },
+
+        // 10. EXPERTOS Y LTWM
+        { q: "En el estudio de Chase y Ericsson (1982), el estudiante SF aumentó su amplitud de dígitos a través de 200 sesiones utilizando una estrategia basada en:", o: ["Repetir los números en un tono musical agudo.", "Codificar los grupos de dígitos como tiempos de carreras de atletismo (conocimiento en el que era experto).", "Cálculos logarítmicos avanzados."], c: 1, e: "Ideó formas de codificar los dígitos sucesivos en términos de tiempos de carrera (4-3-8 como 4 minutos 38 segundos)." },
+        { q: "A partir de estos hallazgos con expertos, Ericsson y Kintsch (2006) desarrollaron el concepto de:", o: ["Memoria de trabajo a largo plazo (LTWM).", "Amnesia anterógrada por estrés.", "Efecto de similitud fonológica profunda."], c: 0, e: "Desarrollaron el concepto de memoria de trabajo a largo plazo (long-term working memory, LTWM)." },
+        { q: "Los calculistas expertos de Japón (ábaco mental) alcanzan amplitudes de dígitos de 16, pero su amplitud para recordar letras es normal. Esto demuestra que la LTWM:", o: ["Es específica del dominio de expertise.", "Ocurre en todo tipo de conocimiento por igual.", "Aumenta la inteligencia general de forma permanente."], c: 0, e: "Su amplitud para letras es normal, lo que demuestra la especificidad del dominio de la LTWM." },
+        { q: "A diferencia del modelo multicomponente de Memoria de Trabajo (MT) clásica de Baddeley, la Memoria de Trabajo a Largo Plazo (LTWM):", o: ["Tiene una capacidad estrictamente fija de 4 chunks.", "Solo usa el hemisferio derecho.", "No tiene una capacidad fija, pues depende del desarrollo de estructuras de conocimiento en la MLP."], c: 2, e: "La MT clásica asume capacidad limitada. La LTWM, por su parte, no tiene una capacidad fija, refiriéndose a cualquier situación donde una habilidad compleja accede a conocimiento de un dominio." },
+
+        // 11. SERIACIÓN
+        { q: "¿Funciona el 'encadenamiento' (chaining - asociar un ítem al siguiente) en la Memoria a Largo Plazo (MLP)?", o: ["La evidencia sugiere que sí, como cuando sabemos qué canción sigue en un CD conocido.", "Es absolutamente imposible según las pruebas.", "Solo en la memoria a corto plazo visual."], c: 0, e: "Ciertas experiencias cotidianas sugieren que algo parecido al encadenamiento sí podría funcionar en la MLP: por ejemplo, al escuchar un CD sabemos qué canción sigue." },
+        { q: "Oliver y Ericsson estudiaron a actores de Shakespeare pidiéndoles que dijeran la palabra siguiente tras una clave. Obtuvieron un recuerdo muy alto y rápido, sugiriendo que:", o: ["Usaban marcadores seriales innatos.", "Adivinaban aleatoriamente.", "El encadenamiento desempeña un papel clave en el recuerdo serial a largo plazo."], c: 2, e: "Esto sugiere que el encadenamiento podría desempeñar un papel en el recuerdo serial a largo plazo que no tiene en la MCP." },
+        { q: "El fenómeno por el cual el recuerdo de una secuencia de dígitos que supera la amplitud mejora gradualmente si esa misma secuencia se repite sin avisar cada tres ensayos, se denomina:", o: ["Efecto Hebb.", "Efecto Von Restorff.", "Viaje temporal acústico."], c: 0, e: "El efecto Hebb: el rendimiento en la secuencia repetida mejora gradualmente, sugiriendo un componente de aprendizaje a largo plazo." },
+        { q: "Según Hitch, Flude y Burgess (2009), el efecto Hebb se diferencia de las tareas de memoria a corto plazo verbal porque:", o: ["No es sensible ni a la similitud fonológica ni a la supresión articulatoria.", "Desaparece si el sujeto sabe leer.", "Requiere una agudeza visual extrema."], c: 0, e: "El efecto Hebb no era sensible ni a la similitud fonológica ni a la supresión articulatoria, reforzando la separación entre componentes." },
+        { q: "La neuroimagen demostró que el aprendizaje de secuencias del efecto Hebb se asocia con áreas vinculadas al aprendizaje a largo plazo, concretamente:", o: ["El cerebelo y la médula espinal.", "El hipocampo, los lóbulos temporales y la ínsula.", "La corteza motora primaria."], c: 1, e: "Se asocia con áreas previamente conocidas por estar relacionadas con el aprendizaje a largo plazo, a saber, el hipocampo, los lóbulos temporales y la ínsula." },
+        { q: "Earhard (1967) descubrió que requerir a los participantes que recordaran una lista de palabras en un orden serial estricto mejoraba el rendimiento de:", o: ["Quienes ya eran excelentes agrupando en 'chunks'.", "Quienes eran peores en hacer 'chunking'.", "Aquellos con amnesia retrógrada profunda."], c: 1, e: "Cuando se les requirió recordar en un orden fijo... los que eran peores en el chunking realmente mejoraron su rendimiento." },
+        { q: "Una aplicación práctica de la estrategia serial para asegurar no olvidar nada es el uso del 'cockpit de cartón' (cardboard cockpit) para que los pilotos:", o: ["Jueguen durante el vuelo real.", "Dominen la secuencia rígida de comprobación de instrumentos de memoria.", "Se protejan del sol en la cabina."], c: 1, e: "Permitía a los pilotos llevar el cockpit de cartón a casa y dominar la secuencia de comprobaciones por su cuenta." },
+
+        // 12. CEREBRO Y PLASTICIDAD
+        { q: "Clayton y Dickinson (1999) demostraron que la memoria episódica conductual (qué, dónde y cuándo) no es exclusivamente humana. Lo probaron en:", o: ["Monos rhesus que escondían plátanos.", "Arrendajos (scrub jays) que recordaban cuándo y dónde escondieron gusanos o cacahuetes.", "Ratones en el laberinto de agua de Morris."], c: 1, e: "Permitieron a arrendajos esconder dos tipos de alimento (gusanos y cacahuetes)... demostrando que las aves recuerdan qué escondieron, dónde y cuándo." },
+        { q: "El caso clásico en neuropsicología que confirmó la importancia del hipocampo en la formación de recuerdos (tras una cirugía bilateral) es el del paciente:", o: ["KF.", "HM.", "Phineas Gage."], c: 1, e: "En el ámbito de la neuropsicología humana, el caso clásico es el de HM, que se volvió densamente amnésico tras una cirugía bilateral... hipocampo." },
+        { q: "Aggleton y Brown sugirieron que una memoria de reconocimiento bien preservada en pacientes con daño hipocampal se sostiene gracias a:", o: ["La corteza rinal y perirrinal.", "El cuerpo calloso.", "El lóbulo occipital lateral."], c: 0, e: "Sugirieron que la corteza rinal y perirrinal podrían sostener el reconocimiento incluso cuando el hipocampo está dañado." },
+        { q: "El caso del paciente Jon (Vargha-Khadem et al., 1997), que sufrió anoxia al nacer con daño en el hipocampo, fue sorprendente porque:", o: ["Desarrolló una excelente memoria semántica a pesar del daño, desafiando que la semántica dependa siempre de la episódica.", "Olvidó su propio nombre pero recordaba rostros.", "Desarrolló un hipocampo del doble de tamaño."], c: 0, e: "Ha desarrollado una inteligencia por encima de la media y excelente memoria semántica. Esto choca con la suposición de que la memoria semántica depende del hipocampo." },
+        { q: "En estudios de neuroimagen sobre la codificación (Wagner et al., 1998), recordar palabras activa el área frontal izquierda, mientras que codificar y recordar escenas visuales complejas activa:", o: ["El área frontal izquierda en exclusiva.", "El área frontal derecha.", "La amígdala cerebelosa."], c: 1, e: "La diferencia en la lateralización frontal (derecha para escenas visuales, izquierda para palabras) refleja la asociación entre hemisferio izquierdo y lenguaje." },
+        { q: "En el estudio de Maguire et al. (2001, 2006), se observó que la modificación estructural o 'plasticidad' en los taxistas expertos de Londres radicaba en que tenían:", o: ["El cerebelo mucho más grande.", "Un mayor volumen en el hipocampo posterior y menor en el anterior respecto a los conductores de autobús.", "El hipocampo totalmente atrofiado."], c: 1, e: "Los taxistas tenían un mayor volumen de materia gris en el área medio-posterior del hipocampo, y menos en la anterior, que los conductores de autobús." },
+        { q: "Esta amplia representación espacial desarrollada por los taxistas expertos les supuso un 'coste' cognitivo. Eran significativamente peores que los autobuseros en:", o: ["Recordar señales de tráfico.", "Una tarea de nuevo aprendizaje visoespacial (copiar y reproducir de memoria una figura compleja).", "Hablar correctamente el idioma."], c: 1, e: "En una tarea de nuevo aprendizaje (copiar y reproducir una figura compleja), los taxistas eran significativamente peores... construyeron su representación espacial a costa de una reducción en la capacidad para nuevo aprendizaje." },
+        { q: "Tulving (1985) propuso que una función importante de la memoria episódica es el viaje mental en el tiempo, cuya finalidad última es:", o: ["Dormir sin pesadillas.", "Utilizar la experiencia pasada para predecir e imaginar el futuro.", "Revivir exclusivamente los traumas infantiles."], c: 1, e: "Tulving etiquetó este proceso como viaje mental en el tiempo, enfatizando la importancia de la memoria episódica para predecir el futuro." },
+        { q: "Schacter et al. (2007) usaron RMf para pedir a los participantes que combinaran episodios pasados para imaginar un escenario futuro. Encontraron que:", o: ["Se activaban las mismas áreas del hipocampo y del lóbulo frontal tanto al recordar el pasado como al crear el futuro.", "El cerebro se silenciaba por completo al pensar en el futuro.", "Solo se activaba la corteza visual."], c: 0, e: "Encontraron las mismas áreas del hipocampo activadas tanto en el recuerdo inicial como en la creación posterior del escenario futuro, implicando también actividad frontal." },
+        { q: "En línea con esto, Hassabis et al. (2007) observaron que los pacientes amnésicos (con daño en memoria episódica) presentaban una gran dificultad para:", o: ["Comer sin ayuda.", "Llevar a cabo la tarea de pensamiento futuro (imaginar nuevas experiencias).", "Reconocer colores básicos."], c: 1, e: "Evidencia adicional proviene de la observación de que los pacientes amnésicos tienen una gran dificultad para llevar a cabo la tarea de pensamiento futuro." },
+
+        // 13 y 14. CONCEPTOS CLAVE FINALES
+        { q: "Según la definición técnica de los conceptos clave, el nivel o profundidad de procesamiento (Craik y Lockhart) determina la memoria no por el almacén en el que está el ítem, sino por:", o: ["El grado en que un estímulo se procesa en términos de su significado.", "La intensidad acústica en decibelios a la que se presenta.", "El color de la tinta de la palabra."], c: 0, e: "Profundidad de procesamiento: Grado en que un estímulo se procesa en términos de su significado. Cuanto más profundo, mejor retención." },
+        { q: "El aprendizaje incidental, paradigma muy utilizado para investigar los niveles de procesamiento, se caracteriza por:", o: ["Exigir al alumno que memorice esforzadamente la lista.", "Someter al participante a estrés eléctrico para consolidar.", "Ser una situación en la que el aprendiz no sabe que habrá una prueba de retención posterior."], c: 2, e: "Aprendizaje incidental: Situación en la que el aprendiz no sabe que habrá una prueba de retención." },
+        { q: "En conclusión, el enfoque de niveles de procesamiento tuvo que ser matizado por el principio de Procesamiento Apropiado para la Transferencia (TAP) para evidenciar que:", o: ["La ventaja del procesamiento profundo depende de que haya congruencia entre cómo se codificó y el tipo de evaluación.", "Las rimas siempre generan mejores recuerdos que las oraciones.", "La memoria semántica y episódica son la misma cosa."], c: 0, e: "TAP matiza los niveles de procesamiento al mostrar que la ventaja del procesamiento profundo depende del tipo de prueba (congruencia codificación-recuperación)." },
+        { q: "¿Qué nombre recibe el efecto descubierto por Deese de que las palabras asociadas en una lista mixta (como hilo, aguja y remendar) se agrupan al ser recuperadas?", o: ["Organización por amnesia retrógrada.", "Disonancia categorial.", "Clustering (agrupamiento) por fuerza asociativa."], c: 2, e: "Palabras asociadas... tendían a recordarse como un grupo o cluster (agrupamiento). El aprendizaje se facilita con fuertes asociaciones." }
+    ];
+
+let questions=[...originalQuestions],currentQuestion=0,score=0,answered=false,missedQuestions=[],retryMode=false;
+const questionText=document.getElementById('question-text'),optionsContainer=document.getElementById('options-container'),feedbackContainer=document.getElementById('feedback-container'),nextBtn=document.getElementById('next-btn'),progressText=document.getElementById('progress-text'),scoreTracker=document.getElementById('score-tracker'),quizScreen=document.getElementById('quiz-screen'),resultScreen=document.getElementById('result-screen'),finalScore=document.getElementById('final-score'),finalMessage=document.getElementById('final-message'),progressBar=document.getElementById('progress-bar'),missedSummary=document.getElementById('missed-summary'),retryMissedBtn=document.getElementById('retry-missed-btn'),modeText=document.getElementById('mode-text'),medalText=document.getElementById('medal-text');
+
+function loadQuestion(){
+answered=false;feedbackContainer.style.display='none';feedbackContainer.className='feedback';feedbackContainer.innerHTML='';nextBtn.style.display='none';
+const q=questions[currentQuestion],total=questions.length,percent=Math.round((currentQuestion/total)*100);
+progressText.innerText=`Pregunta ${currentQuestion+1} de ${total}`;
+progressBar.style.width=`${percent}%`;
+modeText.innerHTML=retryMode?'<span class="mode-label">Modo repaso: falladas</span>':'Modo completo';
+questionText.innerText=`${currentQuestion+1}. ${q.q}`;
+optionsContainer.innerHTML='';
+q.o.forEach((opt,index)=>{const btn=document.createElement('button');btn.className='option-btn';btn.innerText=opt;btn.onclick=()=>selectOption(index,btn);optionsContainer.appendChild(btn);});
+}
+
+function selectOption(index,btn){
+if(answered)return;answered=true;
+const q=questions[currentQuestion],allBtns=optionsContainer.querySelectorAll('.option-btn');
+allBtns.forEach(b=>b.disabled=true);
+const correctText=q.o[q.c];
+if(index===q.c){
+btn.classList.add('correct');score++;scoreTracker.innerText=`Puntuación: ${score}`;
+feedbackContainer.classList.add('show','feedback-correct');
+feedbackContainer.innerHTML=`<strong>Correcto.</strong><span class="solution-label">Por qué es correcto:</span>${q.e}`;
+}else{
+btn.classList.add('incorrect');allBtns[q.c].classList.add('correct');
+if(!missedQuestions.some(item=>item.q===q.q)){missedQuestions.push(q)}
+feedbackContainer.classList.add('show','feedback-incorrect');
+feedbackContainer.innerHTML=`<strong>Respuesta equivocada.</strong><br>Has marcado: <b>${q.o[index]}</b><br>La solución correcta es: <b>${correctText}</b><span class="solution-label">Por qué esa es la solución correcta:</span>${q.e}`;
+}
+nextBtn.style.display='block';
+nextBtn.innerText=currentQuestion===questions.length-1?'Ver resultados':'Siguiente pregunta';
+}
+
+function nextQuestion(){currentQuestion++;if(currentQuestion<questions.length){loadQuestion()}else{showResults()}}
+
+function showResults(){
+quizScreen.style.display='none';resultScreen.style.display='block';progressBar.style.width='100%';
+const percentage=Math.round((score/questions.length)*100);
+finalScore.innerHTML=`Has acertado ${score} de ${questions.length} preguntas (${percentage}%)`;
+if(percentage>=90)medalText.innerText='🏆 Medalla de Oro · Dominio excelente';
+else if(percentage>=75)medalText.innerText='🥈 Medalla de Plata · Muy buen nivel';
+else if(percentage>=60)medalText.innerText='🥉 Medalla de Bronce · Base aprobada';
+else medalText.innerText='📚 Modo refuerzo · Conviene repasar';
+let message='';
+if(percentage>=90)message='Magistral. Dominas los experimentos, procesos, organización, esquemas y correlatos neurocognitivos de la memoria episódica.';
+else if(percentage>=70)message='Gran trabajo. Repasa las falladas para afinar Bartlett, niveles de procesamiento, TAP, organización y plasticidad hipocampal.';
+else message='Conviene repasar autores clásicos, niveles de procesamiento, estrategias de organización, recuerdo episódico y evidencias clínicas/neuronales.';
+finalMessage.innerText=message;
+if(missedQuestions.length>0){
+missedSummary.style.display='block';
+missedSummary.innerHTML=`<h3>Preguntas falladas: ${missedQuestions.length}</h3><ul>${missedQuestions.map((q,i)=>`<li>${i+1}. ${q.q}</li>`).join('')}</ul>`;
+retryMissedBtn.style.display='inline-block';
+}else{
+missedSummary.style.display='block';
+missedSummary.innerHTML='<h3>No has fallado ninguna pregunta.</h3><p>Resultado perfecto. No hay preguntas que reintentar.</p>';
+retryMissedBtn.style.display='none';
+}
+}
+
+function retryMissed(){
+if(missedQuestions.length===0)return;
+questions=[...missedQuestions];missedQuestions=[];currentQuestion=0;score=0;retryMode=true;
+scoreTracker.innerText='Puntuación: 0';resultScreen.style.display='none';quizScreen.style.display='block';nextBtn.innerText='Siguiente pregunta';loadQuestion();
+}
+
+function restartQuiz(){
+questions=[...originalQuestions];currentQuestion=0;score=0;answered=false;missedQuestions=[];retryMode=false;
+scoreTracker.innerText='Puntuación: 0';quizScreen.style.display='block';resultScreen.style.display='none';nextBtn.innerText='Siguiente pregunta';loadQuestion();
+}
+
+loadQuestion();
+</script>
+</body>
+</html>

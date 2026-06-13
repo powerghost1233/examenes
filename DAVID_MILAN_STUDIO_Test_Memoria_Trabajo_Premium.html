@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memoria de Trabajo Premium | DAVID MILÁN STUDIO</title>
+<style>
+:root{
+--bg:#05070d;--bg2:#0b1323;--gold:#d4af37;--gold2:#f3d98b;--white:#f8f4e8;
+--muted:#aab3c5;--green:#33d17a;--red:#ff6b6b;--blue:#4da3ff
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+min-height:100vh;font-family:'Segoe UI',Arial,sans-serif;
+background:radial-gradient(circle at top left,rgba(212,175,55,.22),transparent 34%),
+radial-gradient(circle at bottom right,rgba(30,90,180,.28),transparent 38%),
+linear-gradient(135deg,var(--bg),var(--bg2),#05070d);
+color:var(--white);display:flex;justify-content:center;align-items:center;padding:35px 18px
+}
+.quiz-container{
+width:100%;max-width:980px;
+background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.035));
+border:1px solid rgba(212,175,55,.28);border-radius:30px;padding:34px;
+box-shadow:0 30px 90px rgba(0,0,0,.45);backdrop-filter:blur(18px)
+}
+.brand{display:inline-block;padding:10px 18px;border-radius:999px;border:1px solid rgba(212,175,55,.45);color:var(--gold2);letter-spacing:3px;font-weight:800;font-size:13px;margin-bottom:18px;background:rgba(255,255,255,.04)}
+h1{font-size:clamp(30px,5vw,54px);line-height:1;margin-bottom:10px;letter-spacing:-1px;background:linear-gradient(90deg,#fff,var(--gold2));-webkit-background-clip:text;color:transparent}
+h2{font-size:17px;color:var(--muted);font-weight:400;margin-bottom:26px}
+.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:24px}
+.stat{padding:12px 16px;border-radius:16px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.1);color:var(--gold2);font-weight:800}
+.progress-wrap{height:10px;background:rgba(255,255,255,.09);border-radius:999px;overflow:hidden;margin-bottom:24px}
+.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:999px;transition:.35s ease}
+.question-card{background:rgba(4,8,16,.55);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:26px}
+.question{font-size:21px;font-weight:800;line-height:1.45;margin-bottom:22px}
+.options{display:grid;gap:13px}
+.option-btn{border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:16px 18px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.035));color:var(--white);font-size:16px;text-align:left;cursor:pointer;transition:.25s ease}
+.option-btn:hover:not(:disabled){transform:translateY(-2px);border-color:rgba(212,175,55,.65);box-shadow:0 12px 30px rgba(212,175,55,.12)}
+.option-btn:disabled{cursor:not-allowed;opacity:.95}
+.correct{background:rgba(51,209,122,.16)!important;border-color:var(--green)!important;color:#dfffea!important}
+.incorrect{background:rgba(255,107,107,.16)!important;border-color:var(--red)!important;color:#ffe0e0!important}
+.feedback{display:none;margin-top:22px;padding:20px;border-radius:20px;line-height:1.65;font-size:15px}
+.feedback.show{display:block}
+.feedback-correct{background:rgba(51,209,122,.12);border-left:5px solid var(--green)}
+.feedback-incorrect{background:rgba(255,107,107,.12);border-left:5px solid var(--red)}
+.feedback strong{font-size:18px}
+.solution-label{display:block;margin-top:12px;color:var(--gold2);font-weight:900}
+.controls{margin-top:22px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center}
+.btn{border:none;border-radius:16px;padding:14px 22px;font-weight:900;font-size:15px;cursor:pointer;transition:.25s ease}
+.btn:hover{transform:translateY(-2px)}
+.next-btn{display:none;background:linear-gradient(135deg,var(--gold2),var(--gold));color:#080b12}
+.secondary-btn{background:rgba(255,255,255,.08);color:var(--white);border:1px solid rgba(255,255,255,.14)}
+.score-container{display:none;text-align:center;padding:24px}
+.score-text{font-size:30px;font-weight:900;color:var(--gold2);margin-bottom:18px}
+.result-message{color:var(--muted);font-size:17px;line-height:1.6;margin-bottom:24px}
+.medal{display:inline-block;margin:14px 0 10px;padding:12px 18px;border-radius:999px;border:1px solid rgba(212,175,55,.45);background:rgba(212,175,55,.10);color:var(--gold2);font-weight:900}
+.missed-box{text-align:left;margin:24px 0;padding:20px;border-radius:20px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.1)}
+.missed-box h3{color:var(--gold2);margin-bottom:12px}
+.missed-box ul{padding-left:20px;color:#dbe2f2;line-height:1.6}
+.mode-label{color:var(--blue);font-weight:900}
+@media(max-width:650px){.quiz-container{padding:22px}.question-card{padding:20px}.question{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="quiz-container">
+  <div class="brand">DAVID MILÁN STUDIO</div>
+  <h1>Mega-Test Premium</h1>
+  <h2>Tema 3: Memoria de Trabajo (Arquitectura Cognitiva)</h2>
+
+  <div id="quiz-screen">
+    <div class="topbar">
+      <div class="stat" id="progress-text">Pregunta 1</div>
+      <div class="stat" id="score-tracker">Puntuación: 0</div>
+      <div class="stat" id="mode-text">Modo completo</div>
+    </div>
+    <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+    <div class="question-card">
+      <div class="question" id="question-text"></div>
+      <div class="options" id="options-container"></div>
+      <div id="feedback-container" class="feedback"></div>
+      <div class="controls">
+        <button class="btn secondary-btn" onclick="restartQuiz()">Reiniciar test</button>
+        <button id="next-btn" class="btn next-btn" onclick="nextQuestion()">Siguiente pregunta</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="result-screen" class="score-container">
+    <div class="score-text" id="final-score"></div>
+    <div class="medal" id="medal-text"></div>
+    <div class="result-message" id="final-message"></div>
+    <div id="missed-summary" class="missed-box"></div>
+    <div class="controls" style="justify-content:center;">
+      <button class="btn secondary-btn" onclick="restartQuiz()">Volver a intentar todo</button>
+      <button class="btn next-btn" id="retry-missed-btn" onclick="retryMissed()">Reintentar preguntas falladas</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const originalQuestions = [
+        // 1. DEL MODELO MODAL A LA MT
+        { q: "Según el modelo modal de Atkinson y Shiffrin (1968), ¿qué componente actúa como el 'cuello de botella' de la arquitectura cognitiva por el que debe pasar toda la información?", o: ["El almacén a largo plazo (ALP).", "El registro sensorial ecoico.", "El almacén a corto plazo (ACP)."], c: 2, e: "El ACP, según este modelo, es un sistema de capacidad limitada por el que toda información debe pasar actuando como cuello de botella." },
+        { q: "¿Qué cuestionaron teóricamente Craik y Lockhart (1972) sobre el modelo modal clásico?", o: ["Que el ACP tuviera relación con el aprendizaje verbal.", "Que el tiempo de almacenamiento en el ACP garantizara el aprendizaje; demostraron que lo vital era la profundidad del procesamiento.", "Que el modelo pudiera aplicarse a la memoria visual."], c: 1, e: "Craik y Lockhart cuestionaron el supuesto de que mantener ítems garantizara su aprendizaje. Propusieron el principio de niveles de procesamiento." },
+        { q: "¿Cuál fue el principal problema neuropsicológico del modelo modal evidenciado por los pacientes descritos por Shallice y Warrington (1970)?", o: ["Eran incapaces de recordar su identidad a pesar de tener un ACP normal.", "Presentaban un ACP muy deteriorado (span de 2), pero sus capacidades de aprendizaje y razonamiento eran normales.", "Habían perdido exclusivamente la memoria de trabajo musical."], c: 1, e: "Pacientes con span de 2 (ACP deteriorado) no mostraban déficits globales de memoria o de razonamiento en su vida diaria, refutando las predicciones del modelo." },
+        { q: "¿Qué nombre recibe el hecho de que si el ACP fuera el centro del aprendizaje complejo, un daño en él debería ser cognitivamente devastador, pero en la realidad no lo era?", o: ["Amnesia de fuente.", "Efecto de inhibición proactiva.", "Paradoja neuropsicológica."], c: 2, e: "Se conoce como la paradoja neuropsicológica: si el ACP es vital para el pensamiento, un daño debería ser devastador. Como no lo era, el ACP no podía ser un sistema monolítico." },
+        { q: "Para comprobar experimentalmente la función de la MCP, Baddeley y Hitch (1974) diseñaron un procedimiento que consistía en:", o: ["Someter a los sujetos a aislamiento sensorial extremo.", "Simular el déficit del ACP obligando a participantes sanos a retener secuencias de dígitos mientras resolvían tareas complejas.", "Eliminar el lóbulo temporal en monos de laboratorio."], c: 1, e: "Simularon en sanos el déficit sobrecargando su ACP con retención de dígitos mientras hacían tareas cognitivas para ver si el rendimiento colapsaba." },
+        { q: "En el experimento de Baddeley y Hitch (1974), ¿qué ocurrió con la tarea de razonamiento al cargar la capacidad máxima de 8 dígitos?", o: ["La tasa de errores subió al 90%, demostrando un bloqueo total.", "El tiempo aumentaba sistemáticamente, pero la tasa de errores se mantenía constante en torno al 5%.", "Mejoraron sus tiempos de respuesta exponencialmente."], c: 1, e: "El tiempo de verificación aumentaba (hasta un 50%), pero la tasa de errores se mantenía constante. No se desbarataba completamente el rendimiento." },
+        { q: "La conclusión principal del experimento de Baddeley y Hitch (1974) fue que la memoria a corto plazo no era un almacén unitario, sino:", o: ["Una red puramente asociativa localizada en el cerebelo.", "Un conjunto de componentes especializados capaces de operar en paralelo (memoria de trabajo).", "Una simple extensión pasiva del lóbulo parietal."], c: 1, e: "Concluyeron que debía existir un sistema más complejo: no un almacén unitario, sino componentes especializados operando en paralelo, llamado memoria de trabajo." },
+        { q: "Al introducir el término 'working memory' (memoria de trabajo), los autores pretendían subrayar su función como sistema que sustenta:", o: ["Solo la retención de rostros.", "El pensamiento y la actividad mental compleja frente al mero almacenamiento pasivo.", "La activación puramente refleja."], c: 1, e: "El énfasis en «trabajo» tenía el propósito explícito de disociarlo de los modelos centrados en el almacenamiento y subrayar su rol en el pensamiento complejo." },
+
+        // 2. MODELO MULTICOMPONENTE
+        { q: "En la versión actual del modelo multicomponente de Baddeley y Hitch, ¿cuáles son los cuatro subsistemas que lo integran?", o: ["Bucle fonológico, agenda visoespacial, ejecutivo central y búfer episódico.", "Registro ecoico, registro icónico, ACP y MLP.", "Almacén semántico, almacén episódico, sistema perceptivo y control motor."], c: 0, e: "El modelo actual incluye: bucle fonológico, agenda visoespacial, ejecutivo central y el búfer episódico (añadido en el 2000)." },
+        { q: "En la estructura jerárquica del modelo, ¿qué componente es el de mayor nivel y actúa como sistema de control atencional de los demás?", o: ["La agenda visoespacial.", "El ejecutivo central.", "El búfer episódico."], c: 1, e: "El ejecutivo central es el componente de mayor nivel, un sistema de control atencional que dirige a los 'sistemas esclavos'." },
+
+        // 3. EL BUCLE FONOLÓGICO
+        { q: "¿Qué déficit presentaba la paciente PV que ayudó a descubrir la función evolutiva real del bucle fonológico?", o: ["Tenía amnesia retrógrada total de su niñez.", "Tenía su bucle fonológico casi nulo, pero sus capacidades intelectuales generales eran normales.", "Incapacidad absoluta para procesar imágenes visuales."], c: 1, e: "PV tenía un bucle fonológico muy deteriorado pero capacidades intelectuales y mnésicas a largo plazo normales." },
+        { q: "¿En qué actividad cotidiana experimentaba pequeñas dificultades la paciente PV debido a su déficit fonológico?", o: ["Reconocer rostros familiares.", "Comprender oraciones largas donde debía retener las primeras palabras hasta el final.", "Caminar por su propio barrio."], c: 1, e: "Manifestaba problemas en la comprensión de oraciones largas donde era necesario retener las primeras palabras hasta el final." },
+        { q: "La hipótesis evolutiva más fecunda afirma que el bucle fonológico evolucionó originariamente como una herramienta para:", o: ["Controlar la locomoción bipedal.", "El aprendizaje de nuevas formas de palabra (desarrollo del lenguaje).", "Repetir números telefónicos."], c: 1, e: "La hipótesis es que habría evolucionado como herramienta para el aprendizaje del lenguaje, reteniendo secuencias de sonidos nuevas." },
+        { q: "En el experimento crítico, se le pidió a la paciente PV aprender asociaciones de su idioma italiano con palabras rusas (nuevas fonológicamente). El resultado fue que:", o: ["Aprendió el doble de rápido que los controles.", "No aprendió ni una sola palabra rusa tras diez ensayos.", "Pudo aprenderlas pero solo si las leía al revés."], c: 1, e: "PV no logró aprender ni una sola palabra rusa, ya que esto requería su dañado bucle fonológico para retener formas léxicas nuevas." },
+        { q: "En el mismo experimento, cuando PV debía aprender pares de palabras solo de su lengua materna (basándose en semántica), ¿cuál fue su rendimiento?", o: ["Peor que con el ruso.", "Completamente normal, ya que esto depende del sistema semántico y no del bucle.", "Nulo también."], c: 1, e: "Era completamente normal, ya que aprender vocabulario ya conocido depende de la codificación semántica (MLP), no de retener secuencias fonológicas novedosas." },
+        { q: "El estudio de Papagno et al. con supresión articulatoria comprobó que repetir en voz alta sonidos irrelevantes deterioraba fuertemente el aprendizaje de:", o: ["Palabras en una lengua extranjera nueva.", "Pares de palabras en la lengua materna.", "Imágenes de animales."], c: 0, e: "Deterioraba gravemente el aprendizaje cuando las palabras eran de una lengua extranjera, al bloquear el bucle fonológico que es esencial para este fin." },
+        { q: "¿Qué tarea diseñada por Gathercole demostró correlacionar excepcionalmente bien y ser el mejor predictor del desarrollo de vocabulario en niños pequeños?", o: ["La repetición de pseudopalabras.", "El test de bloques de Corsi.", "El dibujo libre."], c: 0, e: "La repetición de pseudopalabras fue el mejor predictor, porque exige retener secuencias fonológicas nuevas sin ayuda del conocimiento semántico." },
+        { q: "Los niños de 8 años con Trastorno Específico del Lenguaje (TEL), al repetir pseudopalabras, presentaban un rendimiento equivalente a niños de:", o: ["4 años.", "Su misma edad biológica.", "Adultos sanos."], c: 0, e: "Rindieron por debajo de los controles e incluso a un nivel equivalente al de niños de 4 años, sugiriendo un déficit del bucle fonológico." },
+        { q: "En el contexto de aprendizaje de idiomas en aulas (ej. inglés en Finlandia o Luxemburgo), la MCP fonológica demostró ser consistentemente:", o: ["Irrelevante frente al nivel de atención visual.", "Un mal predictor en bilingües.", "El mejor predictor del éxito y adquisición de nuevo vocabulario."], c: 2, e: "El vínculo entre el bucle fonológico y la adquisición de vocabulario en segundas lenguas es uno de los hallazgos más replicados." },
+        { q: "Baddeley et al. (2001) demostraron que el bucle fonológico también se usa para el control de la acción (cambio de tarea) mediante:", o: ["Visión periférica remota.", "Instrucciones subvocales para 'llevar la cuenta' (ej. recordar si toca sumar o restar).", "Inhibición de la médula espinal."], c: 1, e: "La alternancia de tareas (sumar/restar) caía con la supresión articulatoria, porque los participantes usaban el bucle para la instrucción subvocal de control." },
+
+        // 4. LA AGENDA VISOESPACIAL Y LA IMAGINERÍA
+        { q: "Al investigar la imaginería visual subjetiva, Heuer et al. (1986) encontraron que algunas personas que informaban tener imágenes mentales extraordinariamente vívidas:", o: ["Rendían siempre de forma perfecta en memoria visual objetiva.", "Rendían peor en memoria visual, pues usaban la viveza como falso indicador de exactitud.", "Padecían de prosopagnosia severa."], c: 1, e: "Personas con imágenes muy vívidas rendían peor porque usaban la viveza como indicador de exactitud, siendo vulnerables a recuerdos erróneos pero convincentes." },
+        { q: "En la tarea de 'doblar papel' mentalmente de Shepard y Feng, el tiempo de respuesta del participante era directamente proporcional a:", o: ["El nivel de ruido ambiental.", "El número de dobleces imaginados, demostrando manipulación de imágenes en tiempo real.", "Su nivel de glucosa."], c: 1, e: "El tiempo era proporcional al número de dobleces imaginados, sugiriendo manipulación mental análoga a la física." },
+        { q: "Los estudios de imaginería creativa de Finke muestran que, para crear mentalmente objetos nuevos ensamblando partes, el sistema requiere:", o: ["Únicamente la memoria declarativa semántica a largo plazo.", "La coordinación de la agenda visoespacial (para crearla) y el bucle fonológico (para retener los nombres de las partes).", "Un bloqueo total del ejecutivo central."], c: 1, e: "Depende de la agenda visoespacial para sintetizar la forma y del bucle fonológico para mantener los nombres de las figuras simultáneamente." },
+        { q: "Los expertos japoneses en ábaco mental consiguen memorizar listas de hasta 16 dígitos porque codifican la información en:", o: ["El bucle fonológico superdesarrollado.", "El búfer episódico verbal.", "El subsistema visoespacial mediante el uso de la imagen del ábaco."], c: 2, e: "Ellos logran ese span porque codifican los números visual y espacialmente en el ábaco, esquivando la limitación normal del bucle fonológico." },
+        { q: "En los expertos de ábaco mental, una tarea de supresión articulatoria (verbal) afectaba poco a su recuerdo, mientras que se veía muy deteriorado si realizaban:", o: ["Una tarea de interferencia espacial concurrente.", "Una lectura rápida.", "Un cálculo matemático escrito."], c: 0, e: "Una tarea de interferencia espacial deterioraba drásticamente su span, demostrando su dependencia de la agenda visoespacial." },
+        { q: "La agenda visoespacial está compuesta por dos subsistemas que procesan características diferentes, conocidos comúnmente como sistemas del:", o: ["'Qué' (visual) y del 'Dónde' (espacial).", "'Arriba' y 'Abajo'.", "'Claro' y 'Oscuro'."], c: 0, e: "Hay una disociación interna: memoria espacial de localización (dónde) y memoria visual de objetos (qué)." },
+        { q: "El simple hecho de rastrear una fuente sonora en movimiento con los ojos vendados es capaz de perturbar gravemente tareas de:", o: ["Pronunciación de pseudopalabras.", "Imaginería puramente visual (colores).", "Imaginería espacial (porque demanda recursos de localización)."], c: 2, e: "Perturba la imaginería espacial, porque la demanda clave es el seguimiento de la localización espacial de la fuente, no la modalidad visual en sí misma." },
+        { q: "Si a un sujeto se le pide recordar el color y forma de un objeto (imaginería visual) su rendimiento se reduce significativamente si concurrentemente:", o: ["Se le presentan destellos visuales o colores irrelevantes.", "Se le hace caminar por un pasillo.", "Se le hace repetir la sílaba 'ta'."], c: 0, e: "La imaginería basada en objetos visuales es perturbada por estímulos visuales irrelevantes, demostrando interferencia de modalidad específica." },
+
+        // 5. EL EJECUTIVO CENTRAL
+        { q: "El marco teórico que Baddeley adoptó para explicar el funcionamiento del ejecutivo central es el modelo atencional formulado por:", o: ["Atkinson y Shiffrin.", "Norman y Shallice.", "Tulving y Squire."], c: 1, e: "Se adoptó el modelo de Norman y Shallice (1986), que distingue entre control automático y el Sistema de Atención Supervisora." },
+        { q: "Según Norman y Shallice, las acciones rutinarias que consumen poca atención (como conducir al trabajo a diario) son gestionadas por:", o: ["El ejecutivo central de alto nivel.", "El control automático basado en hábitos.", "La agenda espacial automática."], c: 1, e: "Son gestionadas por un sistema de control automático basado en hábitos y resolución de conflictos de baja demanda atencional." },
+        { q: "Si las acciones entran en conflicto, hay una situación novedosa o debemos inhibir un hábito, el modelo de Norman y Shallice propone la intervención de:", o: ["El Sistema de Atención Supervisora (SAS).", "El circuito límbico amigdalino.", "El almacén a largo plazo."], c: 0, e: "En esos casos entra en juego el SAS, que consume recursos atencionales, equivalente al ejecutivo central." },
+        { q: "En el ajedrez (Robbins et al.), generar números aleatoriamente afectaba catastróficamente la elección de la jugada, demostrando la implicación crítica de:", o: ["El bucle fonológico.", "El ejecutivo central (Foco atencional).", "La corteza motora primaria."], c: 1, e: "La generación aleatoria es altamente demandante del ejecutivo central, y su impacto demostró que planificar en el ajedrez depende de este componente." },
+        { q: "En el estudio de conducción de Brown et al. y Strayer et al., hablar por teléfono o realizar tareas verbales mientras se conduce afecta principalmente a:", o: ["La destreza manual del volante.", "La dilatación de las pupilas.", "Las decisiones de supervisión (como frenar a tiempo o juzgar huecos), porque monopoliza el ejecutivo central."], c: 2, e: "No afecta las manos, sino las decisiones ejecutivas del cerebro (juzgar huecos, responder al semáforo) porque el ejecutivo central queda ocupado." },
+        { q: "Un paciente clínico que recorta la misma cinta terapéutica una y otra vez, frustrado, sabiendo que está mal pero siendo incapaz de inhibir la acción padece de:", o: ["Conducta de utilización.", "Perseveración (daño en control ejecutivo frontal).", "Apraxia del habla."], c: 1, e: "La perseveración es repetir una acción sin poder inhibirla, un rasgo típico de un fallo del SAS por daño frontal." },
+        { q: "Si el paciente responde ciegamente a los estímulos del entorno (usando una taza ajena o jeringuillas del médico) sin control superior, muestra:", o: ["Conducta de utilización.", "Confabulación temporal.", "Reflejo miotático exagerado."], c: 0, e: "La conducta de utilización es la respuesta indiscriminada a los 'affordances' del entorno por falta de supervisión ejecutiva." },
+        { q: "Un paciente amnésico relata una biografía falsa con total convicción. Esta falla del ejecutivo central para monitorizar la realidad se llama:", o: ["Agnosia visual.", "Confabulación.", "Demencia vascular semántica."], c: 1, e: "La confabulación es la producción de recuerdos falsos con convicción por fallos en el sistema frontal de monitorización." },
+        { q: "Un déficit neuropsicológico muy específico de la Enfermedad de Alzheimer en etapas tempranas se evidencia de forma clara y desproporcionada al pedirles:", o: ["Dividir la atención entre dos tareas simultáneas (doble tarea).", "Repetir una pseudopalabra simple.", "Recordar su propio nombre."], c: 0, e: "Muestran un déficit desproporcionado en doble tarea, que depende directamente de la coordinación del ejecutivo central." },
+        { q: "En el experimento de Alzheimer y doble tarea, lo que causa la caída desproporcionada del rendimiento de estos pacientes es:", o: ["La alta dificultad aislada de cada tarea.", "El propio acto específico de combinar y supervisar simultáneamente las dos tareas.", "La ansiedad al ver a los investigadores."], c: 1, e: "No es la carga en sí (si se hacen difíciles por separado rinden como controles), sino el acto de combinarlas simultáneamente (función ejecutiva neta)." },
+
+        // 6. EL BÚFER EPISÓDICO
+        { q: "¿Por qué Baddeley decidió agregar el Búfer Episódico en el año 2000 al modelo original de tres componentes?", o: ["Porque el ejecutivo central había demostrado ser inútil.", "Para explicar la profunda interacción e integración de información entre la MT, sus subsistemas y la Memoria a Largo Plazo.", "Para explicar la memoria olfativa pura."], c: 1, e: "Se añadió para explicar fenómenos de integración multimodal y la conexión MT-MLP (ej. el span de 15 en oraciones gracias al chunking semántico)." },
+        { q: "El span de memoria para palabras aleatorias es de 5 o 6, pero para palabras en una frase gramatical llega a 15. Esto evidencia la actuación de:", o: ["El búfer episódico integrando reglas semánticas y sintácticas desde la MLP con el material a corto plazo.", "Solo del bucle fonológico hiperactivado.", "El lóbulo occipital."], c: 0, e: "Ese incremento ocurre por la descarga de conocimiento desde la MLP para agrupar (chunking), unificado temporalmente en el búfer episódico." },
+        { q: "¿Cuál de las siguientes es una característica principal del Búfer Episódico?", o: ["Carece de límites de capacidad.", "Posee un código multimodal y una capacidad de unos 4 chunks.", "Solo almacena representaciones puramente fonológicas."], c: 1, e: "Sus propiedades: código multimodal, interfaz MT-MLP, accesible a la conciencia y capacidad limitada (4 chunks)." },
+        { q: "Para crear mentalmente la imagen nueva de 'un elefante jugando al hockey sobre hielo', es necesario el componente integrador de la memoria conocido como:", o: ["Agenda visoespacial pura.", "Búfer episódico.", "Ejecutivo central periférico."], c: 1, e: "El búfer episódico es el único capaz de combinar conocimiento semántico, imágenes de la MLP y crear un episodio novedoso integrado." },
+        { q: "Bernard Baars propuso que la conciencia sirve para integrar flujos de información en un espacio de trabajo. Baddeley inicialmente relacionó esto con:", o: ["El registro ecoico preatencional.", "El búfer episódico.", "El bucle articulatorio motor."], c: 1, e: "Baddeley vinculó el búfer episódico con la teoría del espacio global de la conciencia de Baars." },
+        { q: "Estudios posteriores demostraron que el 'binding' (ligadura) visual de formas y colores se producía de forma:", o: ["Extremadamente lenta.", "Automática, operando sin un requerimiento masivo del ejecutivo central.", "Imposible en pacientes sanos."], c: 1, e: "Allen, Baddeley y Hitch mostraron que el binding visual es automático, modificando la visión del búfer episódico hacia un ente más pasivo." },
+        { q: "Tras los descubrimientos sobre el binding automático, Baddeley modificó la concepción del búfer episódico. Actualmente se le considera más como:", o: ["Un operador activo que exige muchísima energía atencional.", "Una 'pantalla pasiva' donde se proyecta el resultado de la integración automática controlada desde otros sistemas.", "Un mito de la psicología cognitiva."], c: 1, e: "Pasó de concebirse como un escenario activo (Baars) a una pantalla pasiva de integración donde cristalizan las representaciones." },
+        
+        // 7. DIFERENCIAS INDIVIDUALES Y APLICACIONES
+        { q: "La tarea clásica de Daneman y Carpenter que mide el 'span de Memoria de Trabajo' consiste en:", o: ["Leer oraciones y, al final de la serie, recordar la última palabra de cada oración en orden.", "Memorizar tableros de ajedrez.", "Tocar bloques lumínicos que se encienden en un panel."], c: 0, e: "La tarea exigía leer las oraciones (procesamiento) y retener su última palabra (almacenamiento) de forma simultánea." },
+        { q: "La principal diferencia funcional entre las pruebas clásicas de span simple (MCP) y las pruebas de span de MT (como la de lectura) es que las de MT requieren:", o: ["Solo almacenamiento.", "Simultáneamente almacenamiento temporal y procesamiento cognitivo activo.", "Conocimientos matemáticos previos profundos."], c: 1, e: "El span de MT exige la doble demanda de almacenar los estímulos mientras se procesa activamente información paralela." },
+        { q: "El span de MT ha demostrado correlacionar fuertemente (en torno a r = .50) y predecir de forma muy eficaz:", o: ["La miopía a temprana edad.", "La comprensión lectora global y el razonamiento fluido.", "La velocidad de carrera en atletas de élite."], c: 1, e: "Predice excelentemente la comprensión lectora, el seguimiento de instrucciones, e incluso puntuaciones de inteligencia fluida (Raven)." },
+        { q: "Según las observaciones de Gathercole, los niños escolares con muy baja MT son típicamente calificados de manera errónea por los profesores como:", o: ["Psicópatas infantiles.", "Agresivos y disruptivos.", "Soñadores, desatentos o faltos de esfuerzo."], c: 2, e: "Los profesores no detectan la caída en MT y los describen como soñadores, inatentos y que pierden el hilo." },
+        { q: "Klingberg propuso con su programa Cogmed que se podía entrenar la MT de niños con TDAH. Según las revisiones posteriores (Melby-Lervåg), la realidad clínica es:", o: ["El entrenamiento cura el TDAH en un 90% a largo plazo.", "Hay ganancias de laboratorio a corto plazo, pero no hay evidencia sólida de mejoras o transferencias duraderas a la vida real.", "Produce efectos secundarios letales."], c: 1, e: "Los metaanálisis muestran ganancias a corto plazo, pero carecen de evidencia sobre mejoras duraderas o generalizadas a entornos académicos reales." },
+        { q: "Baddeley considera actualmente que los entrenamientos de MT (como Cogmed) probablemente no mejoran el sistema entero, sino más bien:", o: ["Componentes ejecutivos específicos, como el foco atencional y la resistencia a distracciones.", "La longitud anatómica del nervio auditivo.", "Solo la agenda visoespacial estática."], c: 0, e: "Lo que mejora probablemente es la capacidad de foco atencional o inhibición ejecutiva, no la capacidad real de MT estructural." },
+
+        // 8. TEORÍAS ALTERNATIVAS DE LA MT
+        { q: "Para Nelson Cowan (Modelo de procesos embebidos), la Memoria de Trabajo NO es una estructura separada de la MLP, sino que consiste en:", o: ["Una base de datos de ARN genético.", "Representaciones ya almacenadas en la MLP que se activan temporalmente dirigidas por el foco atencional.", "Un módulo encapsulado en el cerebelo."], c: 1, e: "Cowan sostiene que es la misma MLP, pero cuyas huellas están activadas de manera inusualmente alta bajo el control de la atención." },
+        { q: "Según el modelo de Cowan, el foco atencional que mantiene los elementos activos en MT está limitado estructuralmente a unos:", o: ["15 chunks.", "7 chunks (como decía Miller).", "4 chunks."], c: 2, e: "Una de las marcas del modelo de Cowan es establecer el límite estricto del foco de atención en unos 4 chunks de información." },
+        { q: "A diferencia del búfer de Baddeley, Cowan afirma que cuando se forma un chunk nuevo en la MT, la información:", o: ["Se aloja puramente en un archivo nuevo borrando la memoria episódica.", "No crea un archivo nuevo, sino que usa 'punteros' a las localizaciones de memoria ya existentes en la MLP.", "Se transfiere a los glóbulos rojos."], c: 1, e: "Cowan dice que solo se usan punteros dirigidos a la MLP, mientras Baddeley piensa que la MT descarga representaciones nuevas independientes." },
+        { q: "El 'modelo de control inhibitorio' de Randy Engle sostiene que la gran capacidad predictiva de la MT en los tests se debe a su capacidad para:", o: ["Sumar más rápido.", "Inhibir la Interferencia Proactiva (IP) y los distractores irrelevantes.", "Ampliar la agenda visoespacial lateral."], c: 1, e: "Engle plantea que el predictor de éxito no es la capacidad de almacenaje puro, sino la fuerza ejecutiva para inhibir distractores (Interferencia Proactiva)." },
+        { q: "Los estudios de Engle demuestran que las personas con bajo span de MT son muy vulnerables en situaciones de escucha dicótica porque:", o: ["Son sordos funcionalmente.", "Tienen menos capacidad para ignorar y oyen su propio nombre en el mensaje irrelevante.", "Su bucle fonológico bloquea al ejecutivo."], c: 1, e: "Al no tener fuerza de inhibición ejecutiva, sucumben más al canal irrelevante (ej. oír su nombre), demostrando peor focalización de tareas." },
+        { q: "El modelo TBRS (Recursos Compartidos en el Tiempo) de Barrouillet y Camos sugiere que el olvido en MT se previene mediante:", o: ["Un mecanismo llamado 'refresco atencional' intermitente sobre la representación.", "Drogas colinérgicas administradas exógenamente.", "La repetición exclusivamente vocal a altos decibelios."], c: 0, e: "El modelo asume que hay una reconcentración de atención o refresco atencional (no necesariamente articulado subvocalmente) para mantener la huella viva." },
+        { q: "Para los modelos TBRS y de 'cambio de tarea', ¿qué determina verdaderamente el olvido cuando se hace una tarea secundaria de procesamiento?", o: ["La proporción del tiempo que la tarea secundaria mantiene secuestrada la atención central (su tasa de ocupación).", "La similitud ortográfica entre números y letras.", "Si la habitación tiene luz natural o artificial."], c: 0, e: "Lo crítico no es la dificultad abstracta, sino la ocupación continua de la atención que roba las 'ventanas de tiempo' donde ocurriría el refresco." },
+
+        // 9. NEUROCIENCIA Y CONCEPTOS CLAVE
+        { q: "Los pioneros registros de célula única realizados por Patricia Goldman-Rakic en macacos encontraron que ciertas neuronas del córtex prefrontal mostraban:", o: ["Muerte apoptótica al recordar un objeto.", "Activación persistente y sostenida en el intervalo de demora en el que el estímulo a recordar ya había desaparecido.", "Desconexión total para permitir operar a la médula."], c: 1, e: "Goldman-Rakic documentó el mantenimiento neurobiológico de la MT: neuronas que seguían disparando para guardar la huella tras ocultar el estímulo." },
+        { q: "Mediante el PET, Paulesu, Frith y Frackowiak (1993) confirmaron la anatomía del bucle fonológico, ubicando el proceso de repaso articulatorio en:", o: ["El lóbulo occipital posterior.", "La corteza frontal inferior (área de Broca).", "El núcleo caudado."], c: 1, e: "Separaron los componentes: área parieto-temporal para el almacén y el área de Broca para el repaso articulatorio (proceso motor)." },
+        { q: "Los estudios de neuroimagen de Smith y Jonides separaron la MT visoespacial comprobando que la memoria espacial pura del 'dónde' activa la vía:", o: ["Dorsal.", "Ventral.", "Olfactoria profunda."], c: 0, e: "Paralelamente al sistema visual primario de Ungerleider y Mishkin, la memoria espacial (dónde) es Dorsal, y la de objetos (qué) es Ventral." },
+        { q: "El metaanálisis de Duncan y Owen (2000) indicó que el ejecutivo central involucra prominentemente la región cerebral de:", o: ["El córtex visual estriado.", "La corteza cingulada anterior y los lóbulos frontales.", "El cerebelo vermis."], c: 1, e: "El control ejecutivo activa transversalmente áreas del lóbulo frontal, destacando la corteza cingulada anterior." },
+        { q: "A la pregunta de si 'la MT es simplemente MLP activada', Baddeley responde argumentando que:", o: ["Totalmente, y Cowan opina exactamente lo mismo al 100%.", "Decir eso no explica nada; el lenguaje también es MLP activada, pero la MT tiene su complejidad interactiva propia.", "Sí, es el único modelo matemáticamente comprobado."], c: 1, e: "Critica el planteamiento 'simplemente': es obvio que interacciona con la MLP, pero eso no es una explicación científica suficiente de sus propiedades funcionales." },
+        { q: "El Análisis Multivóxel de Patrones (MVPA) utilizado por Harrison y Tong asombró a la comunidad al demostrar que el contenido que retiene la MT visual puede ser 'leído' en:", o: ["El hígado del paciente.", "Las áreas visuales tempranas (córtex occipital), indicando mantenimiento mediante recursos sensoriales periféricos.", "La corteza motora voluntaria."], c: 1, e: "Mostraron que la huella de memoria visual activaba la corteza visual primaria igual que la percepción, validando un refresco de áreas sensoriales." },
+        { q: "Una lesión neurológica frontal que causa 'perseveración' genera en el paciente una:", o: ["Tendencia a repetir compulsivamente la misma acción o error a pesar de saber que es incorrecta, por falta de inhibición.", "Incapacidad para mover extremidades izquierdas.", "Ceguera cromática (solo ve en blanco y negro)."], c: 0, e: "Perseveración es repetir un esquema fallando en su inhibición central." },
+        { q: "La prueba de 'repetición de pseudopalabras' es clave para aislar y medir específicamente:", o: ["El bucle fonológico y el aprendizaje de palabras nuevas sin contaminación de la semántica previa.", "La agenda visoespacial espacial 3D.", "El grado de inteligencia fluida general."], c: 0, e: "Se usa porque, al no existir en la MLP de idioma, fuerza al sujeto a usar su bucle fonológico para almacenar el nuevo patrón fonético." },
+        { q: "La 'interferencia proactiva' a la que hace mención el modelo de Engle ocurre cuando:", o: ["Los estímulos nuevos bloquean los recuerdos de la infancia.", "Ítems aprendidos anteriormente perturban y compiten al recordar los ítems que estamos aprendiendo ahora.", "Las ondas electromagnéticas alteran el lóbulo temporal."], c: 1, e: "Interferencia proactiva: el pasado perturba la adquisición/recuerdo del presente." },
+        { q: "El 'span de operación' desarrollado por Turner y Engle correlaciona fuertemente con la inteligencia fluida porque en la prueba los participantes deben memorizar a la vez que:", o: ["Cantan.", "Mantienen el equilibrio.", "Resuelven problemas matemáticos/aritméticos."], c: 2, e: "En el span de operación el ítem va seguido de la resolución de un problema matemático, requiriendo MT pura para procesamiento + almacenamiento." },
+        { q: "A nivel teórico, Baddeley afirma que la información dentro del Búfer Episódico tiene la cualidad principal de ser recuperable a través de:", o: ["La médula espinal pura.", "La conciencia explícita del sujeto.", "Solo mediante hipnosis profunda."], c: 1, e: "Es el componente unificado multimodal directamente accesible y recuperable a través de la experiencia consciente presente." },
+        { q: "Si la Memoria de Trabajo solo fuese el Almacén a Corto Plazo pasivo que dictaba el Modelo Modal, el síntoma claro de sufrir una lesión del mismo sería sufrir también de forma inmediata:", o: ["Anestesia olfativa total.", "Déficits globales en el pensamiento, el razonamiento y un grave colapso de la memoria a largo plazo.", "Hiperactividad cardiaca."], c: 1, e: "El Modelo Modal decía que el ACP era el espacio global; su fallo debía crear un colapso generalizado del aprendizaje (la Paradoja de los pacientes contradice esto)." }
+    ];
+
+let questions=[...originalQuestions],currentQuestion=0,score=0,answered=false,missedQuestions=[],retryMode=false;
+const questionText=document.getElementById('question-text'),optionsContainer=document.getElementById('options-container'),feedbackContainer=document.getElementById('feedback-container'),nextBtn=document.getElementById('next-btn'),progressText=document.getElementById('progress-text'),scoreTracker=document.getElementById('score-tracker'),quizScreen=document.getElementById('quiz-screen'),resultScreen=document.getElementById('result-screen'),finalScore=document.getElementById('final-score'),finalMessage=document.getElementById('final-message'),progressBar=document.getElementById('progress-bar'),missedSummary=document.getElementById('missed-summary'),retryMissedBtn=document.getElementById('retry-missed-btn'),modeText=document.getElementById('mode-text'),medalText=document.getElementById('medal-text');
+
+function loadQuestion(){
+answered=false;feedbackContainer.style.display='none';feedbackContainer.className='feedback';feedbackContainer.innerHTML='';nextBtn.style.display='none';
+const q=questions[currentQuestion],total=questions.length,percent=Math.round((currentQuestion/total)*100);
+progressText.innerText=`Pregunta ${currentQuestion+1} de ${total}`;
+progressBar.style.width=`${percent}%`;
+modeText.innerHTML=retryMode?'<span class="mode-label">Modo repaso: falladas</span>':'Modo completo';
+questionText.innerText=`${currentQuestion+1}. ${q.q}`;
+optionsContainer.innerHTML='';
+q.o.forEach((opt,index)=>{const btn=document.createElement('button');btn.className='option-btn';btn.innerText=opt;btn.onclick=()=>selectOption(index,btn);optionsContainer.appendChild(btn);});
+}
+
+function selectOption(index,btn){
+if(answered)return;answered=true;
+const q=questions[currentQuestion],allBtns=optionsContainer.querySelectorAll('.option-btn');
+allBtns.forEach(b=>b.disabled=true);
+const correctText=q.o[q.c];
+if(index===q.c){
+btn.classList.add('correct');score++;scoreTracker.innerText=`Puntuación: ${score}`;
+feedbackContainer.classList.add('show','feedback-correct');
+feedbackContainer.innerHTML=`<strong>Correcto.</strong><span class="solution-label">Por qué es correcto:</span>${q.e}`;
+}else{
+btn.classList.add('incorrect');allBtns[q.c].classList.add('correct');
+if(!missedQuestions.some(item=>item.q===q.q)){missedQuestions.push(q)}
+feedbackContainer.classList.add('show','feedback-incorrect');
+feedbackContainer.innerHTML=`<strong>Respuesta equivocada.</strong><br>Has marcado: <b>${q.o[index]}</b><br>La solución correcta es: <b>${correctText}</b><span class="solution-label">Por qué esa es la solución correcta:</span>${q.e}`;
+}
+nextBtn.style.display='block';
+nextBtn.innerText=currentQuestion===questions.length-1?'Ver resultados':'Siguiente pregunta';
+}
+
+function nextQuestion(){currentQuestion++;if(currentQuestion<questions.length){loadQuestion()}else{showResults()}}
+
+function showResults(){
+quizScreen.style.display='none';resultScreen.style.display='block';progressBar.style.width='100%';
+const percentage=Math.round((score/questions.length)*100);
+finalScore.innerHTML=`Has acertado ${score} de ${questions.length} preguntas (${percentage}%)`;
+if(percentage>=90)medalText.innerText='🏆 Medalla de Oro · Dominio excelente';
+else if(percentage>=75)medalText.innerText='🥈 Medalla de Plata · Muy buen nivel';
+else if(percentage>=60)medalText.innerText='🥉 Medalla de Bronce · Base aprobada';
+else medalText.innerText='📚 Modo refuerzo · Conviene repasar';
+let message='';
+if(percentage>=90)message='Excelencia académica total. Dominas la arquitectura de la memoria de trabajo, sus componentes, modelos alternativos y bases neurocognitivas.';
+else if(percentage>=70)message='Muy buen trabajo. Repasa las falladas para afinar ejecutivo central, búfer episódico, bucle fonológico, agenda visoespacial y teorías alternativas.';
+else message='Conviene repasar la diferencia entre ACP, MCP y MT, los sistemas esclavos, el ejecutivo central, el búfer episódico y los modelos Cowan/Engle/TBRS.';
+finalMessage.innerText=message;
+if(missedQuestions.length>0){
+missedSummary.style.display='block';
+missedSummary.innerHTML=`<h3>Preguntas falladas: ${missedQuestions.length}</h3><ul>${missedQuestions.map((q,i)=>`<li>${i+1}. ${q.q}</li>`).join('')}</ul>`;
+retryMissedBtn.style.display='inline-block';
+}else{
+missedSummary.style.display='block';
+missedSummary.innerHTML='<h3>No has fallado ninguna pregunta.</h3><p>Resultado perfecto. No hay preguntas que reintentar.</p>';
+retryMissedBtn.style.display='none';
+}
+}
+
+function retryMissed(){
+if(missedQuestions.length===0)return;
+questions=[...missedQuestions];missedQuestions=[];currentQuestion=0;score=0;retryMode=true;
+scoreTracker.innerText='Puntuación: 0';resultScreen.style.display='none';quizScreen.style.display='block';nextBtn.innerText='Siguiente pregunta';loadQuestion();
+}
+
+function restartQuiz(){
+questions=[...originalQuestions];currentQuestion=0;score=0;answered=false;missedQuestions=[];retryMode=false;
+scoreTracker.innerText='Puntuación: 0';quizScreen.style.display='block';resultScreen.style.display='none';nextBtn.innerText='Siguiente pregunta';loadQuestion();
+}
+
+loadQuestion();
+</script>
+</body>
+</html>
